@@ -1,0 +1,5 @@
+# use glob syntax.
+syntax: glob
+
+# Ignore compiled *.class files.
+*.class
