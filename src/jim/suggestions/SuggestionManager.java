@@ -52,6 +52,20 @@ public class SuggestionManager {
      *  way of giving feedback than return-null.
      */
     public jim.journal.Command parseCommand(String args[]){
+        /*
+         * TODO: Here is where some of our time will be spent in V0.0,
+         * getting stuff like "add lunch Monday" (or some sensible command)
+         * to work.
+         * 
+         * Adding logic in TDD fashion is *ideal* for this kind of thing,
+         * I would think.
+         * 
+         * Once basic format rules have been established, (e.g. strict syntax for
+         * add, remove, etc.),
+         * THEN
+         * Any language logic here can infer fairly sensibly how to access Journal API.
+         * Journal API can then trust that this will be done sensibly by language logic.
+         */
         return null;
     }
 }
