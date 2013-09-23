@@ -15,6 +15,26 @@ public class SuggestionManager {
         
         return displayedSuggestions;
     }
+    
+    public String getCurrentSuggestion() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+    public void setCurrentSuggestionIndex(int i) {
+        
+    }
+    
+    public int getCurrentSuggestionIndex() {
+        return -1;
+    }
+    
+    public void nextSuggestion() {
+        setCurrentSuggestionIndex((getCurrentSuggestionIndex() + 1) % getSuggestionsToDisplay().size());
+    }
+    
+    public void prevSuggestion() {
+        setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1) % getSuggestionsToDisplay().size());
+    }
 
     /**
      * Update the current 'buffer' of content for the suggestion manager to process.
