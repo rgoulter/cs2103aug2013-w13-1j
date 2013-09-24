@@ -5,11 +5,20 @@ import java.util.List;
 
 public class SuggestionManager {
 
+	private static final String BLACK_COLOR = "</font>"; // Only use this to return to black from other color
+	private static final String RED_COLOR = "<font color='red'>";
+	private static final String BLUE_COLOR = "<font color='blue'>";
+	private static final String PURPLE_COLOR = "<font color='purple'>";
+	private static final String GREEN_COLOR = "<font color='green'>";
+	private static final String GREY_COLOR = "<font color='gray'>";
+	
+	private int highlightedLine = 0;
+	
     public List<String> getSuggestionsToDisplay() {
         List<String> displayedSuggestions = new ArrayList<String>();
 
-        displayedSuggestions.add("add <name> <date> <time>");
-        displayedSuggestions.add("remove <name>");
+        displayedSuggestions.add(BLUE_COLOR + "add" + BLACK_COLOR + " (name) (date) (time)");
+        displayedSuggestions.add(RED_COLOR + "remove" + BLACK_COLOR + " (name)");
         displayedSuggestions.add("display");
         displayedSuggestions.add("exit");
         
@@ -21,11 +30,11 @@ public class SuggestionManager {
     }
     
     public void setCurrentSuggestionIndex(int i) {
-        
+        highlightedLine = i;
     }
     
     public int getCurrentSuggestionIndex() {
-        return -1;
+        return highlightedLine;
     }
     
     public void nextSuggestion() {
@@ -33,7 +42,10 @@ public class SuggestionManager {
     }
     
     public void prevSuggestion() {
-        setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1) % getSuggestionsToDisplay().size());
+        setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1));
+        if (getCurrentSuggestionIndex() < 0) {
+        	setCurrentSuggestionIndex(getSuggestionsToDisplay().size()-1);
+        }
     }
 
     /**

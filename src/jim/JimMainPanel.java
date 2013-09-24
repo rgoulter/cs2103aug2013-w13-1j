@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -16,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
 import java.awt.CardLayout;
+import java.util.Collections;
 
 import jim.suggestions.SuggestionManager;
 import jim.suggestions.SuggestionView;
@@ -35,6 +37,8 @@ public class JimMainPanel extends JPanel {
     // Arbitrary objects for ActionMap.
     private static final String ACTION_EXIT_WINDOW = "exit window";
     private static final String ACTION_EXECUTE_INPUT = "execute input";
+    private static final String ACTION_SUGGESTIONS_FORWARD = "suggestions forward";
+    private static final String ACTION_SUGGESTIONS_BACKWARD = "suggestions backward";
 
     private static final String CARDLAYOUT_JOURNAL_VIEW = "journal view";
     private static final String CARDLAYOUT_SUGGESTION_VIEW = "suggestion view";
@@ -69,6 +73,13 @@ public class JimMainPanel extends JPanel {
         setLayout(new BorderLayout(0, 0));
         
         inputTextField = new JTextField();
+        
+        // Disable default focus traversal keys so we can rebind TAB and SHIFT+TAB
+        inputTextField.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
+        									 Collections.EMPTY_SET);
+        inputTextField.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
+        									 Collections.EMPTY_SET);
+        
         inputTextField.addKeyListener(new KeyListener(){
             @Override
             public void keyPressed(KeyEvent arg0) {
@@ -101,9 +112,7 @@ public class JimMainPanel extends JPanel {
 			}
         });
         
-        // Bind ENTER to execute,
-        // TODO: Bind Tab (unmodified) to nextSuggestion,
-        // TODO: Bind Tab (+ shift) to prevSuggestion.
+        // Bind ENTER to execute
         inputTextField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                                          ACTION_EXECUTE_INPUT);
         inputTextField.getActionMap().put(ACTION_EXECUTE_INPUT, new AbstractAction(){
@@ -111,6 +120,29 @@ public class JimMainPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 executeInput();
             }
+        });
+        
+        // Bind TAB to nextSuggestion
+        inputTextField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0),
+        								 ACTION_SUGGESTIONS_FORWARD);
+        inputTextField.getActionMap().put(ACTION_SUGGESTIONS_FORWARD, new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	suggestionManager.nextSuggestion();
+            	refreshUI();
+            }
+        });
+        
+        // Bind SHIFT+TAB to prevSuggestion
+        inputTextField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
+        								 java.awt.event.InputEvent.SHIFT_DOWN_MASK),
+        								 ACTION_SUGGESTIONS_BACKWARD);
+        inputTextField.getActionMap().put(ACTION_SUGGESTIONS_BACKWARD, new AbstractAction(){
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		suggestionManager.prevSuggestion();
+        		refreshUI();
+        	}
         });
 
         inputTextField.setColumns(10);
@@ -144,6 +176,7 @@ public class JimMainPanel extends JPanel {
         } else {
             // Show the Journal view
             cardLayout.show(viewPanel, CARDLAYOUT_JOURNAL_VIEW);
+            suggestionManager.setCurrentSuggestionIndex(0);	// Reset suggestion to 0
         }
     }
 

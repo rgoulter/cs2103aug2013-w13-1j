@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 import jim.JimView;
 
@@ -17,14 +18,15 @@ public class SuggestionView extends JimView {
     //  and give some indication as to which is the user's "current" selection..
     
     private List<String> displayedSuggestions;
-    private JList<String> outputList;
+    private JTextPane outputPane;
     private SuggestionManager suggestionManager;
     
     public SuggestionView() {
         setLayout(new BorderLayout(0, 0));
         
-        outputList = new JList<String>();
-        add(outputList, BorderLayout.CENTER);
+        outputPane = new JTextPane();
+        outputPane.setContentType("text/html");
+        add(outputPane, BorderLayout.CENTER);
         
         displayedSuggestions = new ArrayList<String>();
     }
@@ -37,20 +39,27 @@ public class SuggestionView extends JimView {
         displayedSuggestions = suggestionManager.getSuggestionsToDisplay();
         
         // Build text from current suggestion content.
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        String output = "<html><font family='verdana'>";
         
-        for(String suggestion : displayedSuggestions){
-            listModel.addElement(suggestion);
+        for(int i=0; i<displayedSuggestions.size(); i++){
+        	String suggestion = displayedSuggestions.get(i);
+        	if (i == suggestionManager.getCurrentSuggestionIndex()) {
+        		output = output + "<b>" + suggestion + "</b><br>";
+        	}
+        	else {
+        		output = output + suggestion + "<br>";
+        	}
         }
         
-        outputList.setModel(listModel);
+        output = output + "</font></html>";
+        outputPane.setText(output);
     }
     
     /**
      * 
      * @param lineNum from 0 ... n-1 for n lines.
      */
-    public void highlightLine(int lineNum){
-        outputList.setSelectedIndex(lineNum);
-    }
+    /* public void highlightLine(int lineNum){
+    	highlightedLine = lineNum;
+    } */
 }
