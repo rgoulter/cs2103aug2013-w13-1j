@@ -5,6 +5,8 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -19,8 +21,6 @@ import jim.suggestions.SuggestionManager;
 import jim.suggestions.SuggestionView;
 import jim.journal.JournalManager;
 import jim.journal.JournalView;
-
-
 
 
 public class JimMainPanel extends JPanel {
@@ -43,15 +43,9 @@ public class JimMainPanel extends JPanel {
     public static final int VIEW_AREA_HEIGHT = 400;
     
     
-    
-    /**
-     * Create the panel.
-     * DON'T PANIC
-     */
     public JimMainPanel() {
         initialiseUIComponents();
-
-        
+ 
         // Initialise the logic
         suggestionManager = new SuggestionManager();
         journalManager = new JournalManager();
@@ -70,15 +64,11 @@ public class JimMainPanel extends JPanel {
     
     
     
-    // DON'T PANIC!!
-    // ...and let WindowBuilder guide the way.
-    // For everything else, there's Google + StackOverflow.
     private void initialiseUIComponents() {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
         
         inputTextField = new JTextField();
-        
         inputTextField.addKeyListener(new KeyListener(){
             @Override
             public void keyPressed(KeyEvent arg0) {
@@ -98,6 +88,17 @@ public class JimMainPanel extends JPanel {
                 refreshUI();
             }
             
+        });
+        
+        inputTextField.addFocusListener(new FocusListener() {
+        	public void focusLost(FocusEvent e) {
+        		inputTextField.requestFocus();
+        	}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				// CC: This is here to fully implement FocusListener. We won't use this.
+			}
         });
         
         // Bind ENTER to execute,
@@ -121,7 +122,6 @@ public class JimMainPanel extends JPanel {
         viewPanel = new JPanel();
         viewPanel.setPreferredSize(new Dimension(VIEW_AREA_WIDTH, VIEW_AREA_HEIGHT));
         add(viewPanel, BorderLayout.CENTER);
-        // FYI: CardLayout is like one thing takes up all its space at a time.
         viewPanel.setLayout(new CardLayout(0, 0));
     }
     
@@ -170,17 +170,13 @@ public class JimMainPanel extends JPanel {
     // To be lazy, this method is called to run the JIM! GUI
     public static void runWindow() {
         final JFrame applicationWindow = new JFrame("JIM!");
-        
-        // FYI: This tells Java to close our program when the window is closed.
         applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // FYI: "Undecorated" means no borders, etc.
         applicationWindow.setUndecorated(true);
 
         JimMainPanel jimPanel = new JimMainPanel();
-        applicationWindow.getContentPane().add(jimPanel);   // Add it to our window.
-
-        // This "packs" the window-size to be the correct size.
+        applicationWindow.getContentPane().add(jimPanel);
         applicationWindow.pack();
 
         // We bind the key "Escape" from the InputField so that 
@@ -196,9 +192,12 @@ public class JimMainPanel extends JPanel {
                                                        }
                                                    });
         
-        // TODO: Centre this in the whole screen
-        applicationWindow.setLocation(150, 150);
+        // Centering Window
+        Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+		int locX = ((int)screen.getWidth() / 2) - (VIEW_AREA_WIDTH/2);
+		int locY = ((int)screen.getHeight() / 2) - (VIEW_AREA_HEIGHT/2);
 
+		applicationWindow.setLocation(locX, locY); 
         applicationWindow.setVisible(true);
     }
     
