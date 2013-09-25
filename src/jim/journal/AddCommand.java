@@ -3,6 +3,7 @@ package jim.journal;
 import java.util.Calendar;
 
 public class AddCommand implements Command {
+    private Task taskToAdd;
     
     /**
      * Adds a Task with specified start date+time, end date+time, and description.
@@ -10,7 +11,7 @@ public class AddCommand implements Command {
      * We represent date+time with the java.util.Calendar class.
      */
     public AddCommand(Calendar startTime, Calendar endTime, String description) {
-        // TODO: Any kindof logic here.
+        taskToAdd = new TimedTask(startTime, endTime, description);
     }
     
     // TODO: If we have more constructors, may be easier to process other command formats.
