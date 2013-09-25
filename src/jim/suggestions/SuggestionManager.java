@@ -1,7 +1,10 @@
 package jim.suggestions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+
+import jim.journal.AddCommand;
 
 public class SuggestionManager {
 
@@ -78,6 +81,22 @@ public class SuggestionManager {
          * Any language logic here can infer fairly sensibly how to access Journal API.
          * Journal API can then trust that this will be done sensibly by language logic.
          */
+        
+        // Add commands
+        if (args[0].equals("add")) {
+            // Accepted add syntaxes:
+            // add <start-date> <start-time> <end-date> <end-time> <words describing event>
+            // TODO: Add more syntaxes
+            
+            Calendar startDateTime = null;
+            Calendar endDateTime = null;
+            String description = null;
+            
+            // TODO: Process values in a sensible way.
+            
+            return new jim.journal.AddCommand(startDateTime, endDateTime, description);
+        }
+        
         return null;
     }
 }
