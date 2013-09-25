@@ -17,4 +17,6 @@ public interface Command {
     //
     // I chose the first option there.
     public void execute(JournalManager journalManager);
+    public String addAnEvent(String anEvent);
+    public String deleteAnEvent();
 }
