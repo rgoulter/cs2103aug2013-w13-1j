@@ -119,6 +119,7 @@ public class JimMainPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 executeInput();
+                inputTextField.setText("");
             }
         });
         
@@ -155,6 +156,7 @@ public class JimMainPanel extends JPanel {
         viewPanel.setPreferredSize(new Dimension(VIEW_AREA_WIDTH, VIEW_AREA_HEIGHT));
         add(viewPanel, BorderLayout.CENTER);
         viewPanel.setLayout(new CardLayout(0, 0));
+        
     }
     
     
@@ -232,6 +234,8 @@ public class JimMainPanel extends JPanel {
 
 		applicationWindow.setLocation(locX, locY); 
         applicationWindow.setVisible(true);
+        
+        jimPanel.refreshUI();	// Load current journal on startup
     }
     
     
