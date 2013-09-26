@@ -85,18 +85,15 @@ public class JimMainPanel extends JPanel {
             public void keyPressed(KeyEvent arg0) {
             }
 
+            // Catches keystrokes as the user inputs them
             @Override
             public void keyReleased(KeyEvent arg0) {
+            	suggestionManager.updateBuffer(inputTextField.getText());
+                refreshUI();
             }
 
-            // FYI: "keyTyped" will be invoked every time a key is 'typed' (i.e. pressed, released).
-            // This will only work when the textfield has "focus".
-            // At the moment, it's possible to give focus to the other TextArea/List.
-            // (Which isn't ideal).
             @Override
             public void keyTyped(KeyEvent arg0) {
-                suggestionManager.updateBuffer(inputTextField.getText());
-                refreshUI();
             }
             
         });
@@ -130,6 +127,8 @@ public class JimMainPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
             	suggestionManager.nextSuggestion();
+            	String selection = suggestionManager.getCurrentSuggestion();
+            	displayAutoComplete(selection);
             	refreshUI();
             }
         });
@@ -142,6 +141,8 @@ public class JimMainPanel extends JPanel {
         	@Override
         	public void actionPerformed(ActionEvent e) {
         		suggestionManager.prevSuggestion();
+        		String selection = suggestionManager.getCurrentSuggestion();
+            	displayAutoComplete(selection);
         		refreshUI();
         	}
         });
@@ -159,6 +160,9 @@ public class JimMainPanel extends JPanel {
         
     }
     
+    private void displayAutoComplete(String text) {
+    	// TODO: Splice suggestion into user's input and reposition cursor in place
+    }
     
     
     private void refreshUI() {
@@ -178,7 +182,7 @@ public class JimMainPanel extends JPanel {
         } else {
             // Show the Journal view
             cardLayout.show(viewPanel, CARDLAYOUT_JOURNAL_VIEW);
-            suggestionManager.setCurrentSuggestionIndex(0);	// Reset suggestion to 0
+            suggestionManager.setCurrentSuggestionIndex(-1);	// Reset suggestion to -1 (No selection)
         }
     }
 

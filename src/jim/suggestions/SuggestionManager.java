@@ -15,9 +15,10 @@ public class SuggestionManager {
 	private static final String GREEN_COLOR = "<font color='green'>";
 	private static final String GREY_COLOR = "<font color='gray'>";
 	
-	private int highlightedLine = 0;
+	private int highlightedLine = -1;
 	
     public List<String> getSuggestionsToDisplay() {
+    	// TODO: Stop cheating on this, as well =P
         List<String> displayedSuggestions = new ArrayList<String>();
 
         displayedSuggestions.add(BLUE_COLOR + "add" + BLACK_COLOR + " (name) (date) (time)");
@@ -29,7 +30,13 @@ public class SuggestionManager {
     }
     
     public String getCurrentSuggestion() {
-        throw new UnsupportedOperationException("Not yet implemented");
+    	String output = "";
+    	if (getCurrentSuggestionIndex() != -1) {
+    		List<String> allStrings = getSuggestionsToDisplay();
+    		output = allStrings.get(getCurrentSuggestionIndex());
+    	}
+    	
+    	return output;
     }
     
     public void setCurrentSuggestionIndex(int i) {
