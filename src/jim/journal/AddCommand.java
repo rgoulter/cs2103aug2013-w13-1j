@@ -2,7 +2,7 @@ package jim.journal;
 
 import java.util.Calendar;
 
-public class AddCommand implements Command {
+public class AddCommand extends Command {
     private Task taskToAdd;
     
     /**

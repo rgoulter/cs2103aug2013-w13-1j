@@ -1,6 +1,6 @@
 package jim.journal;
 
-public interface Command {
+public abstract class Command {
     
     // execute() does not need to have any arguments (per se).
     // This implies that each instance of Command refers to a specific command
@@ -16,7 +16,7 @@ public interface Command {
     // OR have a Singleton of the managers.. (See http://en.wikipedia.org/wiki/Singleton_pattern).
     //
     // I chose the first option there.
-    public void execute(JournalManager journalManager);
-    public String addAnEvent(String anEvent);
-    public String deleteAnEvent();
+    public abstract void execute(JournalManager journalManager);
+    public abstract String addAnEvent(String anEvent);
+    public abstract String deleteAnEvent();
 }
