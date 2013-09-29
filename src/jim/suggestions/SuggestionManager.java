@@ -89,11 +89,13 @@ public class SuggestionManager {
          * Journal API can then trust that this will be done sensibly by language logic.
          */
         
-        // Add commands
-        if (args[0].equals("add")) {
-            // Accepted add syntaxes:
+        // Parse the words into a Command object.
+        // STRICT ASSUMPTION is that the first word is the "operating word". (e.g. add, remove, etc.)
+        // Naturally, this assumption will be broken with more flexible inputs.
+        if (args[0].equals("add")) { // The "Add" commands
+            // Accepted 'add' syntaxes:
             // add <start-date> <start-time> <end-date> <end-time> <words describing event>
-            // TODO: Add more syntaxes
+            // TODO: Add more syntaxes/formats for this command
             
             Calendar startDateTime = null;
             Calendar endDateTime = null;
@@ -102,6 +104,32 @@ public class SuggestionManager {
             // TODO: Process values in a sensible way.
             
             return new jim.journal.AddCommand(startDateTime, endDateTime, description);
+        } else if (args[0].equals("complete")) { // The "Complete" commands
+            // Accepted 'complete' syntaxes:
+            // complete <description>
+            
+            String description = null;
+        } else if (args[0].equals("remove")) { // The "Remove" commands
+            // Accepted 'remove' syntaxes:
+            // remove <description>
+            // TODO: Add more syntaxes/formats for this command
+            
+        } else if (args[0].equals("edit")) { // The "Edit" commands
+            // Accepted 'edit' syntaxes:
+            // edit <description>
+            // TODO: Add more syntaxes/formats for this command
+            
+        } else if (args[0].equals("search")) { // The "Search" commands
+            // Accepted 'search' syntaxes:
+            // search <description>
+            // TODO: Add more syntaxes/formats for this command
+            
+            
+        } else if (args[0].equals("display")) { // The "Display" commands
+            // Accepted 'display' syntaxes:
+            // display <date predicate>
+            // TODO: Add more syntaxes/formats for this command
+            
         }
         
         return null;
