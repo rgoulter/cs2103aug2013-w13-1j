@@ -193,6 +193,7 @@ public class JimMainPanel extends JPanel {
         // Discussion: One thing which may have been neglected is 'feedback' to user.
         //  This can be managed/displayed from here, however it's implemented.
         //  (Possibly just using 'Alert' message-boxes for early stages?)
+    	// Feedback mechanism now implemented! Read commit log for details ~CC
         
         String input = inputTextField.getText();
         String inputTokens[] = input.split(" ");
@@ -200,7 +201,9 @@ public class JimMainPanel extends JPanel {
         jim.journal.Command command = suggestionManager.parseCommand(inputTokens);
         
         if (command != null) {
-           command.execute(journalManager); 
+           command.execute(journalManager);
+           String feedback = command.getOutput();
+           journalView.setFeedbackMessage(feedback);
         }
     }
 

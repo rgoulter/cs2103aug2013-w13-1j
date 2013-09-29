@@ -28,6 +28,7 @@ public class SuggestionManager {
     	// TODO: Stop cheating on this, as well =P
         List<String> displayedSuggestions = new ArrayList<String>();
 
+        displayedSuggestions.add("<h2><font color='red'>Please ignore suggestions for now! ~CC</font></h2>");
         displayedSuggestions.add(BLUE_COLOR + "add" + BLACK_COLOR + " (name) (date) (time)");
         displayedSuggestions.add(RED_COLOR + "remove" + BLACK_COLOR + " (name)");
         displayedSuggestions.add("display");
