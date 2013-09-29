@@ -1,6 +1,11 @@
 package jim.journal;
 
 public abstract class Command {
+    private StringBuilder outputStringBuilder;
+    
+    public Command() {
+        outputStringBuilder = new StringBuilder();
+    }
     
     // execute() does not need to have any arguments (per se).
     // This implies that each instance of Command refers to a specific command
@@ -19,4 +24,17 @@ public abstract class Command {
     public abstract void execute(JournalManager journalManager);
     public abstract String addAnEvent(String anEvent);
     public abstract String deleteAnEvent();
+    
+    protected void output(String outputStr) {
+        outputStringBuilder.append(outputStr);
+    }
+    
+    protected void outputln(String line) {
+        output(line);
+        outputStringBuilder.append('\n');
+    }
+    
+    public String getOutput() {
+        return outputStringBuilder.toString();
+    }
 }
