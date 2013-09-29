@@ -6,37 +6,36 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class JournalManager {
+	private final GregorianCalendar cutoff = new GregorianCalendar();
+	
     /**
      * Returns a String representation of the current Journal state.
      * @return
      */
     public String getDisplayString() {
-        List<String> upcomingEventsList = new ArrayList<String>();
-        upcomingEventsList.add("Monday 12 Sept.:\tBe awesome!");
-        upcomingEventsList.add("Tuesday 13 Sept.:\tWork on CE2 Some more.");
+        List<Task> upcomingTasks = this.getAllTasks();        
+        String timedTasks = "";
+        String floatingTasks = "";
+        String output = "Upcoming Events:\n";
         
-        List<String> todoList = new ArrayList<String>();
-        todoList.add("Write memoirs");
+        Calendar today = Calendar.getInstance();
         
-        
-        StringBuilder output = new StringBuilder();
-        
-        output.append("Upcoming Events:\n");
-        for(String upcomingEventStr : upcomingEventsList){
-            output.append(upcomingEventStr);
-            output.append('\n');
+        for(Task current : upcomingTasks) {
+        	if (current instanceof TimedTask) {
+        		Calendar taskTime = ((TimedTask) current).getStartTime();
+        		if (taskTime.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+     		           taskTime.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
+     				   timedTasks = timedTasks + current.toString() + "\n";
+     			   }
+        	}
+        	else if (current instanceof FloatingTask) {
+        		floatingTasks = floatingTasks + current.toString() + "\n";
+        	}
+        	
         }
-        output.append('\n');
         
-        output.append("Todo:\n");
-        for(String todoItemStr : todoList){
-            output.append(todoItemStr);
-            output.append('\n');
-        }
-        output.append('\n');
-        
-        
-        return output.toString();
+        output = output + timedTasks + "\n\nTodo:\n" + floatingTasks;
+        return output;
     }
     
     public void addTask(Task task) {
