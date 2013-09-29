@@ -22,6 +22,7 @@ public class Jim {
 
         if(cmd != null){
             cmd.execute(journalManager);
+            System.out.print(cmd.getOutput());
         } else {
             System.out.println("Unable to parse arguments.");
         }
