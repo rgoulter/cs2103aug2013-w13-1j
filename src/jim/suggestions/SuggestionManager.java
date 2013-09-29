@@ -24,7 +24,11 @@ public class SuggestionManager {
 	
 	private int highlightedLine = -1;
 	private static final int DEADLINE_TASK_DETECTED = 2;
-	private static final int LENGTH_OF_DATE = 3;
+	private static final int DEADLINE_TASK_WITHOUT_TIME = 1;
+	private static final int LENGTH_OF_DATE = 3;   //[DD][MM][YY]
+	private static final int LENGTH_OF_TIME = 2;  //[22(hrs)][00(mins)]
+	private static final int INDICATE_YEAR = 2;
+	private static final int INDICATE_MONTH = 1;
 	
     public List<String> getSuggestionsToDisplay() {
     	// TODO: Stop cheating on this, as well =P
@@ -158,12 +162,13 @@ public class SuggestionManager {
             return parseSearchCommand(args);
         } else if (args[0].equals("display")) {
             return parseDisplayCommand(args);
+        } else if (args[0].equals("exit")) {
+        	System.exit(0);
         }
-        
         return null;
     }
     
-    private int detectDate(String args[]) {   // added stuff here!!!
+    private int detectDate(String args[]) {   
     	int index_with_date = args.length; 
     	for (int i = 1; i < args.length; i++) {
     	// start from 1 as index 0 is a command.
@@ -185,14 +190,32 @@ public class SuggestionManager {
     }
     
     public int[] splitUpDate (String date_in_string) {
-    	// we will accept date format of 090913 - DD/MM/YY
+    	// we will accept date format of 090913 - DDMMYY
     	int[] dates = new int[LENGTH_OF_DATE];
     	String[] temp = date_in_string.split("");
-    	int counter = 0;
+    	int counter = 1; // temp[0] is a spacing
     	for (int i = 0; i < LENGTH_OF_DATE; i++) {
-    		dates[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    		if (i == INDICATE_YEAR) {
+    			dates[i] = Integer.parseInt("20" + temp[counter++] + temp[counter++]);
+    		} else if (i == INDICATE_MONTH) {
+    			dates[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    			dates[i] = dates[i] - 1;  //month is 0-based, eg. January = 0
+    		} else {
+    			dates[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    		}
     	}
     	return dates;
+    }
+    
+    public int[] splitTime (String time_in_string) {
+    	// we will accept time format of 24 hours - 2200 hrs, default seconds is 00
+    	int[] time_24hours = new int[LENGTH_OF_TIME];
+    	String[] temp = time_in_string.split("");
+    	int counter = 1; // temp[0] is a spacing
+    	for (int i = 0; i < LENGTH_OF_TIME; i++) {
+    		time_24hours[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    	}
+    	return time_24hours;
     }
     
     private AddCommand parseAddCommand(String args[]) {
@@ -200,11 +223,26 @@ public class SuggestionManager {
         // add <start-date> <start-time> <end-date> <end-time> <words describing event>
         // TODO: Add more syntaxes/formats for this command
     	int dateDetectedIndex = detectDate(args);
-    	if (args.length <= DEADLINE_TASK_DETECTED) {
-    		
+    	
+    	Calendar startDateTime = Calendar.getInstance();
+        Calendar endDateTime = Calendar.getInstance();
+        int determine_task_type = args.length - dateDetectedIndex;
+        
+    	if ((determine_task_type > 0) && (determine_task_type <= DEADLINE_TASK_DETECTED)) {
+    		int[] deadline = splitUpDate(args[dateDetectedIndex]);
+    		int YY = deadline[2], MM = deadline[1], DD = deadline[0];
+    		if (determine_task_type == DEADLINE_TASK_WITHOUT_TIME) {
+	    		endDateTime.set(YY, MM, DD);
+    		} else {
+    			int[] time = splitTime (args[dateDetectedIndex+1]);
+    			int hrs = time[0], mins = time [1];
+    			endDateTime.set(YY, MM, DD, hrs, mins);
+    		}
+    		startDateTime.set(YY, MM, DD);
+    	} else {
+    		startDateTime = null;
+            endDateTime = null;
     	}
-        Calendar startDateTime = null;
-        Calendar endDateTime = null;
         
         String description = join(args, ' ', 1, dateDetectedIndex); // The description follows the other words.   editted here!!
         
