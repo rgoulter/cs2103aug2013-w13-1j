@@ -23,6 +23,8 @@ public class SuggestionManager {
 	private static final String GREY_COLOR = "<font color='gray'>";
 	
 	private int highlightedLine = -1;
+	private static final int DEADLINE_TASK_DETECTED = 2;
+	private static final int LENGTH_OF_DATE = 3;
 	
     public List<String> getSuggestionsToDisplay() {
     	// TODO: Stop cheating on this, as well =P
@@ -182,14 +184,29 @@ public class SuggestionManager {
         return true;
     }
     
+    public int[] splitUpDate (String date_in_string) {
+    	// we will accept date format of 090913 - DD/MM/YY
+    	int[] dates = new int[LENGTH_OF_DATE];
+    	String[] temp = date_in_string.split("");
+    	int counter = 0;
+    	for (int i = 0; i < LENGTH_OF_DATE; i++) {
+    		dates[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    	}
+    	return dates;
+    }
+    
     private AddCommand parseAddCommand(String args[]) {
         // Accepted 'add' syntaxes:
         // add <start-date> <start-time> <end-date> <end-time> <words describing event>
         // TODO: Add more syntaxes/formats for this command
-        
+    	int dateDetectedIndex = detectDate(args);
+    	if (args.length <= DEADLINE_TASK_DETECTED) {
+    		
+    	}
         Calendar startDateTime = null;
         Calendar endDateTime = null;
-        String description = join(args, ' ', 1, detectDate(args)); // The description follows the other words.   editted here!!
+        
+        String description = join(args, ' ', 1, dateDetectedIndex); // The description follows the other words.   editted here!!
         
         // TODO: Process values in a sensible way.
         if (startDateTime == null && endDateTime == null ) {
