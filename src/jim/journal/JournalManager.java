@@ -53,6 +53,6 @@ public class JournalManager {
         List<Task> allTasks = new ArrayList<Task>();
         allTasks.add(expectedTask);
         
-        return allTasks;
+        return storeAllTasks;   // Added this change here! 1.
     }
 }

@@ -161,6 +161,27 @@ public class SuggestionManager {
         return null;
     }
     
+    private int detectDate(String args[]) {   // added stuff here!!!
+    	int index_with_date = args.length; 
+    	for (int i = 1; i < args.length; i++) {
+    	// start from 1 as index 0 is a command.
+    		if (isInteger(args[i])) {
+    			index_with_date = i;  
+    			break;
+    		}
+    	}
+    	return index_with_date;
+    }
+    
+    public static boolean isInteger(String s) {
+        try { 
+            Integer.parseInt(s); 
+        } catch(NumberFormatException e) { 
+            return false; 
+        }
+        return true;
+    }
+    
     private AddCommand parseAddCommand(String args[]) {
         // Accepted 'add' syntaxes:
         // add <start-date> <start-time> <end-date> <end-time> <words describing event>
@@ -168,10 +189,12 @@ public class SuggestionManager {
         
         Calendar startDateTime = null;
         Calendar endDateTime = null;
-        String description = join(args, ' ', 1 + 2 + 2); // The description follows the other words.
+        String description = join(args, ' ', 1, detectDate(args)); // The description follows the other words.   editted here!!
         
         // TODO: Process values in a sensible way.
-        
+        if (startDateTime == null && endDateTime == null ) {
+        	return new jim.journal.AddCommand(description);
+        } else 
         return new jim.journal.AddCommand(startDateTime, endDateTime, description);
     }
     
