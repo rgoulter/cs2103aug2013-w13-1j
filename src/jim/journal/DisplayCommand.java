@@ -36,16 +36,5 @@ public class DisplayCommand extends Command {
        }
     }
 
-    // UNUSED COMMANDS
-    // Only added to satisfy the Command Abstract Class
-    @Override
-    public String addAnEvent(String anEvent) {
-        return null;
-    }
-
-    @Override
-    public String deleteAnEvent() {
-        return null;
-    }
 
 }

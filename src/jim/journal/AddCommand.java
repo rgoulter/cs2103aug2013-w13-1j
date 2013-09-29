@@ -14,6 +14,7 @@ public class AddCommand extends Command {
         taskToAdd = new TimedTask(startTime, endTime, description);
     }
     
+    
     public AddCommand(String description) {
     	taskToAdd = new FloatingTask(description);
     }
@@ -26,14 +27,6 @@ public class AddCommand extends Command {
         journalManager.addTask(taskToAdd);
     }
 
-    @Override
-    public String addAnEvent(String anEvent) {
-        return null;
-    }
 
-    @Override
-    public String deleteAnEvent() {
-        return null;
-    }
 
 }

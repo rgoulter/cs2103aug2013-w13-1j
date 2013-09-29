@@ -1,20 +1,20 @@
 package jim.journal;
 
-public class CompleteCommand extends Command {
+import java.util.List;
 
-    @Override
+public class CompleteCommand extends Command {
+	List<Task> tasksCompleted;
+    
+	public CompleteCommand(List<Task> tasksWhichMatchDescription) {
+		tasksCompleted = tasksWhichMatchDescription;
+	}
+
+	@Override
     public void execute(JournalManager journalManager) {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String addAnEvent(String anEvent) {
-        return null;
-    }
-
-    @Override
-    public String deleteAnEvent() {
-        return null;
+		for (Task t : tasksCompleted){
+    		journalManager.completeTask(t);
+    	}
     }
 
 }

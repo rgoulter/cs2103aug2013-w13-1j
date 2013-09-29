@@ -8,6 +8,8 @@ import java.util.ArrayList;
 public class JournalManager {
 	private final GregorianCalendar cutoff = new GregorianCalendar();
 	private List<Task> storeAllTasks = new ArrayList<Task> ();
+	private List<Task> uncompletedTasks = new ArrayList<Task>();
+	private List<Task> completedTasks = new ArrayList<Task>();
 	
     /**
      * Returns a String representation of the current Journal state.
@@ -38,11 +40,7 @@ public class JournalManager {
         output = output + timedTasks + "\n\nTodo:\n" + floatingTasks;
         return output;
     }
-    
-    public void addTask(Task task) {
-    	storeAllTasks.add(task);
-    }
-    
+ 
     public List<Task> getAllTasks() {
         // TODO: Not cheat on this.
         Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
@@ -54,5 +52,40 @@ public class JournalManager {
         allTasks.add(expectedTask);
         
         return storeAllTasks;   // Added this change here! 1.
+    }
+    public List<Task> getuncompletedTasks(){
+    	return uncompletedTasks;
+    }
+    public List<Task> getcompletedTasks(){
+    	return completedTasks;
+    }
+    /*
+     * Following methods update the storeAllTasks, uncompletedTasks, completedTasks.
+     */
+    public void addTask(Task task) {
+    	storeAllTasks.add(task);
+    	uncompletedTasks.add(task);
+    }
+    public void removeTask(Task task){
+    	storeAllTasks.remove(task);
+    	completedTasks.remove(task);
+    	uncompletedTasks.remove(task);
+    }
+    public void completeTask(Task task){
+    	
+    	if (completedTasks.contains(task)){
+    		System.out.println("task already marked as completed");
+    		return ;
+    	}else{
+    		uncompletedTasks.remove(task);
+    		completedTasks.add(task);
+    		return ;
+    	}
+    }
+    public void editTask(Task old_task, Task new_task){
+    	storeAllTasks.remove(old_task);
+    	storeAllTasks.add(new_task);
+    	uncompletedTasks.add(new_task);
+    	uncompletedTasks.remove(old_task);
     }
 }

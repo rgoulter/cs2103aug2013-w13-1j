@@ -80,7 +80,7 @@ public class SuggestionManager {
     // this helper method makes sense.
     private List<jim.journal.Task> searchForTasksByDescription(String description) {
         //TODO: A rudimentary implementation of this.
-        
+        //TODO: check with user if the result matched what they really want???
         return null;
     }
     
@@ -221,8 +221,8 @@ public class SuggestionManager {
         
         String description = join(args, ' ', 1);
         List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
-        
-        return null;
+      
+        return new jim.journal.CompleteCommand(tasksWhichMatchDescription);
     }
     
     private RemoveCommand parseRemoveCommand(String args[]) { // The "Remove" commands
@@ -231,16 +231,19 @@ public class SuggestionManager {
         // TODO: Add more syntaxes/formats for this command
         
         String description = join(args, ' ', 1);
+        List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
         
-        return null;
+        return new jim.journal.RemoveCommand(tasksWhichMatchDescription);
     }
     
     private EditCommand parseEditCommand(String args[]) { // The "Edit" commands
         // Accepted 'edit' syntaxes:
-        // edit <description>
+        // edit <description> = <description of old task> + "TO" + <description of new task>
         // TODO: Add more syntaxes/formats for this command
-        
+       
         String description = join(args, ' ', 1);
+        
+        //List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
         
         return null;
     }
