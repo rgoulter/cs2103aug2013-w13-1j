@@ -66,6 +66,14 @@ public class SuggestionManager {
         
     }
     
+    // Since many of our Commands depend on "searching by description",
+    // this helper method makes sense.
+    private List<jim.journal.Task> searchForTasksByDescription(String description) {
+        //TODO: A rudimentary implementation of this.
+        
+        return null;
+    }
+    
     /**
      * Takes an array of strings, e.g. {"add", "lunch", "Monday", "2pm"},
      * and returns a Journal command to be executed from this.
