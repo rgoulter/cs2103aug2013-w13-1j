@@ -2,6 +2,7 @@ package jim.suggestions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import jim.journal.Task;
@@ -215,9 +216,28 @@ public class SuggestionManager {
     
     private DisplayCommand parseDisplayCommand(String args[]) { // The "Display" commands
         // Accepted 'display' syntaxes:
+    	// display
         // display <date predicate>
+    	// TODO: Basic display command currently displays everything; Ideally we want to limit this ~CC
         // TODO: Add more syntaxes/formats for this command
         
-        return null;
+    	if (args.length == 1) {
+    		// User asks to perform a plain display, which displays everything
+    		return new jim.journal.DisplayCommand();
+    	}
+    	else if (args.length == 2) {
+    		// User asks to perform display given a particular date
+    		
+    		// TODO: Currently, display expects a date in DD-MM-YY format; We should change that ~CC
+    		// Rudimentary way to parse date ~CC
+    		String[] ddmmyy = args[1].split("-");
+    		GregorianCalendar date = new GregorianCalendar(Integer.parseInt(ddmmyy[2]),
+    													   Integer.parseInt(ddmmyy[1]),
+    													   Integer.parseInt(ddmmyy[0]));
+    		
+    		return new jim.journal.DisplayCommand(date);
+    	}
+    	
+    	return null;
     }
 }

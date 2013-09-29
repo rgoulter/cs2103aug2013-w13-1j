@@ -5,13 +5,12 @@ import java.util.Calendar;
 public class TimedTask extends Task {
     private Calendar startTime;
     private Calendar endTime;
-    private String description;
+    // private String description;
     
-    
-    public TimedTask(Calendar startTime, Calendar endTime, String description){
+    public TimedTask(Calendar startTime, Calendar endTime, String desc){
         this.startTime = startTime;
         this.endTime = endTime;
-        this.description = description;
+        description = desc;
     }
     
     public Calendar getStartTime() {
