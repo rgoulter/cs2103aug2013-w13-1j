@@ -7,8 +7,16 @@ public class TimedTask extends Task {
     private Calendar endTime;
     // private String description;
     
-    public TimedTask(Calendar startTime, Calendar endTime, String desc){
+    public TimedTask(Calendar startTime, Calendar endTime, String desc) {
+    	// Tasks with both start and end date and time.
         this.startTime = startTime;
+        this.endTime = endTime;
+        description = desc;
+    }
+    
+    public TimedTask(Calendar endTime, String desc) {
+    	// Tasks with ONLY end date. (AKA deadline tasks)
+        this.startTime = null;
         this.endTime = endTime;
         description = desc;
     }
