@@ -75,6 +75,42 @@ public class SuggestionManager {
     }
     
     /**
+     * Inverse of String.split().
+     * Joins an array of Strings to one string.
+     * e.g. {"abc", "def"} joinwith ' ' -> "abc def".
+     */
+    private String join(String arrayOfStrings[], char joinChar) {
+        return join(arrayOfStrings, joinChar, 0);
+    }
+    
+    /**
+     * Inverse of String.split().
+     * Joins an array of Strings to one string.
+     * e.g. {"abc", "def"} joinwith ' ' -> "abc def".
+     */
+    private String join(String arrayOfStrings[], char joinChar, int startIndex) {
+        return join(arrayOfStrings, joinChar, startIndex, arrayOfStrings.length);
+    }
+        
+    /**
+     * Inverse of String.split().
+     * Joins an array of Strings to one string.
+     * e.g. {"abc", "def"} joinwith ' ' -> "abc def".
+     */
+    private String join(String arrayOfStrings[], char joinChar, int startIndex, int endIndex) {
+        StringBuilder result = new StringBuilder();
+        
+        for (int i = startIndex; i < endIndex - 1; i++) {
+            result.append(arrayOfStrings[i]);
+            result.append(joinChar);
+        }
+        
+        result.append(arrayOfStrings[endIndex - 1]);
+        
+        return result.toString();
+    }
+    
+    /**
      * Takes an array of strings, e.g. {"add", "lunch", "Monday", "2pm"},
      * and returns a Journal command to be executed from this.
      * 
