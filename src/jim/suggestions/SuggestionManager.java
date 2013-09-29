@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import jim.journal.Task;
 import jim.journal.AddCommand;
+import jim.journal.CompleteCommand;
+import jim.journal.RemoveCommand;
+import jim.journal.EditCommand;
+import jim.journal.SearchCommand;
+import jim.journal.DisplayCommand;
 
 public class SuggestionManager {
 
@@ -136,45 +142,81 @@ public class SuggestionManager {
         // Parse the words into a Command object.
         // STRICT ASSUMPTION is that the first word is the "operating word". (e.g. add, remove, etc.)
         // Naturally, this assumption will be broken with more flexible inputs.
-        if (args[0].equals("add")) { // The "Add" commands
-            // Accepted 'add' syntaxes:
-            // add <start-date> <start-time> <end-date> <end-time> <words describing event>
-            // TODO: Add more syntaxes/formats for this command
-            
-            Calendar startDateTime = null;
-            Calendar endDateTime = null;
-            String description = null;
-            
-            // TODO: Process values in a sensible way.
-            
-            return new jim.journal.AddCommand(startDateTime, endDateTime, description);
-        } else if (args[0].equals("complete")) { // The "Complete" commands
-            // Accepted 'complete' syntaxes:
-            // complete <description>
-            
-            String description = null;
-        } else if (args[0].equals("remove")) { // The "Remove" commands
-            // Accepted 'remove' syntaxes:
-            // remove <description>
-            // TODO: Add more syntaxes/formats for this command
-            
-        } else if (args[0].equals("edit")) { // The "Edit" commands
-            // Accepted 'edit' syntaxes:
-            // edit <description>
-            // TODO: Add more syntaxes/formats for this command
-            
-        } else if (args[0].equals("search")) { // The "Search" commands
-            // Accepted 'search' syntaxes:
-            // search <description>
-            // TODO: Add more syntaxes/formats for this command
-            
-            
-        } else if (args[0].equals("display")) { // The "Display" commands
-            // Accepted 'display' syntaxes:
-            // display <date predicate>
-            // TODO: Add more syntaxes/formats for this command
-            
+        if (args[0].equals("add")) {
+            return parseAddCommand(args);
+        } else if (args[0].equals("complete")) {
+            return parseCompleteCommand(args);
+        } else if (args[0].equals("remove")) {
+            return parseRemoveCommand(args);
+        } else if (args[0].equals("edit")) {
+            return parseEditCommand(args);
+        } else if (args[0].equals("search")) {
+            return parseSearchCommand(args);
+        } else if (args[0].equals("display")) {
+            return parseDisplayCommand(args);
         }
+        
+        return null;
+    }
+    
+    private AddCommand parseAddCommand(String args[]) {
+        // Accepted 'add' syntaxes:
+        // add <start-date> <start-time> <end-date> <end-time> <words describing event>
+        // TODO: Add more syntaxes/formats for this command
+        
+        Calendar startDateTime = null;
+        Calendar endDateTime = null;
+        String description = join(args, ' ', 1 + 2 + 2); // The description follows the other words.
+        
+        // TODO: Process values in a sensible way.
+        
+        return new jim.journal.AddCommand(startDateTime, endDateTime, description);
+    }
+    
+    private CompleteCommand parseCompleteCommand(String args[]) { // The "Complete" commands
+        // Accepted 'complete' syntaxes:
+        // complete <description>
+        
+        String description = join(args, ' ', 1);
+        List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
+        
+        return null;
+    }
+    
+    private RemoveCommand parseRemoveCommand(String args[]) { // The "Remove" commands
+        // Accepted 'remove' syntaxes:
+        // remove <description>
+        // TODO: Add more syntaxes/formats for this command
+        
+        String description = join(args, ' ', 1);
+        
+        return null;
+    }
+    
+    private EditCommand parseEditCommand(String args[]) { // The "Edit" commands
+        // Accepted 'edit' syntaxes:
+        // edit <description>
+        // TODO: Add more syntaxes/formats for this command
+        
+        String description = join(args, ' ', 1);
+        
+        return null;
+    }
+    
+    private SearchCommand parseSearchCommand(String args[]) { // The "Search" commands
+        // Accepted 'search' syntaxes:
+        // search <description>
+        // TODO: Add more syntaxes/formats for this command
+
+        String description = join(args, ' ', 1);
+        
+        return null;
+    }
+    
+    private DisplayCommand parseDisplayCommand(String args[]) { // The "Display" commands
+        // Accepted 'display' syntaxes:
+        // display <date predicate>
+        // TODO: Add more syntaxes/formats for this command
         
         return null;
     }
