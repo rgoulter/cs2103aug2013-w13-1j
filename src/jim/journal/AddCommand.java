@@ -19,7 +19,7 @@ public class AddCommand implements Command {
 
     @Override
     public void execute(JournalManager journalManager) {
-        // Execute the add command, feeding the data to the given journalManager.
+        journalManager.addTask(taskToAdd);
     }
 
     @Override
