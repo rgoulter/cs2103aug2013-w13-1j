@@ -1,28 +1,36 @@
 package jim.journal;
 
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RemoveCommand extends Command {
-	List<Task> taskToremove;
-	
-	public RemoveCommand(Calendar startTime, Calendar endTime, String description) {
-        taskToremove.add(new TimedTask(startTime, endTime, description));
-    }
+	String description;
     
-    public RemoveCommand(String description) {
-    	taskToremove.add(new FloatingTask(description));
-    }
-    
-    public RemoveCommand(List<Task> tasks){
-    	taskToremove = tasks;
+    public RemoveCommand(String des) {
+    	description = des;
     }
     
     @Override
     public void execute(JournalManager journalManager) {
+    	List<Task> taskToremove = new ArrayList<Task>();
+		List<Task> allTasks = journalManager.getAllTasks();
+		for (Task task : allTasks){
+			if (task.getDescription().contains(description)) {
+				taskToremove.add(task);
+			}
+		}
+		if (taskToremove.isEmpty()){
+			outputln("Description was not matched.");
+		}
+		
     	for (Task t : taskToremove){
-    		journalManager.removeTask(t);
+    		if (journalManager.removeTask(t)){
+    			outputln("Removed task: " + t.toString());
+    		}else{
+    			outputln("Removing task was not successful.");
+    		}
     	}
+    	
     }
 
 }

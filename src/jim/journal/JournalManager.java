@@ -8,8 +8,7 @@ import java.util.ArrayList;
 public class JournalManager {
 	private final GregorianCalendar cutoff = new GregorianCalendar();
 	private List<Task> storeAllTasks = new ArrayList<Task> ();
-	private List<Task> uncompletedTasks = new ArrayList<Task>();
-	private List<Task> completedTasks = new ArrayList<Task>();
+
 	
     /**
      * Returns a String representation of the current Journal state.
@@ -54,38 +53,44 @@ public class JournalManager {
         return storeAllTasks;   // Added this change here! 1.
     }
     public List<Task> getuncompletedTasks(){
+    	List<Task> uncompletedTasks = new ArrayList<Task>();
+    	for (Task t: storeAllTasks){
+    		if (!t.isCompleted()){
+    			uncompletedTasks.add(t);
+    		}
+    	}
     	return uncompletedTasks;
     }
     public List<Task> getcompletedTasks(){
+    	List<Task> completedTasks = new ArrayList<Task>();
+    	for (Task t: storeAllTasks){
+    		if (t.isCompleted()){
+    			completedTasks.add(t);
+    		}
+    	}
     	return completedTasks;
     }
     /*
      * Following methods update the storeAllTasks, uncompletedTasks, completedTasks.
      */
     public void addTask(Task task) {
-    	storeAllTasks.add(task);
-    	uncompletedTasks.add(task);
-    }
-    public void removeTask(Task task){
-    	storeAllTasks.remove(task);
-    	completedTasks.remove(task);
-    	uncompletedTasks.remove(task);
-    }
-    public void completeTask(Task task){
     	
-    	if (completedTasks.contains(task)){
-    		System.out.println("task already marked as completed");
-    		return ;
+    	storeAllTasks.add(task);
+    }
+    public boolean removeTask(Task task){
+    	return storeAllTasks.remove(task);  
+    }
+    public String completeTask(Task task){
+    	if (task.isCompleted()){
+    		return "Task " + task.toString() + " has already been marked as completed.";
     	}else{
-    		uncompletedTasks.remove(task);
-    		completedTasks.add(task);
-    		return ;
+    		task.markAsCompleted();
+    		return "Completed Task: " + task.toString();
     	}
     }
     public void editTask(Task old_task, Task new_task){
     	storeAllTasks.remove(old_task);
     	storeAllTasks.add(new_task);
-    	uncompletedTasks.add(new_task);
-    	uncompletedTasks.remove(old_task);
     }
+
 }
