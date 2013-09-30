@@ -322,7 +322,7 @@ public class SuggestionManager {
         
         List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
         
-        return null;
+        return new EditCommand(tasksWhichMatchDescription);
     }
     
     private SearchCommand parseSearchCommand(String args[]) { // The "Search" commands
