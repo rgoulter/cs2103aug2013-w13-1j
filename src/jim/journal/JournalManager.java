@@ -8,8 +8,7 @@ import java.util.ArrayList;
 public class JournalManager {
 	private final GregorianCalendar cutoff = new GregorianCalendar();
 	private List<Task> storeAllTasks = new ArrayList<Task> ();
-	private List<Task> uncompletedTasks = new ArrayList<Task>();
-	private List<Task> completedTasks = new ArrayList<Task>();
+
 	
     /**
      * Returns a String representation of the current Journal state.
@@ -54,38 +53,50 @@ public class JournalManager {
         return storeAllTasks;   // Added this change here! 1.
     }
     public List<Task> getuncompletedTasks(){
+    	List<Task> uncompletedTasks = new ArrayList<Task>();
+    	for (Task t: storeAllTasks){
+    		if (!t.isCompleted()){
+    			uncompletedTasks.add(t);
+    		}
+    	}
     	return uncompletedTasks;
     }
     public List<Task> getcompletedTasks(){
+    	List<Task> completedTasks = new ArrayList<Task>();
+    	for (Task t: storeAllTasks){
+    		if (t.isCompleted()){
+    			completedTasks.add(t);
+    		}
+    	}
     	return completedTasks;
     }
     /*
      * Following methods update the storeAllTasks, uncompletedTasks, completedTasks.
      */
     public void addTask(Task task) {
+    	
     	storeAllTasks.add(task);
-    	uncompletedTasks.add(task);
     }
     public void removeTask(Task task){
+    	
     	storeAllTasks.remove(task);
-    	completedTasks.remove(task);
-    	uncompletedTasks.remove(task);
+    	
+    	System.out.println("This task is removed. " + task.toString());
     }
     public void completeTask(Task task){
     	
-    	if (completedTasks.contains(task)){
+    	if (task.isCompleted()){
     		System.out.println("task already marked as completed");
     		return ;
     	}else{
-    		uncompletedTasks.remove(task);
-    		completedTasks.add(task);
+    		task.markAsCompleted();
+    		System.out.println("This task is marked as completed" + task.toString());
     		return ;
     	}
     }
     public void editTask(Task old_task, Task new_task){
     	storeAllTasks.remove(old_task);
     	storeAllTasks.add(new_task);
-    	uncompletedTasks.add(new_task);
-    	uncompletedTasks.remove(old_task);
     }
+
 }
