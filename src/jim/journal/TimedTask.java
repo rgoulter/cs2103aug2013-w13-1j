@@ -36,7 +36,15 @@ public class TimedTask extends Task {
     @Override
     public boolean equals(Object o) {
         // TODO: An actual equals method
-        return o instanceof TimedTask;
+    	if (o instanceof TimedTask){
+    		TimedTask helper = (TimedTask) o;
+    		if ((this.startTime.equals(helper.getStartTime()))
+    				&&(this.endTime.equals(helper.getEndTime()))
+    				&&(this.description.equalsIgnoreCase(helper.getDescription()))){
+    			return true;
+    		}
+    	}
+    	return false;
     }
     
     @Override

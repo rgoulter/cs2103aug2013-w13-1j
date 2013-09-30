@@ -23,6 +23,12 @@ public class SuggestionManager {
 	private static final String GREY_COLOR = "<font color='gray'>";
 	
 	private int highlightedLine = -1;
+	private static final int DEADLINE_TASK_DETECTED = 2;
+	private static final int DEADLINE_TASK_WITHOUT_TIME = 1;
+	private static final int LENGTH_OF_DATE = 3;   //[DD][MM][YY]
+	private static final int LENGTH_OF_TIME = 2;  //[22(hrs)][00(mins)]
+	private static final int INDICATE_YEAR = 2;
+	private static final int INDICATE_MONTH = 1;
 	
     public List<String> getSuggestionsToDisplay() {
     	// TODO: Stop cheating on this, as well =P
@@ -78,7 +84,7 @@ public class SuggestionManager {
     // this helper method makes sense.
     private List<jim.journal.Task> searchForTasksByDescription(String description) {
         //TODO: A rudimentary implementation of this.
-        
+        //TODO: check with user if the result matched what they really want???
         return null;
     }
     
@@ -156,12 +162,13 @@ public class SuggestionManager {
             return parseSearchCommand(args);
         } else if (args[0].equals("display")) {
             return parseDisplayCommand(args);
+        } else if (args[0].equals("exit")) {
+        	System.exit(0);
         }
-        
         return null;
     }
     
-    private int detectDate(String args[]) {   // added stuff here!!!
+    private int detectDate(String args[]) {   
     	int index_with_date = args.length; 
     	for (int i = 1; i < args.length; i++) {
     	// start from 1 as index 0 is a command.
@@ -182,14 +189,62 @@ public class SuggestionManager {
         return true;
     }
     
+    public int[] splitUpDate (String date_in_string) {
+    	// we will accept date format of 090913 - DDMMYY
+    	int[] dates = new int[LENGTH_OF_DATE];
+    	String[] temp = date_in_string.split("");
+    	int counter = 1; // temp[0] is a spacing
+    	for (int i = 0; i < LENGTH_OF_DATE; i++) {
+    		if (i == INDICATE_YEAR) {
+    			dates[i] = Integer.parseInt("20" + temp[counter++] + temp[counter++]);
+    		} else if (i == INDICATE_MONTH) {
+    			dates[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    			dates[i] = dates[i] - 1;  //month is 0-based, eg. January = 0
+    		} else {
+    			dates[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    		}
+    	}
+    	return dates;
+    }
+    
+    public int[] splitTime (String time_in_string) {
+    	// we will accept time format of 24 hours - 2200 hrs, default seconds is 00
+    	int[] time_24hours = new int[LENGTH_OF_TIME];
+    	String[] temp = time_in_string.split("");
+    	int counter = 1; // temp[0] is a spacing
+    	for (int i = 0; i < LENGTH_OF_TIME; i++) {
+    		time_24hours[i] = Integer.parseInt(temp[counter++]+temp[counter++]);
+    	}
+    	return time_24hours;
+    }
+    
     private AddCommand parseAddCommand(String args[]) {
         // Accepted 'add' syntaxes:
         // add <start-date> <start-time> <end-date> <end-time> <words describing event>
         // TODO: Add more syntaxes/formats for this command
+    	int dateDetectedIndex = detectDate(args);
+    	
+    	Calendar startDateTime = Calendar.getInstance();
+        Calendar endDateTime = Calendar.getInstance();
+        int determine_task_type = args.length - dateDetectedIndex;
         
-        Calendar startDateTime = null;
-        Calendar endDateTime = null;
-        String description = join(args, ' ', 1, detectDate(args)); // The description follows the other words.   editted here!!
+    	if ((determine_task_type > 0) && (determine_task_type <= DEADLINE_TASK_DETECTED)) {
+    		int[] deadline = splitUpDate(args[dateDetectedIndex]);
+    		int YY = deadline[2], MM = deadline[1], DD = deadline[0];
+    		if (determine_task_type == DEADLINE_TASK_WITHOUT_TIME) {
+	    		endDateTime.set(YY, MM, DD);
+    		} else {
+    			int[] time = splitTime (args[dateDetectedIndex+1]);
+    			int hrs = time[0], mins = time [1];
+    			endDateTime.set(YY, MM, DD, hrs, mins);
+    		}
+    		startDateTime.set(YY, MM, DD);
+    	} else {
+    		startDateTime = null;
+            endDateTime = null;
+    	}
+        
+        String description = join(args, ' ', 1, dateDetectedIndex); // The description follows the other words.   editted here!!
         
         // TODO: Process values in a sensible way.
         if (startDateTime == null && endDateTime == null ) {
@@ -204,8 +259,8 @@ public class SuggestionManager {
         
         String description = join(args, ' ', 1);
         List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
-        
-        return null;
+      
+        return new jim.journal.CompleteCommand(tasksWhichMatchDescription);
     }
     
     private RemoveCommand parseRemoveCommand(String args[]) { // The "Remove" commands
@@ -214,16 +269,19 @@ public class SuggestionManager {
         // TODO: Add more syntaxes/formats for this command
         
         String description = join(args, ' ', 1);
+        List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
         
-        return null;
+        return new jim.journal.RemoveCommand(tasksWhichMatchDescription);
     }
     
     private EditCommand parseEditCommand(String args[]) { // The "Edit" commands
         // Accepted 'edit' syntaxes:
-        // edit <description>
+        // edit <description> = <description of old task> + "TO" + <description of new task>
         // TODO: Add more syntaxes/formats for this command
-        
+       
         String description = join(args, ' ', 1);
+        
+        //List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
         
         return null;
     }

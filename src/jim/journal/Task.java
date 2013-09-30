@@ -6,5 +6,4 @@ public abstract class Task {
 	public String toString() {
 		return description;
 	}
-	
 }

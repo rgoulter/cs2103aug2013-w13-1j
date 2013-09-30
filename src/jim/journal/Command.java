@@ -22,8 +22,7 @@ public abstract class Command {
     //
     // I chose the first option there.
     public abstract void execute(JournalManager journalManager);
-    public abstract String addAnEvent(String anEvent);
-    public abstract String deleteAnEvent();
+    
     
     protected void output(String outputStr) {
         outputStringBuilder.append(outputStr);

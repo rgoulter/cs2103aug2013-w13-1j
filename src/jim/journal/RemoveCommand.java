@@ -1,20 +1,28 @@
 package jim.journal;
 
-public class RemoveCommand extends Command {
+import java.util.Calendar;
+import java.util.List;
 
+public class RemoveCommand extends Command {
+	List<Task> taskToremove;
+	
+	public RemoveCommand(Calendar startTime, Calendar endTime, String description) {
+        taskToremove.add(new TimedTask(startTime, endTime, description));
+    }
+    
+    public RemoveCommand(String description) {
+    	taskToremove.add(new FloatingTask(description));
+    }
+    
+    public RemoveCommand(List<Task> tasks){
+    	taskToremove = tasks;
+    }
+    
     @Override
     public void execute(JournalManager journalManager) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public String addAnEvent(String anEvent) {
-        return null;
-    }
-
-    @Override
-    public String deleteAnEvent() {
-        return null;
+    	for (Task t : taskToremove){
+    		journalManager.removeTask(t);
+    	}
     }
 
 }
