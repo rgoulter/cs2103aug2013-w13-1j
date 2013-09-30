@@ -125,6 +125,10 @@ public class SuggestionManager {
         return result.toString();
     }
     
+    public jim.journal.Task parseTask(String[] words) {
+        return null;
+    }
+    
     /**
      * Takes an array of strings, e.g. {"add", "lunch", "Monday", "2pm"},
      * and returns a Journal command to be executed from this.
@@ -277,13 +281,14 @@ public class SuggestionManager {
     
     private EditCommand parseEditCommand(String args[]) { // The "Edit" commands
         // Accepted 'edit' syntaxes:
-        // edit <description of old task> to <new description> <new start-date> <new start-time> <new end-date> <new end-time>
+        // edit <description of old task>
+        //  (then read in from input what to replace it with).
         // TODO: Add more syntaxes/formats for this command
-        // NOTE THAT: The format after "to" is a format which describes a Task. (Timed, floating, etc.)
+        // NOTE THAT: The format read in is a format which describes a Task. (Timed, floating, etc.)
        
         String description = join(args, ' ', 1);
         
-        //List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
+        List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
         
         return null;
     }
