@@ -1,5 +1,7 @@
 package jim.suggestions;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -12,6 +14,7 @@ import jim.journal.RemoveCommand;
 import jim.journal.EditCommand;
 import jim.journal.SearchCommand;
 import jim.journal.DisplayCommand;
+import jim.journal.TimedTask;
 
 public class SuggestionManager {
 
@@ -125,8 +128,37 @@ public class SuggestionManager {
         return result.toString();
     }
     
+    private Calendar parseDateTime(String date, String time) {
+        // Accepted Date Formats:
+        // DD/MM/YY
+        // Accepted Time Formats:
+        // 24-hour
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HHmm");
+        
+        try {
+            GregorianCalendar result = new GregorianCalendar();
+            result.setTime(dateFormat.parse(date + " " + time));
+            
+            return result;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     public jim.journal.Task parseTask(String[] words) {
-        return null;
+        // Accepted Task Syntaxes:
+        // TimedTask:
+        //   <start-date> <start-time> <end-date> <end-time> <description..>
+        //   where date format is DD/MM/YY,
+        //   where time format is 24-hour
+
+        Calendar startDateTime = parseDateTime(words[0], words[1]);
+        Calendar endDateTime   = parseDateTime(words[2], words[3]);
+        String description = join(words, ' ', 2 + 2);
+        
+        return new TimedTask(startDateTime, endDateTime, description);
     }
     
     /**
