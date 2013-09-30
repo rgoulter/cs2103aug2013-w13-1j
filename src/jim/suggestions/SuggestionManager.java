@@ -85,7 +85,8 @@ public class SuggestionManager {
     private List<jim.journal.Task> searchForTasksByDescription(String description) {
         //TODO: A rudimentary implementation of this.
         //TODO: check with user if the result matched what they really want???
-        return null;
+        //jfskldfjskldjfkl
+    	return null;
     }
     
     /**
