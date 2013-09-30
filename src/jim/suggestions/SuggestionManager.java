@@ -277,8 +277,9 @@ public class SuggestionManager {
     
     private EditCommand parseEditCommand(String args[]) { // The "Edit" commands
         // Accepted 'edit' syntaxes:
-        // edit <description> = <description of old task> + "TO" + <description of new task>
+        // edit <description of old task> to <new description> <new start-date> <new start-time> <new end-date> <new end-time>
         // TODO: Add more syntaxes/formats for this command
+        // NOTE THAT: The format after "to" is a format which describes a Task. (Timed, floating, etc.)
        
         String description = join(args, ' ', 1);
         

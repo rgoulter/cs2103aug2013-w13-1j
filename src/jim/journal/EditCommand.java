@@ -13,7 +13,6 @@ public class EditCommand extends Command {
     //changedToTask is the new task which user want to replace with the older one.
     
 	public EditCommand(List<Task> tasksWhichMatchDescription, Task changedToTask) {
-		// TODO Auto-generated constructor stub
     	tasksToEdit = tasksWhichMatchDescription;
     	taskChangedTo = changedToTask;
 	}
