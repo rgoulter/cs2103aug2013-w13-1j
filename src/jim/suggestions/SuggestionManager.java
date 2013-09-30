@@ -293,8 +293,7 @@ public class SuggestionManager {
         // TODO: Add more syntaxes/formats for this command
 
         String description = join(args, ' ', 1);
-        
-        return null;
+        return new jim.journal.SearchCommand(description);
     }
     
     private DisplayCommand parseDisplayCommand(String args[]) { // The "Display" commands

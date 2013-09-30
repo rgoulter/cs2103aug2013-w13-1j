@@ -43,13 +43,13 @@ public class JournalManager {
  
     public List<Task> getAllTasks() {
         // TODO: Not cheat on this.
-        Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
+        /* Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
         Calendar endTime =   new GregorianCalendar(2013, 10, 10, 15, 0);
         String description = "CS2103 Lecture";
 
         Task expectedTask = new TimedTask(startTime, endTime, description);
         List<Task> allTasks = new ArrayList<Task>();
-        allTasks.add(expectedTask);
+        allTasks.add(expectedTask); */
         
         return storeAllTasks;   // Added this change here! 1.
     }

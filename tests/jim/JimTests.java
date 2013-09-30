@@ -12,6 +12,7 @@ import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.DisplayCommand;
 import jim.journal.JournalManager;
+import jim.journal.SearchCommand;
 import jim.journal.Task;
 import jim.journal.TimedTask;
 
@@ -42,8 +43,6 @@ public class JimTests {
     public void testStrictSyntaxAddCommandCanExecute() {
         // Strict syntax for "add" command:
         // add <start-date> <start-time> <end-date> <end-time> <words describing event>
-        
-    	// TODO: This is cheating as well ~CC
     	
         Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
         Calendar endTime =   new GregorianCalendar(2013, 10, 10, 15, 0);
@@ -77,9 +76,11 @@ public class JimTests {
     
     @Test
     public void testStrictSyntaxDisplayCommandZeroArgsCanExecute() {
-    	// NB: This is kinda cheating, since it depends on the currently hard-coded "getAllTasks"
-    	
     	JournalManager jManager = new JournalManager();
+    	
+    	AddCommand addCmd = new AddCommand("CS2103 Lecture");
+    	addCmd.execute(jManager);
+    	
     	DisplayCommand dispCmd = new DisplayCommand();
     	dispCmd.execute(jManager);
     	
@@ -94,10 +95,13 @@ public class JimTests {
     }
     
     @Test
-    public void testStrictSyntaxDisplayCommandOneArgsCanExecute() {
-    	// NB: This is kinda cheating, since it depends on the currently hard-coded "getAllTasks"
-    	
+    public void testStrictSyntaxDisplayCommandOneArgsCanExecute() {    	
     	JournalManager jManager = new JournalManager();
+    	
+    	Calendar testDate = new GregorianCalendar(2013,10,10);
+    	AddCommand addCmd = new AddCommand(testDate, testDate, "CS2103 Lecture");
+    	addCmd.execute(jManager);
+    	
     	DisplayCommand dispCmd = new DisplayCommand(new GregorianCalendar(2013,10,10));
     	dispCmd.execute(jManager);
     	
@@ -108,8 +112,74 @@ public class JimTests {
     		stringsMatch = true;
     	}
     	
-    	System.out.println(output.length());
     	assertTrue("Display command test (on one argument) has failed", stringsMatch);
     }
 
+    @Test
+    public void testStrictSyntaxSearchCommandCanParse() {
+    	String[] arguments = {"search", "testing"};
+    	
+    	SuggestionManager sManager = new SuggestionManager();
+    	Command parsedSearchCommand = sManager.parseCommand(arguments);
+    	
+    	assertNotNull(parsedSearchCommand);
+    	assertTrue(parsedSearchCommand instanceof SearchCommand);
+    }
+
+    @Test
+    public void testStrictSyntaxSearchCommandNoMatchCanExecute() {
+    	JournalManager jManager = new JournalManager();
+    	AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
+    	addCmd1.execute(jManager);
+    	AddCommand addCmd2 = new AddCommand("CS2101 Sectional");
+    	addCmd2.execute(jManager);
+    	
+    	SearchCommand searchCmd = new SearchCommand("Tutorial");
+    	searchCmd.execute(jManager);
+    	
+    	String output = searchCmd.getOutput();
+    	boolean result = false;
+    	
+    	if (output.equals("Search term 'Tutorial' was not found.\n")) { result = true; }
+    	assertTrue("Search for absent item has failed", result);
+    }
+
+    @Test
+    public void testStrictSyntaxSearchCommandHasMatchesCanExecute() {
+    	JournalManager jManager = new JournalManager();
+    	AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
+    	addCmd1.execute(jManager);
+    	
+    	SearchCommand searchCmd1 = new SearchCommand("Lecture");
+    	searchCmd1.execute(jManager);
+    	
+    	String output = searchCmd1.getOutput();
+    	boolean result = false;
+    	
+    	if (output.equals("Matches for 'Lecture':\nCS2103 Lecture\n\n")) { result = true; }
+    	assertTrue("Basic search has failed", result);
+    	
+    	result = false;
+    	AddCommand addCmd2 = new AddCommand("CS2103 Tutorial");
+    	addCmd2.execute(jManager);
+    	
+    	SearchCommand searchCmd2 = new SearchCommand("Lecture");
+    	searchCmd2.execute(jManager);
+    	
+    	output = searchCmd2.getOutput();
+    	if (output.equals("Matches for 'Lecture':\nCS2103 Lecture\n\n")) { result = true; }
+    	assertTrue("Search with non-matches failed", result);
+    	
+    	result = false;
+    	AddCommand addCmd3 = new AddCommand("CS2101 Lecture");
+    	addCmd3.execute(jManager);
+
+    	SearchCommand searchCmd3 = new SearchCommand("Lecture");
+    	searchCmd3.execute(jManager);
+    	
+    	output = searchCmd3.getOutput();
+    	if (output.equals("Matches for 'Lecture':\nCS2103 Lecture\nCS2101 Lecture\n\n")) { result = true; }
+    	assertTrue("Search with multiple matches failed", result);
+    	
+    }
 }
