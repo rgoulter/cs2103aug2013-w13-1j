@@ -118,17 +118,12 @@ public class JimTests {
         Calendar oldEndTime =   new GregorianCalendar(2013, 10, 10, 15, 0);
         TimedTask myOldTimedTask = new TimedTask(oldStartTime, oldEndTime, "MyOldTask");
         
-        // n.b. JAN = 0, ..., DEC = 11
-        Calendar newStartTime = new GregorianCalendar(2013, 11, 31, 14, 0);
-        Calendar newEndTime =   new GregorianCalendar(2013, 11, 31, 15, 0);
-        TimedTask expectedNewTimedTask = new TimedTask(newStartTime, newEndTime, "MyNewTask");
-        
         JournalManager journalManager = new JournalManager(); // Empty; NO TASKS.
         journalManager.addTask(myOldTimedTask);
 
         EditCommand editCmd = new EditCommand(Arrays.asList(new Task[]{myOldTimedTask})){
             protected String inputLine() {
-                return "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
+                return "31/12/13 0000 31/12/13 2359 MyNewTask";
             }
         };
         editCmd.execute(journalManager);
