@@ -259,7 +259,6 @@ public class SuggestionManager {
         // complete <description>
         
         String description = join(args, ' ', 1);
-      
         return new jim.journal.CompleteCommand(description);
     }
     
@@ -269,8 +268,6 @@ public class SuggestionManager {
         // TODO: Add more syntaxes/formats for this command
         
         String description = join(args, ' ', 1);
-        
-        
         return new jim.journal.RemoveCommand(description);
     }
     

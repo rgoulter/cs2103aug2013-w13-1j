@@ -15,14 +15,21 @@ public class CompleteCommand extends Command {
         // TODO Auto-generated method stub
 		List<Task> tasksCompleted = new ArrayList<Task>();
 		List<Task> allTasks = journalManager.getAllTasks();
+		
+	
 		for (Task task : allTasks){
 			if (task.getDescription().contains(description)) {
 				tasksCompleted.add(task);
 			}
 		}
-		for (Task t : tasksCompleted){
-    		journalManager.completeTask(t);
+		if (tasksCompleted.isEmpty()){
+			outputln("Description was not matched.");
 		}
+		for (Task t : tasksCompleted){
+    		String feedback = journalManager.completeTask(t);
+    		outputln(feedback);
+		}
+		
     }
 
 }

@@ -77,21 +77,15 @@ public class JournalManager {
     	
     	storeAllTasks.add(task);
     }
-    public void removeTask(Task task){
-    	
-    	storeAllTasks.remove(task);
-    	
-    	System.out.println("This task is removed. " + task.toString());
+    public boolean removeTask(Task task){
+    	return storeAllTasks.remove(task);  
     }
-    public void completeTask(Task task){
-    	
+    public String completeTask(Task task){
     	if (task.isCompleted()){
-    		System.out.println("task already marked as completed");
-    		return ;
+    		return "Task " + task.toString() + " has already been marked as completed.";
     	}else{
     		task.markAsCompleted();
-    		System.out.println("This task is marked as completed" + task.toString());
-    		return ;
+    		return "Completed Task: " + task.toString();
     	}
     }
     public void editTask(Task old_task, Task new_task){

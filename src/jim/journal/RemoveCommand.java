@@ -19,9 +19,18 @@ public class RemoveCommand extends Command {
 				taskToremove.add(task);
 			}
 		}
+		if (taskToremove.isEmpty()){
+			outputln("Description was not matched.");
+		}
+		
     	for (Task t : taskToremove){
-    		journalManager.removeTask(t);
+    		if (journalManager.removeTask(t)){
+    			outputln("Removed task: " + t.toString());
+    		}else{
+    			outputln("Removing task was not successful.");
+    		}
     	}
+    	
     }
 
 }
