@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -26,15 +27,15 @@ public class SuggestionManager {
 	private static final String GREY_COLOR = "<font color='gray'>";
 	
 	private int highlightedLine = -1;
-	private static final int DEADLINE_TASK_DETECTED = 2;
-	private static final int DEADLINE_TASK_WITHOUT_TIME = 1;
+	private static final int DEADLINE_TASK_DETECTED = 1;
+	private static final int DEADLINE_TASK_WITHOUT_TIME = 0;
 	private static final int LENGTH_OF_DATE = 3;   //[DD][MM][YY]
 	private static final int LENGTH_OF_TIME = 2;  //[22(hrs)][00(mins)]
 	private static final int INDICATE_YEAR = 2;
 	private static final int INDICATE_MONTH = 1;
 	private static final int INDICATE_TIME_STRING = 4;
 	private static final int INDICATE_DATE_STRING = 6;
-	private static final int INDICATE_TASK_ENDS_IN_A_DAY = 2;
+	private static final int INDICATE_TASK_ENDS_IN_A_DAY = 1;
 	
     public List<String> getSuggestionsToDisplay() {
     	// TODO: Stop cheating on this, as well =P
@@ -207,17 +208,10 @@ public class SuggestionManager {
         }
         return null;
     }
-    
-    private int detectDate(String args[]) {   
-    	int index_with_date = args.length; 
-    	for (int i = 1; i < args.length; i++) {
-    	// start from 1 as index 0 is a command.
-    		if (isInteger(args[i])) {
-    			index_with_date = i;  
-    			break;
-    		}
-    	}
-    	return index_with_date;
+   
+    public String removeAllSymbols (String tellDateOrTime) {   
+		String findDate = tellDateOrTime.replaceAll("[^\\p{L}\\p{Nd}]", "");
+		return findDate;
     }
     
     public static boolean isInteger(String s) {
@@ -229,7 +223,7 @@ public class SuggestionManager {
         return true;
     }
     
-    public int[] splitUpDate (String date_in_string) {
+    public int[] splitDate (String date_in_string) {
     	// we will accept date format of 090913 - DDMMYY
     	int[] dates = new int[LENGTH_OF_DATE];
     	String[] temp = date_in_string.split("");
@@ -262,61 +256,75 @@ public class SuggestionManager {
         // Accepted 'add' syntaxes:
         // add <start-date> <start-time> <end-date> <end-time> <words describing event>
         // TODO: Add more syntaxes/formats for this command
-    	int dateDetectedIndex = detectDate(args);
     	Calendar startDateTime = Calendar.getInstance();
         Calendar endDateTime = Calendar.getInstance();
-        int determine_task_type = args.length - 1 - dateDetectedIndex;
+        ArrayList <int[]> dateList = new ArrayList<int[]> ();
+        ArrayList <int[]> timeList = new ArrayList<int[]> ();
+        int startDateTimeIndex = 0;
+        int endDateTimeIndex = 0;
         
-    	if ((determine_task_type > 0) && (determine_task_type <= DEADLINE_TASK_DETECTED)) {
-    		int[] deadline = splitUpDate(args[dateDetectedIndex]);
-    		int YY = deadline[2], MM = deadline[1], DD = deadline[0];
-    		if (determine_task_type == DEADLINE_TASK_WITHOUT_TIME) {
-	    		endDateTime.set(YY, MM, DD);
-    		} else {
-    			int[] time = splitTime (args[dateDetectedIndex+1]);
+        for (int i = 1; i < args.length; i++) {
+        	String dateOrTime = removeAllSymbols(args[i]);
+        	if (isInteger(dateOrTime)) {
+        		if (dateOrTime.length() == INDICATE_DATE_STRING) {
+        			dateList.add(splitDate (dateOrTime));
+        			if (startDateTimeIndex == 0) {
+        				startDateTimeIndex = i;
+        			}
+        		} else if (dateOrTime.length() == INDICATE_TIME_STRING){
+        			timeList.add(splitTime (dateOrTime));
+        			if (endDateTimeIndex == 0 || i > endDateTimeIndex) {
+        				endDateTimeIndex = i;
+        			}
+        		}
+        	}
+        }
+        if (startDateTimeIndex != 0 || endDateTimeIndex != 0) {
+        	if (timeList.size() <= DEADLINE_TASK_DETECTED) {
+        		int[] deadline = dateList.get(0);
+        		int YY = deadline[2], MM = deadline[1], DD = deadline[0];
+        		if (timeList.size() == DEADLINE_TASK_WITHOUT_TIME) {
+    	    		endDateTime.set(YY, MM, DD);
+        		} else {
+        			int[] time = timeList.get(0);
+        			int hrs = time[0], mins = time [1];
+        			endDateTime.set(YY, MM, DD, hrs, mins);
+        		}
+        		startDateTime.set(YY, MM, DD);
+        	} else if (timeList.size() > DEADLINE_TASK_DETECTED) {
+        		// indicates that a timed task is detected
+        		int[] deadline = dateList.get(0);
+        		int YY = deadline[2], MM = deadline[1], DD = deadline[0];
+        		int[] time = timeList.get(0);
     			int hrs = time[0], mins = time [1];
-    			endDateTime.set(YY, MM, DD, hrs, mins);
-    		}
-    		startDateTime.set(YY, MM, DD);
-    	} else if (determine_task_type > DEADLINE_TASK_DETECTED) {
-    		// indicates that a timed task is detected
-    		int[] deadline = splitUpDate(args[dateDetectedIndex]);
-    		int YY = deadline[2], MM = deadline[1], DD = deadline[0];
-			int[] time = splitTime (args[dateDetectedIndex+1]);
-			int hrs = time[0], mins = time [1];
-			startDateTime.set(YY, MM, DD, hrs, mins);
-    		int endDateStartIndex = dateDetectedIndex + determine_task_type;
-	    	if (args.length - 1 - endDateStartIndex > INDICATE_TASK_ENDS_IN_A_DAY) {
-	    		for (int i = 0; i < args.length; i++) {
-	    			if (isInteger(args[i]) && args[i].length() == INDICATE_TIME_STRING) {
-	    				time = splitTime (args[i]);
-	    				hrs = time[0]; 
-	    				mins = time[1];
-	    			} else if (isInteger(args[i]) && args[i].length() == INDICATE_DATE_STRING) {
-	    				deadline = splitUpDate(args[i]);
-	    	    		YY = deadline[2];
-	    	    		MM = deadline[1];
-	    	    		DD = deadline[0];
-	    			}
-	    		}
-	    		endDateTime.set(YY, MM, DD, hrs, mins);
-	    	} else {
-    			for (int i = 0; i < args.length; i++) {
-	    			if (isInteger(args[i])) {
-	    				time = splitTime (args[i]);
-	    				hrs = time[0]; 
-	    				mins = time[1];
-	    				endDateTime.set(YY, MM, DD, hrs, mins);
-	    			}
-	    		}
-	    	}
-    	} else {
+    			startDateTime.set(YY, MM, DD, hrs, mins);
+    			time = timeList.get(1);
+    			hrs = time[0]; 
+    			mins = time[1];
+    	    	if (dateList.size() == INDICATE_TASK_ENDS_IN_A_DAY) {
+    	    		endDateTime.set(YY, MM, DD, hrs, mins);
+    	    	} else {
+    	    		deadline = dateList.get(1);
+    	    		YY = deadline[2];
+    	    		MM = deadline[1];
+    	    		DD = deadline[0];
+    	    		endDateTime.set(YY, MM, DD, hrs, mins);
+    	    	}
+        	}
+        } else {
     		startDateTime = null;
             endDateTime = null;
     	}
-        
-        String description = join(args, ' ', 1, dateDetectedIndex); // The description follows the other words.   editted here!!
-        
+    	String description;
+    	if (endDateTimeIndex > startDateTimeIndex) {
+	    	if (startDateTimeIndex == 1) {
+	    		description = join(args, ' ', endDateTimeIndex + 1, args.length); 
+	    	} else {
+	    		description = join(args, ' ', 1, startDateTimeIndex);
+	    	}
+    	} else {
+    		description = join(args, ' ', endDateTimeIndex + 1, args.length); 
+    	}
         // TODO: Process values in a sensible way.
         if (startDateTime == null && endDateTime == null ) {
         	return new jim.journal.AddCommand(description);
