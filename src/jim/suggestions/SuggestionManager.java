@@ -32,6 +32,9 @@ public class SuggestionManager {
 	private static final int LENGTH_OF_TIME = 2;  //[22(hrs)][00(mins)]
 	private static final int INDICATE_YEAR = 2;
 	private static final int INDICATE_MONTH = 1;
+	private static final int INDICATE_TIME_STRING = 4;
+	private static final int INDICATE_DATE_STRING = 6;
+	private static final int INDICATE_TASK_ENDS_IN_A_DAY = 2;
 	
     public List<String> getSuggestionsToDisplay() {
     	// TODO: Stop cheating on this, as well =P
@@ -260,10 +263,9 @@ public class SuggestionManager {
         // add <start-date> <start-time> <end-date> <end-time> <words describing event>
         // TODO: Add more syntaxes/formats for this command
     	int dateDetectedIndex = detectDate(args);
-    	
     	Calendar startDateTime = Calendar.getInstance();
         Calendar endDateTime = Calendar.getInstance();
-        int determine_task_type = args.length - dateDetectedIndex;
+        int determine_task_type = args.length - 1 - dateDetectedIndex;
         
     	if ((determine_task_type > 0) && (determine_task_type <= DEADLINE_TASK_DETECTED)) {
     		int[] deadline = splitUpDate(args[dateDetectedIndex]);
@@ -276,6 +278,38 @@ public class SuggestionManager {
     			endDateTime.set(YY, MM, DD, hrs, mins);
     		}
     		startDateTime.set(YY, MM, DD);
+    	} else if (determine_task_type > DEADLINE_TASK_DETECTED) {
+    		// indicates that a timed task is detected
+    		int[] deadline = splitUpDate(args[dateDetectedIndex]);
+    		int YY = deadline[2], MM = deadline[1], DD = deadline[0];
+			int[] time = splitTime (args[dateDetectedIndex+1]);
+			int hrs = time[0], mins = time [1];
+			startDateTime.set(YY, MM, DD, hrs, mins);
+    		int endDateStartIndex = dateDetectedIndex + determine_task_type;
+	    	if (args.length - 1 - endDateStartIndex > INDICATE_TASK_ENDS_IN_A_DAY) {
+	    		for (int i = 0; i < args.length; i++) {
+	    			if (isInteger(args[i]) && args[i].length() == INDICATE_TIME_STRING) {
+	    				time = splitTime (args[i]);
+	    				hrs = time[0]; 
+	    				mins = time[1];
+	    			} else if (isInteger(args[i]) && args[i].length() == INDICATE_DATE_STRING) {
+	    				deadline = splitUpDate(args[i]);
+	    	    		YY = deadline[2];
+	    	    		MM = deadline[1];
+	    	    		DD = deadline[0];
+	    			}
+	    		}
+	    		endDateTime.set(YY, MM, DD, hrs, mins);
+	    	} else {
+    			for (int i = 0; i < args.length; i++) {
+	    			if (isInteger(args[i])) {
+	    				time = splitTime (args[i]);
+	    				hrs = time[0]; 
+	    				mins = time[1];
+	    				endDateTime.set(YY, MM, DD, hrs, mins);
+	    			}
+	    		}
+	    	}
     	} else {
     		startDateTime = null;
             endDateTime = null;
