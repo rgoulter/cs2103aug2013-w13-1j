@@ -322,6 +322,8 @@ public class SuggestionManager {
 	    	} else {
 	    		description = join(args, ' ', 1, startDateTimeIndex);
 	    	}
+    	} else if (startDateTimeIndex > endDateTimeIndex && endDateTimeIndex == 0) {
+    		description = join(args, ' ', 1, startDateTimeIndex); 
     	} else {
     		description = join(args, ' ', endDateTimeIndex + 1, args.length); 
     	}
