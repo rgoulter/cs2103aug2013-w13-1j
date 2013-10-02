@@ -3,6 +3,7 @@ package jim;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -12,9 +13,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.AbstractAction;
-import javax.swing.JTextField;
+import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 
 import java.awt.CardLayout;
 import java.util.Collections;
@@ -26,14 +30,19 @@ import jim.journal.JournalView;
 
 
 public class JimMainPanel extends JPanel {
-    private JTextField inputTextField;
+    private JEditorPane inputTextField;
     private JPanel viewPanel;
     
     private JournalView journalView;
     private SuggestionView suggestionView;
     private SuggestionManager suggestionManager;
     private JournalManager journalManager;
-
+    
+    // Border Objects
+    private static final Color BORDER_DARK_BLUE = new Color(100,100,188);
+    private static final Color BORDER_BLUE = new Color(225,225,255);
+    private static final Color BORDER_BLACK = new Color(0,0,0);
+    
     // Arbitrary objects for ActionMap.
     private static final String ACTION_EXIT_WINDOW = "exit window";
     private static final String ACTION_EXECUTE_INPUT = "execute input";
@@ -54,7 +63,6 @@ public class JimMainPanel extends JPanel {
         suggestionManager = new SuggestionManager();
         journalManager = new JournalManager();
         
-        
         // Setup the View parts for the Jim-specific stuff.
         suggestionView = new SuggestionView(); 
         suggestionView.setSuggestionManager(suggestionManager);
@@ -72,7 +80,11 @@ public class JimMainPanel extends JPanel {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
         
-        inputTextField = new JTextField();
+        inputTextField = new JEditorPane();
+        Border outerBorder = BorderFactory.createLineBorder(BORDER_BLUE, 4);
+        Border innerBorder = BorderFactory.createLineBorder(BORDER_BLACK, 1);
+        Border inputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
+        inputTextField.setBorder(inputFieldBorder);
         
         // Disable default focus traversal keys so we can rebind TAB and SHIFT+TAB
         inputTextField.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
@@ -88,7 +100,7 @@ public class JimMainPanel extends JPanel {
             // Catches keystrokes as the user inputs them
             @Override
             public void keyReleased(KeyEvent arg0) {
-            	suggestionManager.updateBuffer(inputTextField.getText());
+            	suggestionManager.updateBuffer(inputTextField.getText());            	
                 refreshUI();
             }
 
@@ -147,13 +159,18 @@ public class JimMainPanel extends JPanel {
         	}
         });
 
-        inputTextField.setColumns(10);
+        // inputTextField.setContentType("text/html");
         add(inputTextField, BorderLayout.NORTH);
         
         
         // The viewPanel here is to contain the "Views" which JIM! may need to display,
         // i.e. show a JournalView, or a SuggestionView (or maybe half-and-half).
         viewPanel = new JPanel();
+        outerBorder = BorderFactory.createLineBorder(BORDER_BLUE, 4);
+        innerBorder = BorderFactory.createLoweredSoftBevelBorder();
+        Border outputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
+        viewPanel.setBorder(outputFieldBorder);
+        
         viewPanel.setPreferredSize(new Dimension(VIEW_AREA_WIDTH, VIEW_AREA_HEIGHT));
         add(viewPanel, BorderLayout.CENTER);
         viewPanel.setLayout(new CardLayout(0, 0));
@@ -161,7 +178,7 @@ public class JimMainPanel extends JPanel {
     }
     
     private void displayAutoComplete(String text) {
-    	// TODO: Splice suggestion into user's input and reposition cursor in place
+    	inputTextField.setText(text);
     }
     
     
@@ -214,10 +231,12 @@ public class JimMainPanel extends JPanel {
         final JFrame applicationWindow = new JFrame("JIM!");
         applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        // FYI: "Undecorated" means no borders, etc.
+        // Beautify Program Window
         applicationWindow.setUndecorated(true);
 
         JimMainPanel jimPanel = new JimMainPanel();
+    	jimPanel.setBorder(BorderFactory.createLineBorder(BORDER_DARK_BLUE, 3, true));
+        
         applicationWindow.getContentPane().add(jimPanel);
         applicationWindow.pack();
 
