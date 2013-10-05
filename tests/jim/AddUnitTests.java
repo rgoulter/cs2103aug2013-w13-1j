@@ -1,3 +1,4 @@
+
 package jim;
 
 import static org.junit.Assert.*;
@@ -16,39 +17,49 @@ import jim.suggestions.SuggestionManager;
 
 import org.junit.Test;
 
+
+
+
+
+
 public class AddUnitTests {
 
     @Test
-    public void testStrictSyntaxAddCommandCanParse() {
+    public void testStrictSyntaxAddCommandCanParse () {
         // Strict syntax for "add" command:
-        // add <start-date> <start-time> <end-date> <end-time> <words describing event>
+        // add <start-date> <start-time> <end-date> <end-time> <words describing
+        // event>
         String testCommand = "add 10/10/13 1400 10/10/13 1500 CS2103 Lecture";
-        String[] testCommandWords = testCommand.split(" "); 
-        
+        String[] testCommandWords = testCommand.split(" ");
+
         SuggestionManager suggestionManager = new SuggestionManager();
         Command parsedAddCmd = suggestionManager.parseCommand(testCommandWords);
-        
+
         assertNotNull(parsedAddCmd);
         assertTrue(parsedAddCmd instanceof AddCommand);
     }
 
+
+
     @Test
-    public void testStrictSyntaxAddCommandCanExecute() {
+    public void testStrictSyntaxAddCommandCanExecute () {
         // Strict syntax for "add" command:
-        // add <start-date> <start-time> <end-date> <end-time> <words describing event>
-    	
+        // add <start-date> <start-time> <end-date> <end-time> <words describing
+        // event>
+
         Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
-        Calendar endTime =   new GregorianCalendar(2013, 10, 10, 15, 0);
+        Calendar endTime = new GregorianCalendar(2013, 10, 10, 15, 0);
         String description = "CS2103 Lecture";
-        
+
         AddCommand addCmd = new AddCommand(startTime, endTime, description);
-        JournalManager journalManager = new JournalManager(); // Empty; NO TASKS.
+        JournalManager journalManager = new JournalManager(); // Empty; NO
+                                                              // TASKS.
         addCmd.execute(journalManager);
 
         Task expectedTask = new TimedTask(startTime, endTime, description);
         List<Task> expectedList = new ArrayList<Task>();
         expectedList.add(expectedTask);
-        
+
         assertEquals(expectedList, journalManager.getAllTasks());
     }
 
