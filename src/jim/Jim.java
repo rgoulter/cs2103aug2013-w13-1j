@@ -14,7 +14,7 @@ import jim.suggestions.SuggestionManager;
  */
 public class Jim {
 
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         // Load Journal logic.
         SuggestionManager suggestionManager = new SuggestionManager();
         JournalManager journalManager = new JournalManager();

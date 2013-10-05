@@ -38,13 +38,13 @@ public class SuggestionView extends JimView {
 
 
 
-    public void setSuggestionManager (SuggestionManager suggestionManager) {
+    public void setSuggestionManager(SuggestionManager suggestionManager) {
         this.suggestionManager = suggestionManager;
     }
 
 
 
-    public void updateViewWithContent () {
+    public void updateViewWithContent() {
         displayedSuggestions = suggestionManager.getSuggestionsToDisplay();
 
         // Build text from current suggestion content.

@@ -26,7 +26,7 @@ public class DisplayCommand extends Command {
 
 
     @Override
-    public void execute (JournalManager journalManager) {
+    public void execute(JournalManager journalManager) {
         List<Task> allTasks = journalManager.getAllTasks();
 
         for (Task current : allTasks) {

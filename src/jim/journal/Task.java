@@ -8,25 +8,25 @@ public abstract class Task {
 
 
 
-    public boolean isCompleted () {
+    public boolean isCompleted() {
         return completed;
     }
 
 
 
-    public void markAsCompleted () {
+    public void markAsCompleted() {
         completed = true;
     }
 
 
 
-    public String getDescription () {
+    public String getDescription() {
         return description;
     }
 
 
 
-    public String toString () {
+    public String toString() {
         return description;
     }
 }

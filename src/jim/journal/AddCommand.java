@@ -34,7 +34,7 @@ public class AddCommand extends Command {
     // e.g. add <description> (for a floating task kindof thing).
 
     @Override
-    public void execute (JournalManager journalManager) {
+    public void execute(JournalManager journalManager) {
         journalManager.addTask(taskToAdd);
     }
 

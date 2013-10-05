@@ -19,7 +19,7 @@ public class CompleteCommand extends Command {
 
 
     @Override
-    public void execute (JournalManager journalManager) {
+    public void execute(JournalManager journalManager) {
         // TODO Auto-generated method stub
         List<Task> tasksCompleted = new ArrayList<Task>();
         List<Task> allTasks = journalManager.getAllTasks();

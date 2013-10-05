@@ -19,7 +19,7 @@ public class RemoveCommand extends Command {
 
 
     @Override
-    public void execute (JournalManager journalManager) {
+    public void execute(JournalManager journalManager) {
         List<Task> taskToremove = new ArrayList<Task>();
         List<Task> allTasks = journalManager.getAllTasks();
         for (Task task : allTasks) {

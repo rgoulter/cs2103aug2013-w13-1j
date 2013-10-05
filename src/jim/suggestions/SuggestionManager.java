@@ -44,7 +44,7 @@ public class SuggestionManager {
 
 
 
-    public List<String> getSuggestionsToDisplay () {
+    public List<String> getSuggestionsToDisplay() {
         // TODO: Stop cheating on this, as well =P
         List<String> displayedSuggestions = new ArrayList<String>();
 
@@ -62,7 +62,7 @@ public class SuggestionManager {
 
 
 
-    public String getCurrentSuggestion () {
+    public String getCurrentSuggestion() {
         String output = "";
         if (getCurrentSuggestionIndex() != -1) {
             List<String> allStrings = getSuggestionsToDisplay();
@@ -74,26 +74,26 @@ public class SuggestionManager {
 
 
 
-    public void setCurrentSuggestionIndex (int i) {
+    public void setCurrentSuggestionIndex(int i) {
         highlightedLine = i;
     }
 
 
 
-    public int getCurrentSuggestionIndex () {
+    public int getCurrentSuggestionIndex() {
         return highlightedLine;
     }
 
 
 
-    public void nextSuggestion () {
+    public void nextSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() + 1) %
                                   getSuggestionsToDisplay().size());
     }
 
 
 
-    public void prevSuggestion () {
+    public void prevSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1));
         if (getCurrentSuggestionIndex() < 0) {
             setCurrentSuggestionIndex(getSuggestionsToDisplay().size() - 1);
@@ -109,7 +109,7 @@ public class SuggestionManager {
      * @param text
      *            The input currently in the textfield.
      */
-    public void updateBuffer (String text) {
+    public void updateBuffer(String text) {
 
     }
 
@@ -124,8 +124,8 @@ public class SuggestionManager {
      * @param description
      * @return
      */
-    public List<jim.journal.Task> searchForTasksByDescription (jim.journal.JournalManager journal,
-                                                               String description) {
+    public List<jim.journal.Task> searchForTasksByDescription(jim.journal.JournalManager journal,
+                                                              String description) {
         // TODO: check with user if the result matched what they really want???
         List<jim.journal.Task> matchingTasks = new ArrayList<>();
 
@@ -144,7 +144,7 @@ public class SuggestionManager {
      * Inverse of String.split(). Joins an array of Strings to one string. e.g.
      * {"abc", "def"} joinwith ' ' -> "abc def".
      */
-    private String join (String arrayOfStrings[], char joinChar) {
+    private String join(String arrayOfStrings[], char joinChar) {
         return join(arrayOfStrings, joinChar, 0);
     }
 
@@ -154,7 +154,7 @@ public class SuggestionManager {
      * Inverse of String.split(). Joins an array of Strings to one string. e.g.
      * {"abc", "def"} joinwith ' ' -> "abc def".
      */
-    private String join (String arrayOfStrings[], char joinChar, int startIndex) {
+    private String join(String arrayOfStrings[], char joinChar, int startIndex) {
         return join(arrayOfStrings, joinChar, startIndex, arrayOfStrings.length);
     }
 
@@ -164,10 +164,10 @@ public class SuggestionManager {
      * Inverse of String.split(). Joins an array of Strings to one string. e.g.
      * {"abc", "def"} joinwith ' ' -> "abc def".
      */
-    private String join (String arrayOfStrings[],
-                         char joinChar,
-                         int startIndex,
-                         int endIndex) {
+    private String join(String arrayOfStrings[],
+                        char joinChar,
+                        int startIndex,
+                        int endIndex) {
         StringBuilder result = new StringBuilder();
 
         for (int i = startIndex; i < endIndex - 1; i++) {
@@ -182,7 +182,7 @@ public class SuggestionManager {
 
 
 
-    private Calendar parseDateTime (String date, String time) {
+    private Calendar parseDateTime(String date, String time) {
         // Accepted Date Formats:
         // DD/MM/YY
         // Accepted Time Formats:
@@ -203,7 +203,7 @@ public class SuggestionManager {
 
 
 
-    public jim.journal.Task parseTask (String[] words) {
+    public jim.journal.Task parseTask(String[] words) {
         // Accepted Task Syntaxes:
         // TimedTask:
         // <start-date> <start-time> <end-date> <end-time> <description..>
@@ -226,7 +226,7 @@ public class SuggestionManager {
      * TODO: Potentially throw some kind of "Poor format exception" as a better
      * way of giving feedback than return-null.
      */
-    public jim.journal.Command parseCommand (String args[]) {
+    public jim.journal.Command parseCommand(String args[]) {
         /*
          * TODO: Here is where some of our time will be spent in V0.0, getting
          * stuff like "add lunch Monday" (or some sensible command) to work.
@@ -264,14 +264,14 @@ public class SuggestionManager {
 
 
 
-    public String removeAllSymbols (String tellDateOrTime) {
+    public String removeAllSymbols(String tellDateOrTime) {
         String findDate = tellDateOrTime.replaceAll("[^\\p{L}\\p{Nd}]", "");
         return findDate;
     }
 
 
 
-    public static boolean isInteger (String s) {
+    public static boolean isInteger(String s) {
         try {
             Integer.parseInt(s);
         } catch (NumberFormatException e) {
@@ -282,7 +282,7 @@ public class SuggestionManager {
 
 
 
-    public int[] splitDate (String date_in_string) {
+    public int[] splitDate(String date_in_string) {
         // we will accept date format of 090913 - DDMMYY
         int[] dates = new int[LENGTH_OF_DATE];
         String[] temp = date_in_string.split("");
@@ -304,7 +304,7 @@ public class SuggestionManager {
 
 
 
-    public int[] splitTime (String time_in_string) {
+    public int[] splitTime(String time_in_string) {
         // we will accept time format of 24 hours - 2200 hrs, default seconds is
         // 00
         int[] time_24hours = new int[LENGTH_OF_TIME];
@@ -319,7 +319,7 @@ public class SuggestionManager {
 
 
 
-    private AddCommand parseAddCommand (String args[]) {
+    private AddCommand parseAddCommand(String args[]) {
         // Accepted 'add' syntaxes:
         // add <start-date> <start-time> <end-date> <end-time> <words describing
         // event>
@@ -407,9 +407,9 @@ public class SuggestionManager {
 
 
 
-    private CompleteCommand parseCompleteCommand (String args[]) { // The
-                                                                   // "Complete"
-                                                                   // commands
+    private CompleteCommand parseCompleteCommand(String args[]) { // The
+                                                                  // "Complete"
+                                                                  // commands
         // Accepted 'complete' syntaxes:
         // complete <description>
 
@@ -419,8 +419,8 @@ public class SuggestionManager {
 
 
 
-    private RemoveCommand parseRemoveCommand (String args[]) { // The "Remove"
-                                                               // commands
+    private RemoveCommand parseRemoveCommand(String args[]) { // The "Remove"
+                                                              // commands
         // Accepted 'remove' syntaxes:
         // remove <description>
         // TODO: Add more syntaxes/formats for this command
@@ -431,8 +431,8 @@ public class SuggestionManager {
 
 
 
-    private EditCommand parseEditCommand (String args[]) { // The "Edit"
-                                                           // commands
+    private EditCommand parseEditCommand(String args[]) { // The "Edit"
+                                                          // commands
         // Accepted 'edit' syntaxes:
         // edit <description of old task>
         // (then read in from input what to replace it with).
@@ -446,8 +446,8 @@ public class SuggestionManager {
 
 
 
-    private SearchCommand parseSearchCommand (String args[]) { // The "Search"
-                                                               // commands
+    private SearchCommand parseSearchCommand(String args[]) { // The "Search"
+                                                              // commands
         // Accepted 'search' syntaxes:
         // search <description>
         // TODO: Add more syntaxes/formats for this command
@@ -458,9 +458,9 @@ public class SuggestionManager {
 
 
 
-    private DisplayCommand parseDisplayCommand (String args[]) { // The
-                                                                 // "Display"
-                                                                 // commands
+    private DisplayCommand parseDisplayCommand(String args[]) { // The
+                                                                // "Display"
+                                                                // commands
         // Accepted 'display' syntaxes:
         // display
         // display <date predicate>

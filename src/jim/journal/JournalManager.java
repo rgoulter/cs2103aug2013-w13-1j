@@ -20,7 +20,7 @@ public class JournalManager {
      * 
      * @return
      */
-    public String getDisplayString () {
+    public String getDisplayString() {
         List<Task> upcomingTasks = this.getAllTasks();
         String timedTasks = "";
         String floatingTasks = "";
@@ -47,7 +47,7 @@ public class JournalManager {
 
 
 
-    public List<Task> getAllTasks () {
+    public List<Task> getAllTasks() {
         // TODO: Not cheat on this.
         /*
          * Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
@@ -64,7 +64,7 @@ public class JournalManager {
 
 
 
-    public List<Task> getuncompletedTasks () {
+    public List<Task> getuncompletedTasks() {
         List<Task> uncompletedTasks = new ArrayList<Task>();
         for (Task t : storeAllTasks) {
             if (!t.isCompleted()) {
@@ -76,7 +76,7 @@ public class JournalManager {
 
 
 
-    public List<Task> getcompletedTasks () {
+    public List<Task> getcompletedTasks() {
         List<Task> completedTasks = new ArrayList<Task>();
         for (Task t : storeAllTasks) {
             if (t.isCompleted()) {
@@ -92,20 +92,20 @@ public class JournalManager {
      * Following methods update the storeAllTasks, uncompletedTasks,
      * completedTasks.
      */
-    public void addTask (Task task) {
+    public void addTask(Task task) {
 
         storeAllTasks.add(task);
     }
 
 
 
-    public boolean removeTask (Task task) {
+    public boolean removeTask(Task task) {
         return storeAllTasks.remove(task);
     }
 
 
 
-    public String completeTask (Task task) {
+    public String completeTask(Task task) {
         if (task.isCompleted()) {
             return "Task " +
                    task.toString() +
@@ -118,7 +118,7 @@ public class JournalManager {
 
 
 
-    public void editTask (Task old_task, Task new_task) {
+    public void editTask(Task old_task, Task new_task) {
         storeAllTasks.remove(old_task);
         storeAllTasks.add(new_task);
     }

@@ -31,25 +31,25 @@ public class TimedTask extends Task {
      * (GregorianCalendar) endTime; description = desc; }
      */
 
-    public Calendar getStartTime () {
+    public Calendar getStartTime() {
         return startTime;
     }
 
 
 
-    public Calendar getEndTime () {
+    public Calendar getEndTime() {
         return endTime;
     }
 
 
 
-    public String getDescription () {
+    public String getDescription() {
         return description;
     }
 
 
 
-    public String toString () {
+    public String toString() {
         String taskName = "%s %d/%d/%d %d%d %d%d";
         return String.format(taskName,
                              getDescription(),
@@ -65,7 +65,7 @@ public class TimedTask extends Task {
 
 
     @Override
-    public boolean equals (Object o) {
+    public boolean equals(Object o) {
         // TODO: An actual equals method
         if (o instanceof TimedTask) {
             TimedTask helper = (TimedTask) o;
@@ -81,7 +81,7 @@ public class TimedTask extends Task {
 
 
     @Override
-    public int hashCode () {
+    public int hashCode() {
         return startTime.hashCode() *
                31 +
                endTime.hashCode() *

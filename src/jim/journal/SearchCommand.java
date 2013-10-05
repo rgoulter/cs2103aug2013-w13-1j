@@ -18,7 +18,7 @@ public class SearchCommand extends Command {
 
 
     @Override
-    public void execute (JournalManager journalManager) {
+    public void execute(JournalManager journalManager) {
         String output = "";
         List<Task> allTasks = journalManager.getAllTasks();
 

@@ -80,7 +80,7 @@ public class JimMainPanel extends JPanel {
 
 
 
-    private void initialiseUIComponents () {
+    private void initialiseUIComponents() {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
 
@@ -100,14 +100,14 @@ public class JimMainPanel extends JPanel {
         inputTextField.addKeyListener(new KeyListener() {
 
             @Override
-            public void keyPressed (KeyEvent arg0) {
+            public void keyPressed(KeyEvent arg0) {
             }
 
 
 
             // Catches keystrokes as the user inputs them
             @Override
-            public void keyReleased (KeyEvent arg0) {
+            public void keyReleased(KeyEvent arg0) {
                 suggestionManager.updateBuffer(inputTextField.getText());
                 refreshUI();
             }
@@ -115,21 +115,21 @@ public class JimMainPanel extends JPanel {
 
 
             @Override
-            public void keyTyped (KeyEvent arg0) {
+            public void keyTyped(KeyEvent arg0) {
             }
 
         });
 
         inputTextField.addFocusListener(new FocusListener() {
 
-            public void focusLost (FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 inputTextField.requestFocus();
             }
 
 
 
             @Override
-            public void focusGained (FocusEvent arg0) {
+            public void focusGained(FocusEvent arg0) {
                 // CC: This is here to fully implement FocusListener. We won't
                 // use this.
             }
@@ -143,7 +143,7 @@ public class JimMainPanel extends JPanel {
                                           new AbstractAction() {
 
                                               @Override
-                                              public void actionPerformed (ActionEvent e) {
+                                              public void actionPerformed(ActionEvent e) {
                                                   executeInput();
                                                   inputTextField.setText("");
                                               }
@@ -157,7 +157,7 @@ public class JimMainPanel extends JPanel {
                                           new AbstractAction() {
 
                                               @Override
-                                              public void actionPerformed (ActionEvent e) {
+                                              public void actionPerformed(ActionEvent e) {
                                                   suggestionManager.nextSuggestion();
                                                   String selection = suggestionManager.getCurrentSuggestion();
                                                   displayAutoComplete(selection);
@@ -174,7 +174,7 @@ public class JimMainPanel extends JPanel {
                                           new AbstractAction() {
 
                                               @Override
-                                              public void actionPerformed (ActionEvent e) {
+                                              public void actionPerformed(ActionEvent e) {
                                                   suggestionManager.prevSuggestion();
                                                   String selection = suggestionManager.getCurrentSuggestion();
                                                   displayAutoComplete(selection);
@@ -204,13 +204,13 @@ public class JimMainPanel extends JPanel {
 
 
 
-    private void displayAutoComplete (String text) {
+    private void displayAutoComplete(String text) {
         inputTextField.setText(text);
     }
 
 
 
-    private void refreshUI () {
+    private void refreshUI() {
         journalView.updateViewWithContent();
         suggestionView.updateViewWithContent();
 
@@ -236,7 +236,7 @@ public class JimMainPanel extends JPanel {
 
 
     // This method is called when we want to execute input
-    private void executeInput () {
+    private void executeInput() {
         // Discussion: One thing which may have been neglected is 'feedback' to
         // user.
         // This can be managed/displayed from here, however it's implemented.
@@ -258,7 +258,7 @@ public class JimMainPanel extends JPanel {
 
 
     // To be lazy, this method is called to run the JIM! GUI
-    public static void runWindow () {
+    public static void runWindow() {
         final JFrame applicationWindow = new JFrame("JIM!");
         applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -284,7 +284,7 @@ public class JimMainPanel extends JPanel {
                                                    new AbstractAction() {
 
                                                        @Override
-                                                       public void actionPerformed (ActionEvent e) {
+                                                       public void actionPerformed(ActionEvent e) {
                                                            applicationWindow.dispose();
                                                        }
                                                    });
@@ -302,7 +302,7 @@ public class JimMainPanel extends JPanel {
 
 
 
-    public static void main (String args[]) {
+    public static void main(String args[]) {
         JimMainPanel.runWindow();
     }
 

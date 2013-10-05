@@ -31,7 +31,7 @@ public class EditCommand extends Command {
 
 
     @Override
-    public void execute (JournalManager journalManager) {
+    public void execute(JournalManager journalManager) {
         if (tasksToEdit == null) {
             // TODO: Probably we will need to get access to a/the Suggestion
             // Manager somehow. How??
