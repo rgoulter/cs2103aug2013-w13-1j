@@ -5,30 +5,31 @@ import java.util.List;
 import jim.suggestions.SuggestionManager;
 
 public class EditCommand extends Command {
-	
-	List<Task> tasksToEdit;
-    Task taskToEdit;
-    Task taskChangedTo;
+
+    String description;
     
-    //TODO maybe editcommand should only accept one taskToEdit not a list of task. 
-    //This will depend on how the searchbydescription function works.
-    //changedToTask is the new task which user want to replace with the older one.
+	List<Task> tasksToEdit = null;
+    Task taskToEdit        = null;
+    Task taskChangedTo     = null;
     
-    public EditCommand(List<Task> tasksWhichMatchDescription) {
-        // Expected behavior: ask for which one to replace.
-        tasksToEdit = tasksWhichMatchDescription;
-        taskToEdit = null;
-        taskChangedTo = null;
+    public EditCommand(String des) {
+        description = des;
     }
     
-	public EditCommand(List<Task> tasksWhichMatchDescription, Task changedToTask) {
-    	tasksToEdit = tasksWhichMatchDescription;
-        taskToEdit = null;
-    	taskChangedTo = changedToTask;
-	}
+    public EditCommand(String des, Task newTask) {
+        description = des;
+        taskChangedTo = newTask;
+    }
 
 	@Override
     public void execute(JournalManager journalManager) {
+	    if (tasksToEdit == null) {
+	        // TODO: Probably we will need to get access to a/the Suggestion Manager somehow. How??
+	        SuggestionManager suggMan = new SuggestionManager();
+	        
+	        tasksToEdit = suggMan.searchForTasksByDescription(journalManager, description);
+	    }
+	    
         if (taskChangedTo == null) {
             // We weren't given a task to change to.
             // Get one from the cmd line:

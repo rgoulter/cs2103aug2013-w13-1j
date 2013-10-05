@@ -55,7 +55,7 @@ public class EditUnitTests {
         JournalManager journalManager = new JournalManager(); // Empty; NO TASKS.
         journalManager.addTask(myOldTimedTask);
 
-        EditCommand editCmd = new EditCommand(Arrays.asList(new Task[]{myOldTimedTask}),
+        EditCommand editCmd = new EditCommand("MyOldTask",
                                               expectedNewTimedTask);
         editCmd.execute(journalManager);
         
@@ -77,7 +77,7 @@ public class EditUnitTests {
         JournalManager journalManager = new JournalManager(); // Empty; NO TASKS.
         journalManager.addTask(myOldTimedTask);
 
-        EditCommand editCmd = new EditCommand(Arrays.asList(new Task[]{myOldTimedTask})){
+        EditCommand editCmd = new EditCommand("MyOldTask"){
             protected String inputLine() {
                 return "31/12/13 0000 31/12/13 2359 MyNewTask";
             }

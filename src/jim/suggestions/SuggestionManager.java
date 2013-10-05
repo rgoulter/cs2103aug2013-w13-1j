@@ -87,13 +87,26 @@ public class SuggestionManager {
         
     }
     
-    // Since many of our Commands depend on "searching by description",
-    // this helper method makes sense.
-    private List<jim.journal.Task> searchForTasksByDescription(String description) {
-        //TODO: A rudimentary implementation of this.
+    /**
+     * Search the given Journal for a list of tasks which match the given description.
+     * At present, "matching" is defined strictly as "has the same description".
+     * 
+     * @param journal
+     * @param description
+     * @return
+     */
+    public List<jim.journal.Task> searchForTasksByDescription(jim.journal.JournalManager journal,
+                                                              String description) {
         //TODO: check with user if the result matched what they really want???
+        List<jim.journal.Task> matchingTasks = new ArrayList<>();
         
-    	return null;
+        for(jim.journal.Task task : journal.getAllTasks()){
+            if(task.getDescription().equals(description)){
+                matchingTasks.add(task);
+            }
+        }
+        
+    	return matchingTasks;
     }
     
     /**
@@ -359,10 +372,7 @@ public class SuggestionManager {
         // NOTE THAT: The format read in is a format which describes a Task. (Timed, floating, etc.)
        
         String description = join(args, ' ', 1);
-        
-        List<Task> tasksWhichMatchDescription = searchForTasksByDescription(description);
-        
-        return new EditCommand(tasksWhichMatchDescription);
+        return new EditCommand(description);
     }
     
     private SearchCommand parseSearchCommand(String args[]) { // The "Search" commands
