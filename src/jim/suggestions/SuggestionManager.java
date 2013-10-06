@@ -5,17 +5,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import jim.journal.Task;
 import jim.journal.AddCommand;
 import jim.journal.CompleteCommand;
-import jim.journal.RemoveCommand;
-import jim.journal.EditCommand;
-import jim.journal.SearchCommand;
 import jim.journal.DisplayCommand;
+import jim.journal.EditCommand;
+import jim.journal.RemoveCommand;
+import jim.journal.SearchCommand;
 import jim.journal.TimedTask;
 
 
@@ -41,6 +41,44 @@ public class SuggestionManager {
     private static final int INDICATE_TIME_STRING = 4;
     private static final int INDICATE_DATE_STRING = 6;
     private static final int INDICATE_TASK_ENDS_IN_A_DAY = 1;
+
+    /**
+     * Matches DD/MM/YY.
+     */
+    private static final String REGEX_DATE_DDMMYY = "\\d\\d/\\d\\d/\\d\\d";
+
+    /**
+     * Matches four digits in a row. e.g. HHMM.
+     */
+    private static final String REGEX_TIME_HHMM = "\\d\\d\\d\\d";
+
+    /**
+     * "Phrase" here is a minimal amount of words.
+     */
+    private static final String REGEX_PHRASE = "(?:\\S+\\s?)+";
+
+    /**
+     * Accepted Add Command Formats:
+     * 
+     * add DD/MM/YY HHMM DD/MM/YY HHMM <description>
+     */
+    public enum AddCommandFormats {
+        AddDateTimeDateTimeDescription(join(new String[] {"add",
+                                                          REGEX_DATE_DDMMYY,
+                                                          REGEX_TIME_HHMM,
+                                                          REGEX_DATE_DDMMYY,
+                                                          REGEX_TIME_HHMM,
+                                                          REGEX_PHRASE}, ' '));
+
+        String format;
+
+
+
+        AddCommandFormats(String fmt) {
+            format = fmt;
+        }
+
+    }
 
 
 
@@ -144,7 +182,7 @@ public class SuggestionManager {
      * Inverse of String.split(). Joins an array of Strings to one string. e.g.
      * {"abc", "def"} joinwith ' ' -> "abc def".
      */
-    private String join(String arrayOfStrings[], char joinChar) {
+    private static String join(String arrayOfStrings[], char joinChar) {
         return join(arrayOfStrings, joinChar, 0);
     }
 
@@ -154,7 +192,9 @@ public class SuggestionManager {
      * Inverse of String.split(). Joins an array of Strings to one string. e.g.
      * {"abc", "def"} joinwith ' ' -> "abc def".
      */
-    private String join(String arrayOfStrings[], char joinChar, int startIndex) {
+    private static String join(String arrayOfStrings[],
+                               char joinChar,
+                               int startIndex) {
         return join(arrayOfStrings, joinChar, startIndex, arrayOfStrings.length);
     }
 
@@ -164,10 +204,10 @@ public class SuggestionManager {
      * Inverse of String.split(). Joins an array of Strings to one string. e.g.
      * {"abc", "def"} joinwith ' ' -> "abc def".
      */
-    private String join(String arrayOfStrings[],
-                        char joinChar,
-                        int startIndex,
-                        int endIndex) {
+    private static String join(String arrayOfStrings[],
+                               char joinChar,
+                               int startIndex,
+                               int endIndex) {
         StringBuilder result = new StringBuilder();
 
         for (int i = startIndex; i < endIndex - 1; i++) {
@@ -178,6 +218,18 @@ public class SuggestionManager {
         result.append(arrayOfStrings[endIndex - 1]);
 
         return result.toString();
+    }
+
+
+
+    private Calendar parseDate(String date) {
+        return null;
+    }
+
+
+
+    private Calendar parseTime(String time) {
+        return null;
     }
 
 
@@ -324,78 +376,31 @@ public class SuggestionManager {
         // add <start-date> <start-time> <end-date> <end-time> <words describing
         // event>
         // TODO: Add more syntaxes/formats for this command
-        Calendar startDateTime = Calendar.getInstance();
-        Calendar endDateTime = Calendar.getInstance();
-        ArrayList<int[]> dateList = new ArrayList<int[]>();
-        ArrayList<int[]> timeList = new ArrayList<int[]>();
-        int startDateTimeIndex = 0;
-        int endDateTimeIndex = 0;
 
-        for (int i = 1; i < args.length; i++) {
-            String dateOrTime = removeAllSymbols(args[i]);
-            if (isInteger(dateOrTime)) {
-                if (dateOrTime.length() == INDICATE_DATE_STRING) {
-                    dateList.add(splitDate(dateOrTime));
-                    if (startDateTimeIndex == 0) {
-                        startDateTimeIndex = i;
-                    }
-                } else if (dateOrTime.length() == INDICATE_TIME_STRING) {
-                    timeList.add(splitTime(dateOrTime));
-                    if (endDateTimeIndex == 0 || i > endDateTimeIndex) {
-                        endDateTimeIndex = i;
-                    }
+        Calendar startDateTime = null;
+        Calendar endDateTime = null;
+        String description = null;
+
+        for (AddCommandFormats format : AddCommandFormats.values()) {
+            Pattern regexPattern = Pattern.compile(format.format);
+
+            Matcher inputRegexMatcher = regexPattern.matcher(join(args, ' '));
+            if (inputRegexMatcher.matches()) {
+                switch (format) {
+                case AddDateTimeDateTimeDescription:
+                    startDateTime = parseDateTime(args[1], args[2]);
+                    endDateTime = parseDateTime(args[3], args[4]);
+                    description = join(args, ' ', 5);
+                    break;
+
+                default:
+                    throw new IllegalStateException("A new AddCommandFormat was added, but not handled in ParseCommand.");
                 }
+
+                break;
             }
         }
-        if (startDateTimeIndex != 0 || endDateTimeIndex != 0) {
-            if (timeList.size() <= DEADLINE_TASK_DETECTED) {
-                int[] deadline = dateList.get(0);
-                int YY = deadline[2], MM = deadline[1], DD = deadline[0];
-                if (timeList.size() == DEADLINE_TASK_WITHOUT_TIME) {
-                    endDateTime.set(YY, MM, DD);
-                } else {
-                    int[] time = timeList.get(0);
-                    int hrs = time[0], mins = time[1];
-                    endDateTime.set(YY, MM, DD, hrs, mins);
-                }
-                startDateTime.set(YY, MM, DD);
-            } else if (timeList.size() > DEADLINE_TASK_DETECTED) {
-                // indicates that a timed task is detected
-                int[] deadline = dateList.get(0);
-                int YY = deadline[2], MM = deadline[1], DD = deadline[0];
-                int[] time = timeList.get(0);
-                int hrs = time[0], mins = time[1];
-                startDateTime.set(YY, MM, DD, hrs, mins);
-                time = timeList.get(1);
-                hrs = time[0];
-                mins = time[1];
-                if (dateList.size() == INDICATE_TASK_ENDS_IN_A_DAY) {
-                    endDateTime.set(YY, MM, DD, hrs, mins);
-                } else {
-                    deadline = dateList.get(1);
-                    YY = deadline[2];
-                    MM = deadline[1];
-                    DD = deadline[0];
-                    endDateTime.set(YY, MM, DD, hrs, mins);
-                }
-            }
-        } else {
-            startDateTime = null;
-            endDateTime = null;
-        }
-        String description;
-        if (endDateTimeIndex > startDateTimeIndex) {
-            if (startDateTimeIndex == 1) {
-                description = join(args, ' ', endDateTimeIndex + 1, args.length);
-            } else {
-                description = join(args, ' ', 1, startDateTimeIndex);
-            }
-        } else if (startDateTimeIndex > endDateTimeIndex &&
-                   endDateTimeIndex == 0) {
-            description = join(args, ' ', 1, startDateTimeIndex);
-        } else {
-            description = join(args, ' ', endDateTimeIndex + 1, args.length);
-        }
+
         // TODO: Process values in a sensible way.
         if (startDateTime == null && endDateTime == null) {
             return new jim.journal.AddCommand(description);
