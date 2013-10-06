@@ -46,11 +46,13 @@ public class SuggestionManager {
      * Matches DD/MM/YY.
      */
     private static final String REGEX_DATE_DDMMYY = "\\d\\d/\\d\\d/\\d\\d";
+    private static final String DATEFORMAT_DATE_DDMMYY = "dd/MM/yy"; // SimpleDateFormat
 
     /**
      * Matches four digits in a row. e.g. HHMM.
      */
     private static final String REGEX_TIME_HHMM = "\\d\\d\\d\\d";
+    private static final String DATEFORMAT_TIME_HHMM = "HHmm"; // SimpleDateFormat
 
     /**
      * "Phrase" here is a minimal amount of words.
@@ -222,14 +224,28 @@ public class SuggestionManager {
 
 
 
-    private Calendar parseDate(String date) {
-        return null;
+    private Calendar parseDate(String date) throws ParseException {
+        // TODO: Abstract Date parsing like AddCommand
+        // ACCEPTED FORMATS: dd/mm/yy
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATEFORMAT_DATE_DDMMYY);
+
+        GregorianCalendar result = new GregorianCalendar();
+        result.setTime(dateFormat.parse(date));
+
+        return result;
     }
 
 
 
-    private Calendar parseTime(String time) {
-        return null;
+    private Calendar parseTime(String time) throws ParseException {
+        // TODO: Abstract Time parsing like AddCommand
+        // ACCEPTED FORMATS: HHMM
+        SimpleDateFormat timeFormat = new SimpleDateFormat(DATEFORMAT_TIME_HHMM);
+
+        GregorianCalendar result = new GregorianCalendar();
+        result.setTime(timeFormat.parse(time));
+
+        return result;
     }
 
 
@@ -240,11 +256,17 @@ public class SuggestionManager {
         // Accepted Time Formats:
         // 24-hour
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HHmm");
-
         try {
             GregorianCalendar result = new GregorianCalendar();
-            result.setTime(dateFormat.parse(date + " " + time));
+
+            Calendar dateCalendar = parseDate(date);
+            Calendar timeCalendar = parseTime(time);
+
+            result.set(dateCalendar.get(Calendar.YEAR),
+                       dateCalendar.get(Calendar.MONTH),
+                       dateCalendar.get(Calendar.DAY_OF_MONTH),
+                       timeCalendar.get(Calendar.HOUR_OF_DAY),
+                       timeCalendar.get(Calendar.MINUTE));
 
             return result;
         } catch (ParseException e) {
