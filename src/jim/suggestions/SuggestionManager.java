@@ -49,13 +49,11 @@ public class SuggestionManager {
      * Matches DD/MM/YY.
      */
     private static final String REGEX_DATE_DDMMYY = "\\d\\d/\\d\\d/\\d\\d";
-    private static final String DATEFORMAT_DATE_DDMMYY = "dd/MM/yy"; // SimpleDateFormat
 
     /**
      * Matches four digits in a row. e.g. HHMM.
      */
     private static final String REGEX_TIME_HHMM = "\\d\\d\\d\\d";
-    private static final String DATEFORMAT_TIME_HHMM = "HHmm"; // SimpleDateFormat
 
     /**
      * "Phrase" here is a minimal amount of words.
@@ -64,53 +62,6 @@ public class SuggestionManager {
 
     private interface SyntaxTermParser {
         public Object parse(String inputTerm);
-    }
-
-    /**
-     * Accepted Add Command Formats:
-     * 
-     * add <description>
-     * add DD/MM/YY <description>
-     * add DD/MM/YY HHMM DD/MM/YY HHMM <description>
-     * add DD/MM/YY HHMM to HHMM <description>
-     * add DD/MM/YY HHMM HHMM <description>
-     */
-    public enum AddCommandFormats {                                
-
-
-        AddDateTimeDateTimeDescription(join(new String[] {"add",
-                                                          REGEX_DATE_DDMMYY,
-                                                          REGEX_TIME_HHMM,
-                                                          REGEX_DATE_DDMMYY,
-                                                          REGEX_TIME_HHMM,
-                                                          REGEX_PHRASE}, ' ')),
-                                                          
-  		AddDateTimeToTimeDescription(join(new String[] {"add",
-                                                        REGEX_DATE_DDMMYY,
-										                REGEX_TIME_HHMM,
-										                "to",
-										                REGEX_TIME_HHMM,
-										                REGEX_PHRASE}, ' ')),
-					                                                                
-        AddDateTimeTimeDescription(join(new String[] {"add",
-					                                    REGEX_DATE_DDMMYY,
-					                                    REGEX_TIME_HHMM, 
-					                                    REGEX_TIME_HHMM,
-					                                    REGEX_PHRASE}, ' ')),
-                                    
-	    AddDateDescription(join(new String[] {"add",
-										      REGEX_DATE_DDMMYY,
-										      REGEX_PHRASE}, ' ')),    
-				
-        AddDescription(join(new String[] {"add",
-                                          REGEX_PHRASE}, ' '));
-        
-
-        String format;
-        AddCommandFormats(String fmt) {
-            format = fmt;
-        }
-
     }
 
     private final Map<String, List<String>> syntaxClassesMap = new HashMap<String, List<String>>();
@@ -694,24 +645,6 @@ public class SuggestionManager {
         /*result.setDateTime(dateFormat.parse(date));*/
 
         return result;
-    }
-
-
-
-    private MutableDateTime parseDateTime(String date, String time) {
-        // Accepted Date Formats:
-        // DD/MM/YY
-        // Accepted Time Formats:
-        // 24-hour
-
-        MutableDateTime result = new MutableDateTime();
-		int[] takeDateArray = splitDate(removeAllSymbols(date));
-		int YY = takeDateArray[2],MM = takeDateArray[1],DD = takeDateArray[0];
-		int[] takeTimeArray = splitTime(time);
-		int HH = takeTimeArray[0], mm = takeTimeArray[1];
-		result.setDateTime(YY, MM, DD, HH, mm, 00, 00);
-
-		return result;
     }
 
 
