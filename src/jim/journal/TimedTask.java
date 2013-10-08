@@ -19,14 +19,6 @@ public class TimedTask extends Task {
         description = desc;
     }
 
-
-
-    /*
-     * public TimedTask(Calendar endTime, String desc) { // Tasks with ONLY end
-     * date. (AKA deadline tasks) this.startTime = null; this.endTime =
-     * (GregorianCalendar) endTime; description = desc; }
-     */
-
     public MutableDateTime getStartTime() {
         return startTime;
     }
@@ -46,11 +38,11 @@ public class TimedTask extends Task {
 
 
     public String toString() {
-    	String taskName = "%s %d/%d/%d %d%d %d%d";
-    	/* return String.format(taskName, getDescription(), endTime.dayOfMonth(), endTime.monthOfYear(), endTime.year(),
-    						startTime.hourOfDay(), startTime.minuteOfHour(),
-    						endTime.hourOfDay(), endTime.minuteOfHour()); */
-    	return getDescription() +"  "+ startTime.toString() +" to " + endTime.toString();
+    	String taskName = "%s %d/%d/%d %02d:%02d to %02d:%02d";
+    	return String.format(taskName, getDescription(), endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
+    						startTime.getHourOfDay(), startTime.getMinuteOfHour(),
+    						endTime.getHourOfDay(), endTime.getMinuteOfHour());
+    	//return getDescription() +"  "+ startTime.toString() +" to " + endTime.toString();
     }
 
 

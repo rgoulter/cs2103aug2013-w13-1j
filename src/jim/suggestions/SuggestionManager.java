@@ -66,9 +66,7 @@ public class SuggestionManager {
      * add DD/MM/YY HHMM DD/MM/YY HHMM <description>
      */
     public enum AddCommandFormats {                                
-        AddDateDescription(join(new String[] {"add",
-                                              REGEX_DATE_DDMMYY,
-                                              REGEX_PHRASE}, ' ')),
+
 
         AddDateTimeDateTimeDescription(join(new String[] {"add",
                                                           REGEX_DATE_DDMMYY,
@@ -76,7 +74,10 @@ public class SuggestionManager {
                                                           REGEX_DATE_DDMMYY,
                                                           REGEX_TIME_HHMM,
                                                           REGEX_PHRASE}, ' ')),
-        
+	  AddDateDescription(join(new String[] {"add",
+					      REGEX_DATE_DDMMYY,
+					      REGEX_PHRASE}, ' ')),       
+					      
         AddDescription(join(new String[] {"add",
                                           REGEX_PHRASE}, ' '));
         
@@ -266,8 +267,7 @@ public class SuggestionManager {
         // 24-hour
 
         MutableDateTime result = new MutableDateTime();
-		
-		int[] takeDateArray = splitDate(date);
+		int[] takeDateArray = splitDate(removeAllSymbols(date));
 		int YY = takeDateArray[2],MM = takeDateArray[1],DD = takeDateArray[0];
 		int[] takeTimeArray = splitTime(time);
 		int HH = takeTimeArray[0], mm = takeTimeArray[1];
@@ -410,6 +410,13 @@ public class SuggestionManager {
             Matcher inputRegexMatcher = regexPattern.matcher(join(args, ' '));
             if (inputRegexMatcher.matches()) {
                 switch (format) {
+                
+                case AddDateTimeDateTimeDescription:
+                    startDateTime = parseDateTime(args[1], args[2]);
+                    endDateTime = parseDateTime(args[3], args[4]);
+                    description = join(args, ' ', 5);
+                    break;
+                
                 case AddDateDescription:
                     try {
                     startDateTime = parseDate(args[1]);
@@ -421,12 +428,6 @@ public class SuggestionManager {
                     
                     break;
                 
-                case AddDateTimeDateTimeDescription:
-                    startDateTime = parseDateTime(args[1], args[2]);
-                    endDateTime = parseDateTime(args[3], args[4]);
-                    description = join(args, ' ', 5);
-                    break;
-                    
                 case AddDescription:
                     description = join(args, ' ', 1);
                     break;
