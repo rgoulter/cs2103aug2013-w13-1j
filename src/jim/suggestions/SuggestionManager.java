@@ -150,14 +150,14 @@ public class SuggestionManager {
     private void initSyntaxParsers() {
         //TODO: Abstract Key into a key type.
         // KEY: syntaxTerm + " => " + nextSyntaxTerm
-        syntaxParsers.put("<date> => /" + REGEX_DATE_DDMMYY + "/",
+        syntaxParsers.put("date => /" + REGEX_DATE_DDMMYY + "/",
                           new SyntaxTermParser(){
                               @Override
                               public Object parse(String inputTerm) {
                                   return parseDate(inputTerm);
                               }
                           });
-        syntaxParsers.put("<date> => /\\d\\d\\d\\d\\d\\d/",
+        syntaxParsers.put("date => /\\d\\d\\d\\d\\d\\d/",
                           new SyntaxTermParser() {
 
                               @Override
@@ -167,7 +167,7 @@ public class SuggestionManager {
                           });
 
 
-        syntaxParsers.put("<time> => /" + REGEX_TIME_HHMM + "/",
+        syntaxParsers.put("time => /" + REGEX_TIME_HHMM + "/",
                           new SyntaxTermParser() {
 
                               @Override
@@ -175,10 +175,10 @@ public class SuggestionManager {
                                   int hh = Integer.parseInt(inputTerm.substring(0, 2));
                                   int mm = Integer.parseInt(inputTerm.substring(2));
                                   
-                                  return new MutableDateTime(0, 0, 0, hh, mm, 00, 00);
+                                  return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
                               }
                           });
-        syntaxParsers.put("<time> => /\\d\\d:\\d\\d/",
+        syntaxParsers.put("time => /\\d\\d:\\d\\d/",
                           new SyntaxTermParser() {
 
                               @Override
@@ -192,7 +192,7 @@ public class SuggestionManager {
         
 
         // Redundant?
-        syntaxParsers.put("<word> := /\\S+/",
+        syntaxParsers.put("word := /\\S+/",
                           new SyntaxTermParser() {
 
                               @Override
@@ -203,7 +203,7 @@ public class SuggestionManager {
 
 
         // Redundant?
-        syntaxParsers.put("<phrase> => <word>",
+        syntaxParsers.put("phrase => <word>",
                           new SyntaxTermParser() {
 
                               @Override
@@ -212,7 +212,7 @@ public class SuggestionManager {
                                   return inputTerm;
                               }
                           });
-        syntaxParsers.put("<phrase> => <word> <phrase>",
+        syntaxParsers.put("phrase => <word> <phrase>",
                           new SyntaxTermParser() {
 
                               @Override
@@ -221,33 +221,26 @@ public class SuggestionManager {
                               }
                           });
 
-        addSyntax("<timedtask> := " +
-                  "<date> <time> <date> <time> <description> | " +
-                  "<date> <time> 'to' <time> <description> | " +
-                  "<date> <time> <time> <description> | " +
-                  "<date> <description>");
-        addSyntax("<floatingtask> := <description>");
 
-
-        syntaxParsers.put("<timedtask> => <date> <time> <date> <time> <description>",
+        syntaxParsers.put("timedtask => <date> <time> <date> <time> <description>",
                           new SyntaxTermParser() {
                               @Override
                               public Object parse(String input) {
                                   String[] inputParts = input.split(" ");
                                   MutableDateTime startDate =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[1]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[1]);
                                   MutableDateTime endDate =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[2]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[2]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[3]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[3]);
                                   String description = join(inputParts, ' ', 4);
                                   return new TimedTask(datetime(startDate, startTime),
                                                        datetime(endDate, endTime), description);
                               }
                           });
-        syntaxParsers.put("<timedtask> => <date> <time> 'to' <time> <description>",
+        syntaxParsers.put("timedtask => <date> <time> 'to' <time> <description>",
                           new SyntaxTermParser() {
                               @Override
                               public Object parse(String input) {
@@ -264,7 +257,7 @@ public class SuggestionManager {
                                                        description);
                               }
                           });
-        syntaxParsers.put("<timedtask> => <date> <time> <time> <description>",
+        syntaxParsers.put("timedtask => <date> <time> <time> <description>",
                           new SyntaxTermParser() {
                               @Override
                               public Object parse(String input) {
@@ -281,7 +274,7 @@ public class SuggestionManager {
                                                        description);
                               }
                           });
-        syntaxParsers.put("<timedtask> => <date> <description>",
+        syntaxParsers.put("timedtask => <date> <description>",
                           new SyntaxTermParser() {
                               @Override
                               public Object parse(String input) {
@@ -294,7 +287,7 @@ public class SuggestionManager {
                           });
         
         
-        syntaxParsers.put("<floatingtask> => <description>",
+        syntaxParsers.put("floatingtask => <description>",
                           new SyntaxTermParser() {
                               @Override
                               public Object parse(String input) {
@@ -327,8 +320,7 @@ public class SuggestionManager {
      * e.g. parseInputTermWithSyntaxClass("<time>", "2359");
      */
     private Object parseInputTermWithSyntaxClass(String syntaxTerm, String inputTerm) {
-        assert isSyntaxClass(syntaxTerm);
-        assert isMatchSyntaxTermWithInputTerm(syntaxTerm, inputTerm);
+        assert isMatchSyntaxTermWithInputTerm('<' + syntaxTerm + '>', inputTerm);
         
         List<String> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxTerm);
         
@@ -514,7 +506,7 @@ public class SuggestionManager {
         } else {
             // May not make sense if we just strip by n?
             String inner = str.substring(1, str.length() - 1);
-            return stripStringPrefixSuffix(str, n - 1);
+            return stripStringPrefixSuffix(inner, n - 1);
         }
     }
 
@@ -557,6 +549,11 @@ public class SuggestionManager {
      *   It is expected this will be resolved in future.
      */
     private boolean isMatchSyntaxTermWithInputTerm(String syntaxTerm, String inputTerm) {
+        // TODO: assert & debug.
+        if (syntaxTerm.length() == 0) {
+            return false;
+        }
+        
         //TODO: Memoization of results?
         String strippedTerm = stripStringPrefixSuffix(syntaxTerm, 1);
 
@@ -677,8 +674,11 @@ public class SuggestionManager {
     private void addSyntax(String syntaxLine) {
         String[] syntaxLineParts = syntaxLine.split(" := ");
         String syntaxClassName = stripStringPrefixSuffix(syntaxLineParts[0], 1);
-        String[] definedAsSyntaxTerms = syntaxLineParts[1].split(" | ");
+        String[] definedAsSyntaxTerms = syntaxLineParts[1].split(" \\| ");
         
+        for(String s : definedAsSyntaxTerms){
+            System.out.println(syntaxClassName + " := \'" + s + "\'");
+        }
         syntaxClassesMap.put(syntaxClassName,
                              Arrays.asList(definedAsSyntaxTerms));
     }
@@ -722,18 +722,18 @@ public class SuggestionManager {
     public jim.journal.Task parseTask(String[] input) {
         // This is ugly, but temporary due to limitations of the grammar parser.
 
-        List<String> timedTaskDefinitions = syntaxClassesMap.get("<timedtask>");
+        List<String> timedTaskDefinitions = syntaxClassesMap.get("timedtask");
         for (String timedTaskDefinition : timedTaskDefinitions) {
             String[] parsed = tryMatchInputWithSyntax(timedTaskDefinition, input);
             
             if (parsed != null) {
                 // KEY: syntaxTerm + " => " + nextSyntaxTerm
-                SyntaxTermParser parser = syntaxParsers.get("<timedtask> => " + timedTaskDefinition);
+                SyntaxTermParser parser = syntaxParsers.get("timedtask => " + timedTaskDefinition);
                 
                 if (parser != null) {
                     return (TimedTask) parser.parse(join(input, ' '));
                 } else {
-                    throw new IllegalStateException("Parser not implemented: <timedtask> => " + timedTaskDefinition);
+                    throw new IllegalStateException("Parser not implemented: timedtask => " + timedTaskDefinition);
                 }
             }
         }
