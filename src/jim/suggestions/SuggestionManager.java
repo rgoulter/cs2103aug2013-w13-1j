@@ -788,14 +788,14 @@ public class SuggestionManager {
 
 
 
-    public String removeAllSymbols(String tellDateOrTime) {
+    private static String removeAllSymbols(String tellDateOrTime) {
         String findDate = tellDateOrTime.replaceAll("[^\\p{L}\\p{Nd}]", "");
         return findDate;
     }
 
 
 
-    public static boolean isInteger(String s) {
+    private static boolean isInteger(String s) {
         try {
             Integer.parseInt(s);
         } catch (NumberFormatException e) {
@@ -806,7 +806,7 @@ public class SuggestionManager {
 
 
 
-    public int[] splitDate(String date_in_string) {
+    private int[] splitDate(String date_in_string) {
         // we will accept date format of 090913 - DDMMYY
         int[] dates = new int[LENGTH_OF_DATE];
         String[] temp = date_in_string.split("");
@@ -828,7 +828,7 @@ public class SuggestionManager {
 
 
 
-    public int[] splitTime(String time_in_string) {
+    private int[] splitTime(String time_in_string) {
         // we will accept time format of 24 hours - 2200 hrs, default seconds is
         // 00
         int[] time_24hours = new int[LENGTH_OF_TIME];
@@ -841,7 +841,7 @@ public class SuggestionManager {
         return time_24hours;
     }
     
-    public boolean isDate(String isItDate){
+    private boolean isDate(String isItDate){
     	String temp = removeAllSymbols(isItDate);
     	if (isInteger(temp)) {
     		if (temp.length() == INDICATE_DATE_STRING) {
@@ -854,7 +854,7 @@ public class SuggestionManager {
     	}
     }
 
-    public String[] moveDescriptionToBack(String args[]) {
+    private String[] moveDescriptionToBack(String args[]) {
     	ArrayList<String> temp = new ArrayList<>(); 
     	int startIndex = START_OF_DESCRIPTION_INDEX, endIndex = START_OF_DESCRIPTION_INDEX;
     	for (int i = 2; i < args.length; i++) {
