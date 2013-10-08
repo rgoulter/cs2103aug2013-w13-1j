@@ -1,11 +1,10 @@
 
 package jim.journal;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.ArrayList;
-
+import org.joda.time.MutableDateTime;
+import org.joda.time.DateTimeComparator;
 
 
 public class JournalManager {
@@ -24,15 +23,16 @@ public class JournalManager {
         String floatingTasks = "";
         String output = "Upcoming Events:\n";
 
-        Calendar today = Calendar.getInstance();
+        MutableDateTime today = new MutableDateTime();
 
         for (Task current : upcomingTasks) {
             if (current instanceof TimedTask) {
-                Calendar taskTime = ((TimedTask) current).getStartTime();
-                if (taskTime.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-                    taskTime.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
-                    timedTasks = timedTasks + current.toString() + "\n";
-                }
+            	MutableDateTime taskTime = ((TimedTask) current).getStartTime();                
+                if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, today) == 0
+        				/*taskTime.year() == today.year() &&
+     		           taskTime.dayOfYear()  == today.dayOfYear() */) {
+     				   timedTasks = timedTasks + current.toString() + "\n";
+     			   }
             } else if (current instanceof FloatingTask) {
                 floatingTasks = floatingTasks + current.toString() + "\n";
             }

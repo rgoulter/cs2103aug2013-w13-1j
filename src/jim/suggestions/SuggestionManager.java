@@ -4,8 +4,6 @@ package jim.suggestions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -232,55 +230,50 @@ public class SuggestionManager {
 
 
 
-    private Calendar parseDate(String date) throws ParseException {
+    private MutableDateTime parseDate(String date) throws ParseException {
         // TODO: Abstract Date parsing like AddCommand
         // ACCEPTED FORMATS: dd/mm/yy
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATEFORMAT_DATE_DDMMYY);
+        //SimpleDateFormat dateFormat = new SimpleDateFormat(DATEFORMAT_DATE_DDMMYY);
+    	
+        int[] takeDateArray = splitDate(removeAllSymbols(date));
+		int YY = takeDateArray[2],MM = takeDateArray[1],DD = takeDateArray[0];
 
-        GregorianCalendar result = new GregorianCalendar();
-        result.setTime(dateFormat.parse(date));
+        MutableDateTime result = new MutableDateTime(YY,MM,DD,0,0,0,0);
+        /*result.setDateTime(dateFormat.parse(date));*/
 
         return result;
     }
 
 
 
-    private Calendar parseTime(String time) throws ParseException {
+    private MutableDateTime parseTime(String time) throws ParseException {
         // TODO: Abstract Time parsing like AddCommand
         // ACCEPTED FORMATS: HHMM
         SimpleDateFormat timeFormat = new SimpleDateFormat(DATEFORMAT_TIME_HHMM);
 
-        GregorianCalendar result = new GregorianCalendar();
-        result.setTime(timeFormat.parse(time));
+        MutableDateTime result = new MutableDateTime(timeFormat);
+       /* result.setTime(timeFormat.parse(time));*/
 
         return result;
     }
 
 
 
-    private Calendar parseDateTime(String date, String time) {
+    private MutableDateTime parseDateTime(String date, String time) {
         // Accepted Date Formats:
         // DD/MM/YY
         // Accepted Time Formats:
         // 24-hour
 
-        try {
-            GregorianCalendar result = new GregorianCalendar();
+        MutableDateTime result = new MutableDateTime();
+		
+		int[] takeDateArray = splitDate(date);
+		int YY = takeDateArray[2],MM = takeDateArray[1],DD = takeDateArray[0];
+		int[] takeTimeArray = splitTime(time);
+		int HH = takeTimeArray[0], mm = takeTimeArray[1];
+		result.setDateTime(YY, MM, DD, HH, mm, 00, 00);
 
-            Calendar dateCalendar = parseDate(date);
-            Calendar timeCalendar = parseTime(time);
-
-            result.set(dateCalendar.get(Calendar.YEAR),
-                       dateCalendar.get(Calendar.MONTH),
-                       dateCalendar.get(Calendar.DAY_OF_MONTH),
-                       timeCalendar.get(Calendar.HOUR_OF_DAY),
-                       timeCalendar.get(Calendar.MINUTE));
-
-            return result;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
+		return result;
     }
 
 
@@ -292,8 +285,8 @@ public class SuggestionManager {
         // where date format is DD/MM/YY,
         // where time format is 24-hour
 
-        Calendar startDateTime = parseDateTime(words[0], words[1]);
-        Calendar endDateTime = parseDateTime(words[2], words[3]);
+        MutableDateTime startDateTime = parseDateTime(words[0], words[1]);
+        MutableDateTime endDateTime = parseDateTime(words[2], words[3]);
         String description = join(words, ' ', 2 + 2);
 
         return new TimedTask(startDateTime, endDateTime, description);
@@ -376,7 +369,7 @@ public class SuggestionManager {
                                             temp[counter++]);
             } else if (i == INDICATE_MONTH) {
                 dates[i] = Integer.parseInt(temp[counter++] + temp[counter++]);
-                dates[i] = dates[i] - 1; // month is 0-based, eg. January = 0
+                dates[i] = dates[i];
             } else {
                 dates[i] = Integer.parseInt(temp[counter++] + temp[counter++]);
             }
@@ -407,8 +400,8 @@ public class SuggestionManager {
         // event>
         // TODO: Add more syntaxes/formats for this command
 
-        Calendar startDateTime = null;
-        Calendar endDateTime = null;
+    	MutableDateTime startDateTime = null;
+    	MutableDateTime endDateTime = null;
         String description = null;
 
         for (AddCommandFormats format : AddCommandFormats.values()) {
@@ -528,9 +521,9 @@ public class SuggestionManager {
             // should change that ~CC
             // Rudimentary way to parse date ~CC
             String[] ddmmyy = args[1].split("-");
-            GregorianCalendar date = new GregorianCalendar(Integer.parseInt(ddmmyy[2]),
+            MutableDateTime date = new MutableDateTime(Integer.parseInt(ddmmyy[2]),
                                                            Integer.parseInt(ddmmyy[1]),
-                                                           Integer.parseInt(ddmmyy[0]));
+                                                           Integer.parseInt(ddmmyy[0]),00,00,00,00);
 
             return new jim.journal.DisplayCommand(date);
         }

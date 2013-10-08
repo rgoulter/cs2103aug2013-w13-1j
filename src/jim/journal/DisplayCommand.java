@@ -1,19 +1,19 @@
 
 package jim.journal;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import org.joda.time.MutableDateTime;
+import org.joda.time.DateTimeComparator;
 import java.util.List;
 
 
 
 public class DisplayCommand extends Command {
 
-    GregorianCalendar dateLimit;
+    MutableDateTime dateLimit;
 
 
 
-    public DisplayCommand(GregorianCalendar date) {
+    public DisplayCommand(MutableDateTime date) {
         dateLimit = date;
     }
 
@@ -34,13 +34,14 @@ public class DisplayCommand extends Command {
                 outputln(current.toString());
             } else {
                 if (current instanceof TimedTask) {
-                    GregorianCalendar taskTime = (GregorianCalendar) ((TimedTask) current).getStartTime();
+                	MutableDateTime taskTime =((TimedTask) current).getStartTime();
 
                     // Workaround to check if two events are on the same day,
                     // ignoring time
-                    if (taskTime.get(Calendar.YEAR) == dateLimit.get(Calendar.YEAR) &&
-                        taskTime.get(Calendar.DAY_OF_YEAR) == dateLimit.get(Calendar.DAY_OF_YEAR)) {
-                        outputln(current.toString());
+                	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0
+            				/*	   taskTime.year() == dateLimit.year() &&
+            		           taskTime.dayOfYear() == dateLimit.dayOfYear()*/){
+            				   outputln(current.toString());
                     }
                 }
             }

@@ -1,25 +1,21 @@
 
 package jim.journal;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
+import org.joda.time.MutableDateTime;
 
 
 public class TimedTask extends Task {
 
-    private GregorianCalendar startTime;
-    private GregorianCalendar endTime;
+    private MutableDateTime startTime;
+    private MutableDateTime endTime;
 
 
 
     // private String description;
 
-    public TimedTask(Calendar startTime, Calendar endTime, String desc) {
+    public TimedTask(MutableDateTime startTime, MutableDateTime endTime, String desc) {
         // Tasks with both start and end date and time.
-        this.startTime = (GregorianCalendar) startTime;
-        this.endTime = (GregorianCalendar) endTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
         description = desc;
     }
 
@@ -31,13 +27,13 @@ public class TimedTask extends Task {
      * (GregorianCalendar) endTime; description = desc; }
      */
 
-    public Calendar getStartTime() {
+    public MutableDateTime getStartTime() {
         return startTime;
     }
 
 
 
-    public Calendar getEndTime() {
+    public MutableDateTime getEndTime() {
         return endTime;
     }
 
@@ -50,16 +46,11 @@ public class TimedTask extends Task {
 
 
     public String toString() {
-        String taskName = "%s %d/%d/%d %d%d %d%d";
-        return String.format(taskName,
-                             getDescription(),
-                             endTime.get(Calendar.DAY_OF_MONTH),
-                             endTime.get(Calendar.MONTH) + 1,
-                             endTime.get(Calendar.YEAR),
-                             startTime.get(Calendar.HOUR_OF_DAY),
-                             startTime.get(Calendar.MINUTE),
-                             endTime.get(Calendar.HOUR_OF_DAY),
-                             endTime.get(Calendar.MINUTE));
+    	String taskName = "%s %d/%d/%d %d%d %d%d";
+    	/* return String.format(taskName, getDescription(), endTime.dayOfMonth(), endTime.monthOfYear(), endTime.year(),
+    						startTime.hourOfDay(), startTime.minuteOfHour(),
+    						endTime.hourOfDay(), endTime.minuteOfHour()); */
+    	return getDescription() +"  "+ startTime.toString() +" to " + endTime.toString();
     }
 
 

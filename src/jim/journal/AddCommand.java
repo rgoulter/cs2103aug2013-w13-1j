@@ -1,8 +1,7 @@
 
 package jim.journal;
 
-import java.util.Calendar;
-
+import org.joda.time.MutableDateTime;
 
 
 public class AddCommand extends Command {
@@ -17,7 +16,7 @@ public class AddCommand extends Command {
      * 
      * We represent date+time with the java.util.Calendar class.
      */
-    public AddCommand(Calendar startTime, Calendar endTime, String description) {
+    public AddCommand(MutableDateTime startTime, MutableDateTime endTime, String description) {
         taskToAdd = new TimedTask(startTime, endTime, description);
     }
 
