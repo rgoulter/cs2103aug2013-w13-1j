@@ -4,10 +4,12 @@ package jim.suggestions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.joda.time.MutableDateTime;
 
 import jim.journal.AddCommand;
 import jim.journal.CompleteCommand;
@@ -16,6 +18,8 @@ import jim.journal.EditCommand;
 import jim.journal.RemoveCommand;
 import jim.journal.SearchCommand;
 import jim.journal.TimedTask;
+
+import org.joda.time.MutableDateTime;
 
 
 
@@ -79,7 +83,7 @@ public class SuggestionManager {
                                                           REGEX_PHRASE}, ' ')),
                                                           
   		AddDateTimeToTimeDescription(join(new String[] {"add",
-										                REGEX_DATE_DDMMYY,
+                                                        REGEX_DATE_DDMMYY,
 										                REGEX_TIME_HHMM,
 										                "to",
 										                REGEX_TIME_HHMM,
@@ -104,6 +108,28 @@ public class SuggestionManager {
             format = fmt;
         }
 
+    }
+
+    private final Map<String, List<String>> syntaxClassesMap = new HashMap<String, List<String>>();
+
+    {
+        // Initialise our syntax classes dictionary.
+        // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
+        addSyntax("<date> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/");
+        addSyntax("<time> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
+        addSyntax("<word> := \\S+"); // non whitespace
+        addSyntax("<phrase> := <word> | <word> <phrase>");
+        addSyntax("<description> := <phrase>");
+
+        addSyntax("<timedtask> := " +
+                  "<date> <time> <date> <time> <description> | " +
+                  "<date> <time> 'to' <time> <description> | " +
+                  "<date> <time> <time> <description> | " +
+                  "<date> <description>");
+        addSyntax("<floatingtask> := <description>");
+        addSyntax("<task> := <timedtask> | <floatingtask>");
+
+        addSyntax("<addcmd> := 'add' <task>");
     }
 
 
@@ -244,6 +270,192 @@ public class SuggestionManager {
         result.append(arrayOfStrings[endIndex - 1]);
 
         return result.toString();
+    }
+
+
+
+    private static boolean isStringSurroundedBy(String str, char begin, char end) {
+        return str.charAt(0) == begin && str.charAt(str.length() - 1) == end;
+    }
+
+
+
+    private static String stripStringPrefixSuffix(String str, int n){
+        // Not an efficient solution. <3 Recursion, though
+        if (n <= 0) {
+            return str;
+        } else {
+            // May not make sense if we just strip by n?
+            String inner = str.substring(1, str.length() - 1);
+            return stripStringPrefixSuffix(str, n - 1);
+        }
+    }
+
+
+
+    /**
+     * Helper method for parsing Syntax.
+     * Returns true if the given String is surrounded by '<' and '>'
+     */
+    private static boolean isSyntaxClass(String s) {
+        // TODO: Eliminate magic values.
+        return isStringSurroundedBy(s, '<', '>');
+    }
+
+
+
+    private static boolean isSyntaxRegex(String s){
+        return isStringSurroundedBy(s, '/', '/');
+    }
+
+
+
+    private static boolean isSyntaxLiteral(String s){
+        return isStringSurroundedBy(s, '\'', '\'');
+    }
+
+
+
+    /**
+     * Checks whether the given input term matches the syntax term.
+     * 
+     * There are currently THREE types of syntax terms:
+     * - Literals: e.g. 'add', matches "add" only.
+     * - Regular Exrpessions: e.g. /a[bc]/, matches ab, ac
+     * - Syntax classes: e.g. <date>, matches 11/22/33, etc.
+     * 
+     * LIMITATIONS:
+     * * This can only handle single-word single-word matches.
+     *   This limits both syntax, and input.
+     *   It is expected this will be resolved in future.
+     */
+    private boolean isMatchSyntaxTermWithInputTerm(String syntaxTerm, String inputTerm) {
+        //TODO: Memoization of results?
+        String strippedTerm = stripStringPrefixSuffix(syntaxTerm, 1);
+
+        if (isSyntaxLiteral(syntaxTerm)) {
+            // syntaxTerm == 'something'
+            String literal = strippedTerm;
+
+            return literal.equals(inputTerm);
+        } else if (isSyntaxRegex(syntaxTerm)) {
+            // syntaxTerm = /something/
+            // NOTE: Regex can only match one word/term at a time.
+            String regex = strippedTerm;
+            Pattern regexPattern = Pattern.compile(regex);
+            Matcher regexMatcher = regexPattern.matcher(inputTerm);
+
+            return regexMatcher.matches();
+        } else if (isSyntaxClass(syntaxTerm)) {
+            // syntaxTerm = <something> e.g. <date>, <time>, <task>, ...
+            String syntaxClassName = strippedTerm;
+
+            // Get the enum(?) for the current class name,
+            //   for each item in that,
+            //     try matching the current item...
+            List<String> listOfSyntaxTerms = syntaxClassesMap.get(syntaxClassName);
+
+            if (listOfSyntaxTerms == null) {
+                throw new IllegalArgumentException("Given a syntax term with unknown class: " + syntaxTerm);
+            } else {
+                // Descend through the syntax terms.
+                for (String nextSyntaxTerm : listOfSyntaxTerms) {
+                    if (isMatchSyntaxTermWithInputTerm(nextSyntaxTerm, inputTerm)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        } else {
+            throw new IllegalStateException("An invalid syntax was given: " +
+                                            syntaxTerm);
+        }
+
+        return false;
+    }
+
+
+
+    /**
+     * @param syntaxDefn the definition of a syntax class,
+     *      e.g. "<date> <time> <date> <time> <description>"
+     */
+    private String[] tryMatchInputWithSyntax(String syntaxDefn, String input[]){
+        String[] syntaxTerms = syntaxDefn.split(" ");
+        return tryMatchInputWithSyntax(syntaxTerms, input);
+    }
+
+
+
+
+    /**
+     * Will try and match the given input-arguments with the given syntax.
+     * 
+     * e.g.
+     * syntax = {"<date>",   "<time>", "<description>"}
+     * input  = {"10/10/13", "2359",   "Must", "submit", "homework."}
+     * will match, and return:
+     * {"10/10/13", "2359", "Must submit homework."}
+     *
+     * CAVEAT: ONLY WORKS WITH <description> AT THE END!!
+     *
+     * @return Strings which match the syntax IF MATCHED; null, otherwise.
+     */
+    private String[] tryMatchInputWithSyntax(String[] syntax, String input[]){
+        List<String> result = new ArrayList<String>();
+        int syntaxPtr = 0;
+        int inputPtr = 0;
+
+        if (input.length < syntax.length) {
+            return null;
+        }
+
+        // We check that the input matches/satisfies the given syntax
+        //  by checking each term one by one.
+        // If they ever don't match, we return null.
+        
+        while (syntaxPtr < syntax.length) {
+            String currentSyntaxTerm = syntax[syntaxPtr];
+            String currentInputTerm = input[inputPtr];
+
+            // BY OUR ASSUMPTIONS, ONLY THE LAST ITEM CAN BE A <description>,
+            if (syntaxPtr == syntax.length - 1 && currentSyntaxTerm.equals("<description>")) {
+                String description = join(input, ' ', inputPtr);
+                
+                result.add(description);
+                syntaxPtr++;
+                inputPtr = input.length;
+                break;
+            }
+
+            if (isMatchSyntaxTermWithInputTerm(currentSyntaxTerm, currentInputTerm)) {
+                result.add(currentInputTerm);
+                syntaxPtr++;
+                inputPtr++;
+            } else {
+                return null;
+            }
+        }
+
+        boolean matchedSuccessfully = syntaxPtr == syntax.length;
+        return matchedSuccessfully ? result.toArray(new String[]{}) : null;
+    }
+    
+    
+    
+    /**
+     * 
+     * @param syntaxLine
+     *            in format "<syntaxClassName> := somesyntax [| somesyntax]*"
+     */
+    private void addSyntax(String syntaxLine) {
+        String[] syntaxLineParts = syntaxLine.split(" := ");
+        String syntaxClassName = stripStringPrefixSuffix(syntaxLineParts[0], 1);
+        String[] definedAsSyntaxTerms = syntaxLineParts[1].split(" | ");
+        
+        syntaxClassesMap.put(syntaxClassName,
+                             Arrays.asList(definedAsSyntaxTerms));
     }
 
 
