@@ -19,6 +19,10 @@ public class TimedTask extends Task {
         description = desc;
     }
 
+    public TimedTask(MutableDateTime date, String description) {
+        // TODO Auto-generated constructor stub
+    }
+
     public MutableDateTime getStartTime() {
         return startTime;
     }

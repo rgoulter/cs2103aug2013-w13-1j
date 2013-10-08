@@ -13,6 +13,7 @@ import jim.journal.AddCommand;
 import jim.journal.CompleteCommand;
 import jim.journal.DisplayCommand;
 import jim.journal.EditCommand;
+import jim.journal.FloatingTask;
 import jim.journal.RemoveCommand;
 import jim.journal.SearchCommand;
 import jim.journal.TimedTask;
@@ -219,10 +220,108 @@ public class SuggestionManager {
                                   return input;
                               }
                           });
+
+        addSyntax("<timedtask> := " +
+                  "<date> <time> <date> <time> <description> | " +
+                  "<date> <time> 'to' <time> <description> | " +
+                  "<date> <time> <time> <description> | " +
+                  "<date> <description>");
+        addSyntax("<floatingtask> := <description>");
+
+
+        syntaxParsers.put("<timedtask> => <date> <time> <date> <time> <description>",
+                          new SyntaxTermParser() {
+                              @Override
+                              public Object parse(String input) {
+                                  String[] inputParts = input.split(" ");
+                                  MutableDateTime startDate =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                  MutableDateTime startTime =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[1]);
+                                  MutableDateTime endDate =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[2]);
+                                  MutableDateTime endTime =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[3]);
+                                  String description = join(inputParts, ' ', 4);
+                                  return new TimedTask(datetime(startDate, startTime),
+                                                       datetime(endDate, endTime), description);
+                              }
+                          });
+        syntaxParsers.put("<timedtask> => <date> <time> 'to' <time> <description>",
+                          new SyntaxTermParser() {
+                              @Override
+                              public Object parse(String input) {
+                                  String[] inputParts = input.split(" ");
+                                  MutableDateTime date =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                  MutableDateTime startTime =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[1]);
+                                  MutableDateTime endTime =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[3]);
+                                  String description = join(inputParts, ' ', 4);
+                                  return new TimedTask(datetime(date, startTime),
+                                                       datetime(date, endTime),
+                                                       description);
+                              }
+                          });
+        syntaxParsers.put("<timedtask> => <date> <time> <time> <description>",
+                          new SyntaxTermParser() {
+                              @Override
+                              public Object parse(String input) {
+                                  String[] inputParts = input.split(" ");
+                                  MutableDateTime date =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                  MutableDateTime startTime =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[1]);
+                                  MutableDateTime endTime =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[2]);
+                                  String description = join(inputParts, ' ', 3);
+                                  return new TimedTask(datetime(date, startTime),
+                                                       datetime(date, endTime),
+                                                       description);
+                              }
+                          });
+        syntaxParsers.put("<timedtask> => <date> <description>",
+                          new SyntaxTermParser() {
+                              @Override
+                              public Object parse(String input) {
+                                  String[] inputParts = input.split(" ");
+                                  MutableDateTime date =
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                  String description = join(inputParts, ' ', 1);
+                                  return new TimedTask(date, description);
+                              }
+                          });
+        
+        
+        syntaxParsers.put("<floatingtask> => <description>",
+                          new SyntaxTermParser() {
+                              @Override
+                              public Object parse(String input) {
+                                  return new FloatingTask(input);
+                              }
+                          });
+        
     }
     
     
     
+    /**
+     * Merge a date and time value into a datetime.
+     */
+    private MutableDateTime datetime(MutableDateTime date,
+                                     MutableDateTime time) {
+        return new MutableDateTime(date.getYear(),
+                                   date.getMonthOfYear(),
+                                   date.getDayOfMonth(),
+                                   date.getHourOfDay(),
+                                   date.getMinuteOfHour(),
+                                   date.getSecondOfMinute(),
+                                   00);
+    }
+
+
+
     /**
      * This finds the appropriate parser of the syntaxClass for the inputTerm.
      * e.g. parseInputTermWithSyntaxClass("<time>", "2359");
@@ -621,17 +720,9 @@ public class SuggestionManager {
 
 
     public jim.journal.Task parseTask(String[] words) {
-        // Accepted Task Syntaxes:
-        // TimedTask:
-        // <start-date> <start-time> <end-date> <end-time> <description..>
-        // where date format is DD/MM/YY,
-        // where time format is 24-hour
-
-        MutableDateTime startDateTime = parseDateTime(words[0], words[1]);
-        MutableDateTime endDateTime = parseDateTime(words[2], words[3]);
-        String description = join(words, ' ', 2 + 2);
-
-        return new TimedTask(startDateTime, endDateTime, description);
+        
+        
+        return null;
     }
 
 
