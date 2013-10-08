@@ -1,6 +1,7 @@
 
 package jim;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -84,7 +85,8 @@ public class DisplayUnitTests {
     public void testStrictSyntaxDisplayCommandOneArgsCanExecute () {
         JournalManager jManager = new JournalManager();
 
-        Calendar testDateCal = new GregorianCalendar(2013, 10, 10);
+        // Note that "January" is Month 0. October is month 9..
+        Calendar testDateCal = new GregorianCalendar(2013, 9, 10);
         MutableDateTime testDate = new MutableDateTime(testDateCal);
         AddCommand addCmd = new AddCommand(testDate, testDate, "CS2103 Lecture");
         addCmd.execute(jManager);
@@ -93,14 +95,7 @@ public class DisplayUnitTests {
         dispCmd.execute(jManager);
 
         String output = dispCmd.getOutput();
-
-        boolean stringsMatch = false;
-        if (output.equals("CS2103 Lecture 10/10/2013 00 00\n")) {
-            stringsMatch = true;
-        }
-
-        assertTrue("Display command test (on one argument) has failed",
-                   stringsMatch);
+        assertEquals("CS2103 Lecture 10/10/2013 00:00 to 00:00\n", output);
     }
     
     @Test
