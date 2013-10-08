@@ -12,6 +12,7 @@ import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.DisplayCommand;
 import jim.journal.JournalManager;
+import jim.journal.TemporaryJournalManager;
 import jim.suggestions.SuggestionManager;
 
 import org.joda.time.MutableDateTime;
@@ -43,7 +44,7 @@ public class DisplayUnitTests {
 
     @Test
     public void testStrictSyntaxDisplayCommandUntimedTasksCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
 
         AddCommand addCmd = new AddCommand("CS2103 Lecture");
         addCmd.execute(jManager);
@@ -64,7 +65,7 @@ public class DisplayUnitTests {
 
     @Test
     public void testStrictSyntaxDisplayCommandTimedTasksCanExecute() {
-    	JournalManager jManager = new JournalManager();
+    	JournalManager jManager = new TemporaryJournalManager();
         Calendar startCal = new GregorianCalendar(2013, 10, 7);
         Calendar endCal = new GregorianCalendar(2013, 10, 8);
         MutableDateTime start = new MutableDateTime(startCal);
@@ -84,7 +85,7 @@ public class DisplayUnitTests {
 
     @Test
     public void testStrictSyntaxDisplayCommandOneArgsCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
 
         // Note that "January" is Month 0. October is month 9..
         Calendar testDateCal = new GregorianCalendar(2013, 9, 10);
@@ -101,7 +102,7 @@ public class DisplayUnitTests {
     
     @Test
     public void testStrictSyntaxDisplayCommandMultipleItemsCanExecute() {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         
         Calendar testDateCal = new GregorianCalendar(2013, 9, 10);
         MutableDateTime testDate = new MutableDateTime(testDateCal);

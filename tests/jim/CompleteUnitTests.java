@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import jim.journal.AddCommand;
 import jim.journal.CompleteCommand;
 import jim.journal.JournalManager;
+import jim.journal.TemporaryJournalManager;
 
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ public class CompleteUnitTests {
 
     @Test
     public void testStrictSyntaxCompleteCommandNoMatchCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
         AddCommand addCmd2 = new AddCommand("CS2101 Sectional");
@@ -35,7 +36,7 @@ public class CompleteUnitTests {
 
     @Test
     public void testStrictSyntaxCompleteCommandHasMatchesCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
@@ -51,7 +52,7 @@ public class CompleteUnitTests {
 
     @Test
     public void testStrictSyntaxCompleteCommandHasMultipleMatchesCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
         AddCommand addCmd2 = new AddCommand("Lecture");
@@ -71,7 +72,7 @@ public class CompleteUnitTests {
 
     @Test
     public void testStrictSyntaxCompleteCommandHasMultipleMatchesButCompletedCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 

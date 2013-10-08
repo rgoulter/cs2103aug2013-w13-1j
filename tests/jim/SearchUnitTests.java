@@ -6,6 +6,7 @@ import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.JournalManager;
 import jim.journal.SearchCommand;
+import jim.journal.TemporaryJournalManager;
 import jim.suggestions.SuggestionManager;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class SearchUnitTests {
 
     @Test
     public void testStrictSyntaxSearchCommandNoMatchCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
         AddCommand addCmd2 = new AddCommand("CS2101 Sectional");
@@ -54,7 +55,7 @@ public class SearchUnitTests {
 
     @Test
     public void testStrictSyntaxSearchCommandHasMatchesCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 

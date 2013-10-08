@@ -14,6 +14,7 @@ import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.JournalManager;
 import jim.journal.Task;
+import jim.journal.TemporaryJournalManager;
 import jim.journal.TimedTask;
 import jim.suggestions.SuggestionManager;
 
@@ -57,7 +58,7 @@ public class AddUnitTests {
         String description = "CS2103 Lecture";
 
         AddCommand addCmd = new AddCommand(startTime, endTime, description);
-        JournalManager journalManager = new JournalManager(); // Empty; NO
+        JournalManager journalManager = new TemporaryJournalManager(); // Empty; NO
                                                               // TASKS.
         addCmd.execute(journalManager);
 

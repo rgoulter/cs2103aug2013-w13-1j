@@ -11,6 +11,7 @@ import java.util.GregorianCalendar;
 import jim.journal.Command;
 import jim.journal.EditCommand;
 import jim.journal.JournalManager;
+import jim.journal.TemporaryJournalManager;
 import jim.journal.TimedTask;
 import jim.suggestions.SuggestionManager;
 
@@ -74,7 +75,7 @@ public class EditUnitTests {
                                                        newEndTime,
                                                        "MyNewTask");
 
-        JournalManager journalManager = new JournalManager(); // Empty; NO
+        JournalManager journalManager = new TemporaryJournalManager(); // Empty; NO
                                                               // TASKS.
         journalManager.addTask(myOldTimedTask);
 
@@ -103,7 +104,7 @@ public class EditUnitTests {
                                                  oldEndTime,
                                                  "MyOldTask");
 
-        JournalManager journalManager = new JournalManager(); // Empty; NO
+        JournalManager journalManager = new TemporaryJournalManager(); // Empty; NO
                                                               // TASKS.
         journalManager.addTask(myOldTimedTask);
 

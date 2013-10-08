@@ -6,6 +6,7 @@ import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.JournalManager;
 import jim.journal.RemoveCommand;
+import jim.journal.TemporaryJournalManager;
 import jim.suggestions.SuggestionManager;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class RemoveUnitTests {
 
     @Test
     public void testStrictSyntaxRemoveCommandNoMatchCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
         AddCommand addCmd2 = new AddCommand("CS2101 Sectional");
@@ -54,7 +55,7 @@ public class RemoveUnitTests {
 
     @Test
     public void testStrictSyntaxRemoveCommandHasMatchesCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
@@ -70,7 +71,7 @@ public class RemoveUnitTests {
 
     @Test
     public void testStrictSyntaxRemoveCommandHasMultipleMatchesCanExecute () {
-        JournalManager jManager = new JournalManager();
+        JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
         AddCommand addCmd2 = new AddCommand("Lecture");
