@@ -62,20 +62,27 @@ public class SuggestionManager {
     /**
      * Accepted Add Command Formats:
      * 
+     * add <description>
+     * add DD/MM/YY <description>
      * add DD/MM/YY HHMM DD/MM/YY HHMM <description>
      */
-    public enum AddCommandFormats {
+    public enum AddCommandFormats {                                
+        AddDateDescription(join(new String[] {"add",
+                                              REGEX_DATE_DDMMYY,
+                                              REGEX_PHRASE}, ' ')),
+
         AddDateTimeDateTimeDescription(join(new String[] {"add",
                                                           REGEX_DATE_DDMMYY,
                                                           REGEX_TIME_HHMM,
                                                           REGEX_DATE_DDMMYY,
                                                           REGEX_TIME_HHMM,
-                                                          REGEX_PHRASE}, ' '));
+                                                          REGEX_PHRASE}, ' ')),
+        
+        AddDescription(join(new String[] {"add",
+                                          REGEX_PHRASE}, ' '));
+        
 
         String format;
-
-
-
         AddCommandFormats(String fmt) {
             format = fmt;
         }
@@ -409,10 +416,25 @@ public class SuggestionManager {
             Matcher inputRegexMatcher = regexPattern.matcher(join(args, ' '));
             if (inputRegexMatcher.matches()) {
                 switch (format) {
+                case AddDateDescription:
+                    try {
+                    startDateTime = parseDate(args[1]);
+                    } catch (ParseException e) {
+                        System.out.println("Parse Date Exception Encountered in SuggestionManager");
+                    }
+                    endDateTime = startDateTime;
+                    description = join(args, ' ', 2);
+                    
+                    break;
+                
                 case AddDateTimeDateTimeDescription:
                     startDateTime = parseDateTime(args[1], args[2]);
                     endDateTime = parseDateTime(args[3], args[4]);
                     description = join(args, ' ', 5);
+                    break;
+                    
+                case AddDescription:
+                    description = join(args, ' ', 1);
                     break;
 
                 default:

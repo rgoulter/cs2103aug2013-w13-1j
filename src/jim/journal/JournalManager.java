@@ -9,8 +9,6 @@ import java.util.ArrayList;
 
 
 public class JournalManager {
-
-    private final GregorianCalendar cutoff = new GregorianCalendar();
     private List<Task> storeAllTasks = new ArrayList<Task>();
 
 
