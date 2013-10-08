@@ -116,12 +116,11 @@ public class DisplayUnitTests {
         addCmd = new AddCommand(testDate, testDate, "CS2101 Lesson");
         addCmd.execute(jManager);
         
-        testDate = new GregorianCalendar(2013, 10, 11);
+        testDate = new GregorianCalendar(2013, 10, 10);
         DisplayCommand dispCmd = new DisplayCommand((GregorianCalendar)testDate);
         dispCmd.execute(jManager);
         
         String output = dispCmd.getOutput();
-        System.out.println(output);
         assertTrue("Display command test on multiple items failed",
                     output.equals("CS2103 Lecture 10/10/2013 00 00\n"));
     }
