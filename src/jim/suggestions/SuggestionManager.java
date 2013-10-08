@@ -64,6 +64,8 @@ public class SuggestionManager {
      * add <description>
      * add DD/MM/YY <description>
      * add DD/MM/YY HHMM DD/MM/YY HHMM <description>
+     * add DD/MM/YY HHMM to HHMM <description>
+     * add DD/MM/YY HHMM HHMM <description>
      */
     public enum AddCommandFormats {                                
 
@@ -74,9 +76,25 @@ public class SuggestionManager {
                                                           REGEX_DATE_DDMMYY,
                                                           REGEX_TIME_HHMM,
                                                           REGEX_PHRASE}, ' ')),
-	  AddDateDescription(join(new String[] {"add",
+                                                          
+  		AddDateTimeToTimeDescription(join(new String[] {"add",
+					                REGEX_DATE_DDMMYY,
+					                REGEX_TIME_HHMM,
+					                "to",
+					                REGEX_TIME_HHMM,
+					                REGEX_PHRASE}, ' ')),
+					                                                                
+        AddDateTimeTimeDescription(join(new String[] {"add",
+                                    REGEX_DATE_DDMMYY,
+                                    REGEX_TIME_HHMM, 
+                                    REGEX_TIME_HHMM,
+                                    REGEX_PHRASE}, ' ')),
+                                    
+	    AddDateDescription(join(new String[] {"add",
 					      REGEX_DATE_DDMMYY,
-					      REGEX_PHRASE}, ' ')),       
+					      REGEX_PHRASE}, ' ')),    
+					 
+
 					      
         AddDescription(join(new String[] {"add",
                                           REGEX_PHRASE}, ' '));
@@ -427,7 +445,19 @@ public class SuggestionManager {
                     description = join(args, ' ', 2);
                     
                     break;
-                
+                    
+                case AddDateTimeToTimeDescription:
+                	startDateTime = parseDateTime(args[1], args[2]);
+                    endDateTime = parseDateTime(args[1], args[4]);
+                    description = join(args, ' ', 5);
+                    break;
+                    
+                case AddDateTimeTimeDescription:
+                	startDateTime = parseDateTime(args[1], args[2]);
+                    endDateTime = parseDateTime(args[1], args[3]);
+                    description = join(args, ' ', 4);
+                    break;
+                    
                 case AddDescription:
                     description = join(args, ' ', 1);
                     break;
