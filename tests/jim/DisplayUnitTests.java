@@ -102,24 +102,25 @@ public class DisplayUnitTests {
     public void testStrictSyntaxDisplayCommandMultipleItemsCanExecute() {
         JournalManager jManager = new JournalManager();
         
-        Calendar testDateCal = new GregorianCalendar(2013, 10, 10);
+        Calendar testDateCal = new GregorianCalendar(2013, 9, 10);
         MutableDateTime testDate = new MutableDateTime(testDateCal);
         AddCommand addCmd = new AddCommand(testDate, testDate, "CS2103 Lecture");
         addCmd.execute(jManager);
         
-        testDateCal = new GregorianCalendar(2013, 10, 14);
+        testDateCal = new GregorianCalendar(2013, 9, 14);
         testDate = new MutableDateTime(testDateCal);
         addCmd = new AddCommand(testDate, testDate, "CS2101 Lesson");
         addCmd.execute(jManager);
         
-        testDateCal = new GregorianCalendar(2013, 10, 10);
+        testDateCal = new GregorianCalendar(2013, 9, 10);
         testDate = new MutableDateTime(testDateCal);
         DisplayCommand dispCmd = new DisplayCommand(testDate);
         dispCmd.execute(jManager);
         
         String output = dispCmd.getOutput();
-        assertTrue("Display command test on multiple items failed",
-                   output.equals("CS2103 Lecture 10/10/2013 00 00\n"));
+        assertEquals("Display command test on multiple items failed",
+                     "CS2103 Lecture 10/10/2013 00:00 to 00:00\n",
+                     output);
     }
 
 }
