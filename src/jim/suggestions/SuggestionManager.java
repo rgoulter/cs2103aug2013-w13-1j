@@ -1,8 +1,6 @@
 
 package jim.suggestions;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,6 +61,10 @@ public class SuggestionManager {
      */
     private static final String REGEX_PHRASE = "(?:\\S+\\s?)+";
 
+    private interface SyntaxTermParser {
+        public Object parse(String inputTerm);
+    }
+
     /**
      * Accepted Add Command Formats:
      * 
@@ -111,13 +113,21 @@ public class SuggestionManager {
     }
 
     private final Map<String, List<String>> syntaxClassesMap = new HashMap<String, List<String>>();
+    private final Map<String, SyntaxTermParser> syntaxParsers = new HashMap<String, SyntaxTermParser>();
 
-    {
+
+    public SuggestionManager() {
+        initSyntax();
+    }
+
+
+
+    private void initSyntax() {
         // Initialise our syntax classes dictionary.
         // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
         addSyntax("<date> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/");
         addSyntax("<time> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
-        addSyntax("<word> := \\S+"); // non whitespace
+        addSyntax("<word> := /\\S+/"); // non whitespace
         addSyntax("<phrase> := <word> | <word> <phrase>");
         addSyntax("<description> := <phrase>");
 
@@ -130,6 +140,124 @@ public class SuggestionManager {
         addSyntax("<task> := <timedtask> | <floatingtask>");
 
         addSyntax("<addcmd> := 'add' <task>");
+
+        initSyntaxParsers();
+    }
+
+
+
+    private void initSyntaxParsers() {
+        //TODO: Abstract Key into a key type.
+        // KEY: syntaxTerm + " => " + nextSyntaxTerm
+        syntaxParsers.put("<date> => /" + REGEX_DATE_DDMMYY + "/",
+                          new SyntaxTermParser(){
+                              @Override
+                              public Object parse(String inputTerm) {
+                                  return parseDate(inputTerm);
+                              }
+                          });
+        syntaxParsers.put("<date> => /\\d\\d\\d\\d\\d\\d/",
+                          new SyntaxTermParser() {
+
+                              @Override
+                              public Object parse(String inputTerm) {
+                                  return parseDate(inputTerm);
+                              }
+                          });
+
+
+        syntaxParsers.put("<time> => /" + REGEX_TIME_HHMM + "/",
+                          new SyntaxTermParser() {
+
+                              @Override
+                              public Object parse(String inputTerm) {
+                                  int hh = Integer.parseInt(inputTerm.substring(0, 2));
+                                  int mm = Integer.parseInt(inputTerm.substring(2));
+                                  
+                                  return new MutableDateTime(0, 0, 0, hh, mm, 00, 00);
+                              }
+                          });
+        syntaxParsers.put("<time> => /\\d\\d:\\d\\d/",
+                          new SyntaxTermParser() {
+
+                              @Override
+                              public Object parse(String inputTerm) {
+                                  int hh = Integer.parseInt(inputTerm.substring(0, 2));
+                                  int mm = Integer.parseInt(inputTerm.substring(3));
+                                  
+                                  return new MutableDateTime(0, 0, 0, hh, mm, 00, 00);
+                              }
+                          });
+        
+
+        // Redundant?
+        syntaxParsers.put("<word> := /\\S+/",
+                          new SyntaxTermParser() {
+
+                              @Override
+                              public Object parse(String inputTerm) {
+                                  return inputTerm;
+                              }
+                          });
+
+
+        // Redundant?
+        syntaxParsers.put("<phrase> => <word>",
+                          new SyntaxTermParser() {
+
+                              @Override
+                              public Object parse(String inputTerm) {
+                                  // Get parser for <word> ...
+                                  return inputTerm;
+                              }
+                          });
+        syntaxParsers.put("<phrase> => <word> <phrase>",
+                          new SyntaxTermParser() {
+
+                              @Override
+                              public Object parse(String input) {
+                                  return input;
+                              }
+                          });
+    }
+    
+    
+    
+    /**
+     * This finds the appropriate parser of the syntaxClass for the inputTerm.
+     * e.g. parseInputTermWithSyntaxClass("<time>", "2359");
+     */
+    private Object parseInputTermWithSyntaxClass(String syntaxTerm, String inputTerm) {
+        assert isSyntaxClass(syntaxTerm);
+        assert isMatchSyntaxTermWithInputTerm(syntaxTerm, inputTerm);
+        
+        List<String> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxTerm);
+        
+        if (syntaxClassDefinitionsList == null) {
+            throw new IllegalArgumentException("Given a syntax term with unknown class: " + syntaxTerm);
+        }
+        
+        for (String nextSyntaxTerm : syntaxClassDefinitionsList) {
+            if(isMatchSyntaxTermWithInputTerm(nextSyntaxTerm, inputTerm)){
+                // KEY: syntaxTerm + " => " + nextSyntaxTerm
+                SyntaxTermParser parser = syntaxParsers.get(syntaxTerm + " => " + nextSyntaxTerm);
+                
+                if (parser != null) {
+                    return parser.parse(inputTerm);
+                } else {
+                    // This would reach if we don't have '<someclass> => <matchedDefn>' parser.
+                    // e.g. "<timedtask> => <date> <time> <description>".
+                    // For now, this doesn't happen.
+                    
+                    throw new IllegalStateException("Could not find parser for " +
+                                                    syntaxTerm +
+                                                    " => " +
+                                                    nextSyntaxTerm); 
+                }
+            }
+        }
+        
+        throw new IllegalStateException();
     }
 
 
@@ -371,8 +499,6 @@ public class SuggestionManager {
             throw new IllegalStateException("An invalid syntax was given: " +
                                             syntaxTerm);
         }
-
-        return false;
     }
 
 
@@ -460,29 +586,16 @@ public class SuggestionManager {
 
 
 
-    private MutableDateTime parseDate(String date) throws ParseException {
+    private MutableDateTime parseDate(String date) {
         // TODO: Abstract Date parsing like AddCommand
         // ACCEPTED FORMATS: dd/mm/yy
         //SimpleDateFormat dateFormat = new SimpleDateFormat(DATEFORMAT_DATE_DDMMYY);
     	
         int[] takeDateArray = splitDate(removeAllSymbols(date));
-		int YY = takeDateArray[2],MM = takeDateArray[1],DD = takeDateArray[0];
+        int YY = takeDateArray[2], MM = takeDateArray[1], DD = takeDateArray[0];
 
         MutableDateTime result = new MutableDateTime(YY,MM,DD,0,0,0,0);
         /*result.setDateTime(dateFormat.parse(date));*/
-
-        return result;
-    }
-
-
-
-    private MutableDateTime parseTime(String time) throws ParseException {
-        // TODO: Abstract Time parsing like AddCommand
-        // ACCEPTED FORMATS: HHMM
-        SimpleDateFormat timeFormat = new SimpleDateFormat(DATEFORMAT_TIME_HHMM);
-
-        MutableDateTime result = new MutableDateTime(timeFormat);
-       /* result.setTime(timeFormat.parse(time));*/
 
         return result;
     }
@@ -690,11 +803,8 @@ public class SuggestionManager {
                     break;
                 
                 case AddDateDescription:
-                    try {
                     startDateTime = parseDate(args[1]);
-                    } catch (ParseException e) {
-                        System.out.println("Parse Date Exception Encountered in SuggestionManager");
-                    }
+
                     endDateTime = startDateTime;
                     description = join(args, ' ', 2);
                     
