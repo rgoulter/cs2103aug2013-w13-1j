@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.joda.time.MutableDateTime;
 
 import jim.journal.AddCommand;
 import jim.journal.CompleteCommand;
