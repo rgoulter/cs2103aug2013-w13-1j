@@ -719,10 +719,29 @@ public class SuggestionManager {
 
 
 
-    public jim.journal.Task parseTask(String[] words) {
+    public jim.journal.Task parseTask(String[] input) {
+        // This is ugly, but temporary due to limitations of the grammar parser.
+
+        List<String> timedTaskDefinitions = syntaxClassesMap.get("<timedtask>");
+        for (String timedTaskDefinition : timedTaskDefinitions) {
+            String[] parsed = tryMatchInputWithSyntax(timedTaskDefinition, input);
+            
+            if (parsed != null) {
+                // KEY: syntaxTerm + " => " + nextSyntaxTerm
+                SyntaxTermParser parser = syntaxParsers.get("<timedtask> => " + timedTaskDefinition);
+                
+                if (parser != null) {
+                    return (TimedTask) parser.parse(join(input, ' '));
+                } else {
+                    throw new IllegalStateException("Parser not implemented: <timedtask> => " + timedTaskDefinition);
+                }
+            }
+        }
         
-        
-        return null;
+        // If it reaches here and it's a task..
+        // The only other accepted task is <floatingtask> which is defined
+        //  only by a description. Any words can be a description..
+        return new FloatingTask(join(input, ' '));
     }
 
 
