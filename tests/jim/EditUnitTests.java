@@ -1,19 +1,20 @@
 
 package jim;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import jim.journal.Command;
 import jim.journal.EditCommand;
 import jim.journal.JournalManager;
-import jim.journal.Task;
 import jim.journal.TimedTask;
 import jim.suggestions.SuggestionManager;
 
+import org.joda.time.MutableDateTime;
 import org.junit.Test;
 
 
@@ -30,8 +31,10 @@ public class EditUnitTests {
         // edit <description of old task> to <new description> <new start-date>
         // <new start-time> <new end-date> <new end-time>
 
-        Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
-        Calendar endTime = new GregorianCalendar(2013, 10, 10, 15, 0);
+        Calendar startTimeCal = new GregorianCalendar(2013, 10, 10, 14, 0);
+        Calendar endTimeCal = new GregorianCalendar(2013, 10, 10, 15, 0);
+        MutableDateTime startTime = new MutableDateTime(startTimeCal);
+        MutableDateTime endTime = new MutableDateTime(endTimeCal);
         TimedTask myOldTimedTask = new TimedTask(startTime,
                                                  endTime,
                                                  "MyOldTask");
@@ -54,15 +57,19 @@ public class EditUnitTests {
 
         // e.g. "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
 
-        Calendar oldStartTime = new GregorianCalendar(2013, 10, 10, 14, 0);
-        Calendar oldEndTime = new GregorianCalendar(2013, 10, 10, 15, 0);
+        Calendar oldStartTimeCal = new GregorianCalendar(2013, 10, 10, 14, 0);
+        Calendar oldEndTimeCal = new GregorianCalendar(2013, 10, 10, 15, 0);
+        MutableDateTime oldStartTime = new MutableDateTime(oldStartTimeCal);
+        MutableDateTime oldEndTime = new MutableDateTime(oldEndTimeCal);
         TimedTask myOldTimedTask = new TimedTask(oldStartTime,
                                                  oldEndTime,
                                                  "MyOldTask");
 
         // n.b. JAN = 0, ..., DEC = 11
-        Calendar newStartTime = new GregorianCalendar(2013, 11, 31, 14, 0);
-        Calendar newEndTime = new GregorianCalendar(2013, 11, 31, 15, 0);
+        Calendar newStartTimeCal = new GregorianCalendar(2013, 11, 31, 14, 0);
+        Calendar newEndTimeCal = new GregorianCalendar(2013, 11, 31, 15, 0);
+        MutableDateTime newStartTime = new MutableDateTime(newStartTimeCal);
+        MutableDateTime newEndTime = new MutableDateTime(newEndTimeCal);
         TimedTask expectedNewTimedTask = new TimedTask(newStartTime,
                                                        newEndTime,
                                                        "MyNewTask");
@@ -88,8 +95,10 @@ public class EditUnitTests {
 
         // e.g. "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
 
-        Calendar oldStartTime = new GregorianCalendar(2013, 10, 10, 14, 0);
-        Calendar oldEndTime = new GregorianCalendar(2013, 10, 10, 15, 0);
+        Calendar oldStartTimeCal = new GregorianCalendar(2013, 10, 10, 14, 0);
+        Calendar oldEndTimeCal = new GregorianCalendar(2013, 10, 10, 15, 0);
+        MutableDateTime oldStartTime = new MutableDateTime(oldStartTimeCal);
+        MutableDateTime oldEndTime = new MutableDateTime(oldEndTimeCal);
         TimedTask myOldTimedTask = new TimedTask(oldStartTime,
                                                  oldEndTime,
                                                  "MyOldTask");

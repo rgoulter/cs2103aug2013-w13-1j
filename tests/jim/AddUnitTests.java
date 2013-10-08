@@ -1,7 +1,9 @@
 
 package jim;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,6 +17,7 @@ import jim.journal.Task;
 import jim.journal.TimedTask;
 import jim.suggestions.SuggestionManager;
 
+import org.joda.time.MutableDateTime;
 import org.junit.Test;
 
 
@@ -47,8 +50,10 @@ public class AddUnitTests {
         // add <start-date> <start-time> <end-date> <end-time> <words describing
         // event>
 
-        Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
-        Calendar endTime = new GregorianCalendar(2013, 10, 10, 15, 0);
+        Calendar startTimeCal = new GregorianCalendar(2013, 10, 10, 14, 0);
+        Calendar endTimeCal = new GregorianCalendar(2013, 10, 10, 15, 0);
+        MutableDateTime startTime = new MutableDateTime(startTimeCal);
+        MutableDateTime endTime = new MutableDateTime(endTimeCal);
         String description = "CS2103 Lecture";
 
         AddCommand addCmd = new AddCommand(startTime, endTime, description);
