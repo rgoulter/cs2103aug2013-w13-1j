@@ -77,7 +77,7 @@ public class SuggestionManager {
     private void initSyntax() {
         // Initialise our syntax classes dictionary.
         // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
-        addSyntax("<date> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/");
+        addSyntax("<date> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/");
         addSyntax("<time> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
         addSyntax("<word> := /\\S+/"); // non whitespace
         addSyntax("<phrase> := <word> | <word> <phrase>");
@@ -101,21 +101,19 @@ public class SuggestionManager {
     private void initSyntaxParsers() {
         //TODO: Abstract Key into a key type.
         // KEY: syntaxTerm + " => " + nextSyntaxTerm
+        SyntaxTermParser genericDDMMYYParser =
+        new SyntaxTermParser(){
+            @Override
+            public Object parse(String inputTerm) {
+                return parseDate(inputTerm);
+            }
+        };
         syntaxParsers.put("date => /" + REGEX_DATE_DDMMYY + "/",
-                          new SyntaxTermParser(){
-                              @Override
-                              public Object parse(String inputTerm) {
-                                  return parseDate(inputTerm);
-                              }
-                          });
+                          genericDDMMYYParser);
         syntaxParsers.put("date => /\\d\\d\\d\\d\\d\\d/",
-                          new SyntaxTermParser() {
-
-                              @Override
-                              public Object parse(String inputTerm) {
-                                  return parseDate(inputTerm);
-                              }
-                          });
+                          genericDDMMYYParser);
+        syntaxParsers.put("date => /\\d\\d-\\d\\d-\\d\\d/",
+                          genericDDMMYYParser);
 
 
         syntaxParsers.put("time => /" + REGEX_TIME_HHMM + "/",
@@ -885,7 +883,7 @@ public class SuggestionManager {
                                                                 // commands
         // Accepted 'display' syntaxes:
         // display
-        // display <date predicate>
+        // display <date>
         // TODO: Basic display command currently displays everything; Ideally we
         // want to limit this ~CC
         // TODO: Add more syntaxes/formats for this command
@@ -898,11 +896,7 @@ public class SuggestionManager {
 
             // TODO: Currently, display expects a date in DD-MM-YY format; We
             // should change that ~CC
-            // Rudimentary way to parse date ~CC
-            String[] ddmmyy = args[1].split("-");
-            MutableDateTime date = new MutableDateTime(Integer.parseInt(ddmmyy[2]),
-                                                           Integer.parseInt(ddmmyy[1]),
-                                                           Integer.parseInt(ddmmyy[0]),00,00,00,00);
+            MutableDateTime date = (MutableDateTime) parseInputTermWithSyntaxClass("date", args[1]);
 
             return new jim.journal.DisplayCommand(date);
         }
