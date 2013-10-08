@@ -6,8 +6,6 @@ public abstract class Task {
     protected String description;
     protected boolean completed = false;
 
-
-
     public boolean isCompleted() {
         return completed;
     }

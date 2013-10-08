@@ -18,7 +18,25 @@ public class TimedTask extends Task {
         this.endTime = endTime;
         description = desc;
     }
-
+    
+    //
+    public TimedTask(String startTime, String endTime, String desc) {
+        if (startTime.isEmpty() && endTime.isEmpty()){
+            
+               System.out.println("timed task must have time! error exists in storage.");
+            
+        }else if (startTime.isEmpty()){
+            this.endTime = new MutableDateTime(endTime);
+        }else if (endTime.isEmpty()){
+            this.startTime = new MutableDateTime(startTime);
+        }
+        this.startTime = new MutableDateTime(startTime);
+        this.endTime = new MutableDateTime(endTime);
+        description = desc;
+        
+    }
+    
+    
     public TimedTask(MutableDateTime date, String description) {
         // TODO Auto-generated constructor stub
     }

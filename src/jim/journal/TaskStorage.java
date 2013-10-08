@@ -15,7 +15,11 @@ public class TaskStorage {
 	private BufferedReader bufferedreader;
 	private FileWriter filewriter;
 	private BufferedWriter bufferedwriter;
-	private String TaskFormat = " Type: %1$s \n SDate&Time: %2$s \n EDate&Time: %3$s \n Description: %4$s \n Status: %5$s \n";
+	private String TypeFormat = "T:%1$s"; 
+	private String StartDateFormat = "S:%1$s";
+	private String EndDateFormat = "E:%1$s";
+	private String DescriptionFormat = "D:%1$s";
+	private String StatusFormat = "C:%1$s";
 	
 	//TODO link with the configuration to set the fileDirectory through journal manager.
 	public TaskStorage(String fileDirectory){
@@ -29,16 +33,19 @@ public class TaskStorage {
 	 * The changes to the file will be saved in each command.
 	 */
 	
+	
 	//So far, new task will append to the end of the file.
 	public void recordNewTask(Task task) throws IOException{
-		String TaskType;
+		
+	    String TaskType;
 		String StartTime = "";
 		String EndTime = "";
 		String Description;
 		String Status;
 		
 		if (task instanceof TimedTask){
-			TaskType = "TimedTask";
+			
+		    TaskType = "TimedTask";
 			StartTime = ((TimedTask) task).getStartTime().toString();
 			EndTime = ((TimedTask) task).getEndTime().toString();
 			
@@ -57,12 +64,22 @@ public class TaskStorage {
 		filewriter = new FileWriter(StorageFile,true);
 		bufferedwriter = new BufferedWriter(filewriter);
 		
-		bufferedwriter.write(String.format(TaskFormat,TaskType,StartTime,EndTime,Description,Status));
+		bufferedwriter.write(String.format(TypeFormat,TaskType));
+		bufferedwriter.newLine();
+		bufferedwriter.write(String.format(StartDateFormat,StartTime));
+        bufferedwriter.newLine();
+        bufferedwriter.write(String.format(EndDateFormat,EndTime));
+        bufferedwriter.newLine();
+        bufferedwriter.write(String.format(DescriptionFormat,Description));
+        bufferedwriter.newLine();
+        bufferedwriter.write(String.format(StatusFormat, Status));
+        bufferedwriter.newLine();
 		
-		filewriter.close();
+		
 		bufferedwriter.close();
+		filewriter.close();
 	}
-	
+	/*
 	public void removeTask(){
 		//TODO 
 	}
@@ -71,7 +88,16 @@ public class TaskStorage {
 	public void modifyTask(){
 		//TODO
 		
+	}*/
+	
+	public void writeToFile(ArrayList<Task> tasks) throws IOException{
+	    filewriter = new FileWriter(StorageFile);
+	    bufferedwriter = new BufferedWriter(filewriter);
+	    for (Task t : tasks){
+	        recordNewTask(t);
+	    }
 	}
+	
 	public ArrayList<Task> getAllTasks() throws Exception{
 		ArrayList<Task> AllTasks = new ArrayList<Task>();
 		String TaskType;
@@ -80,22 +106,26 @@ public class TaskStorage {
 		String Description;
 		String Status;
 		Task currentTask = null;
-		
+		filereader = new FileReader(StorageFile);
+		bufferedreader = new BufferedReader(filereader);
 		String crtLine;
 		while ((crtLine = bufferedreader.readLine()) != null){
 			
-			TaskType = crtLine.substring(6);
-			StartTime = bufferedreader.readLine().substring(12);  
-			EndTime = bufferedreader.readLine().substring(12);
-			Description = bufferedreader.readLine().substring(13);
-			Status = bufferedreader.readLine().substring(8);
+			TaskType = crtLine.substring(2);
+			StartTime = bufferedreader.readLine().substring(2);  
+			EndTime = bufferedreader.readLine().substring(2);
+			Description = bufferedreader.readLine().substring(2);
+			Status = bufferedreader.readLine().substring(2);
 			
 			//create Task object
 			if (TaskType.equals("TimedTask")){
 			//TODO modify to use the joda time.
-				//currentTask = new TimedTask(StartTime, EndTime, Description);
+				currentTask = new TimedTask(StartTime, EndTime, Description);
+				
 			}else if (TaskType.equals("FloatingTask")){
-				currentTask = new FloatingTask(Description);
+				
+			    currentTask = new FloatingTask(Description);
+			
 			}else{
 				throw new Exception ("Wrong format in the storage.");
 			}
@@ -109,6 +139,7 @@ public class TaskStorage {
 		}
 		
 		bufferedreader.close();
+		filereader.close();
 		return AllTasks;
 	}
 	
