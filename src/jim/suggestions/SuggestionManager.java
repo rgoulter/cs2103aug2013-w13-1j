@@ -31,6 +31,7 @@ public class SuggestionManager {
     private static final String GREY_COLOR = "<font color='gray'>";
 
     private int highlightedLine = -1;
+    private static final int START_OF_DESCRIPTION_INDEX = 1;
     private static final int DEADLINE_TASK_DETECTED = 1;
     private static final int DEADLINE_TASK_WITHOUT_TIME = 0;
     private static final int LENGTH_OF_DATE = 3; // [DD][MM][YY]
@@ -78,24 +79,22 @@ public class SuggestionManager {
                                                           REGEX_PHRASE}, ' ')),
                                                           
   		AddDateTimeToTimeDescription(join(new String[] {"add",
-					                REGEX_DATE_DDMMYY,
-					                REGEX_TIME_HHMM,
-					                "to",
-					                REGEX_TIME_HHMM,
-					                REGEX_PHRASE}, ' ')),
+										                REGEX_DATE_DDMMYY,
+										                REGEX_TIME_HHMM,
+										                "to",
+										                REGEX_TIME_HHMM,
+										                REGEX_PHRASE}, ' ')),
 					                                                                
         AddDateTimeTimeDescription(join(new String[] {"add",
-                                    REGEX_DATE_DDMMYY,
-                                    REGEX_TIME_HHMM, 
-                                    REGEX_TIME_HHMM,
-                                    REGEX_PHRASE}, ' ')),
+					                                    REGEX_DATE_DDMMYY,
+					                                    REGEX_TIME_HHMM, 
+					                                    REGEX_TIME_HHMM,
+					                                    REGEX_PHRASE}, ' ')),
                                     
 	    AddDateDescription(join(new String[] {"add",
-					      REGEX_DATE_DDMMYY,
-					      REGEX_PHRASE}, ' ')),    
-					 
-
-					      
+										      REGEX_DATE_DDMMYY,
+										      REGEX_PHRASE}, ' ')),    
+				
         AddDescription(join(new String[] {"add",
                                           REGEX_PHRASE}, ' '));
         
@@ -409,8 +408,47 @@ public class SuggestionManager {
         }
         return time_24hours;
     }
+    
+    public boolean isDate(String isItDate){
+    	String temp = removeAllSymbols(isItDate);
+    	if (isInteger(temp)) {
+    		if (temp.length() == INDICATE_DATE_STRING) {
+    			return true;
+    		} else {
+    			return false;
+    		}
+    	} else {
+    		return false;
+    	}
+    }
 
-
+    public String[] moveDescriptionToBack(String args[]) {
+    	ArrayList<String> temp = new ArrayList<>(); 
+    	int startIndex = START_OF_DESCRIPTION_INDEX, endIndex = START_OF_DESCRIPTION_INDEX;
+    	for (int i = 2; i < args.length; i++) {
+    		if (isDate(args[i])) {
+    			System.out.println("Date is found at " + i + "!!!");
+    			endIndex = i;
+    			break;
+    		}
+    	}
+    	for (int i = endIndex; i < args.length; i++) {
+    		temp.add(args[i]);
+    	}
+    	for (int i = startIndex; i < endIndex + 1; i++) {
+    		temp.add(args[i]);
+    	}
+    	for (int i = 0; i < args.length - 1; i++) {
+    		System.out.println("Showing TEMP-ArrayList[" + i +"]= " + temp.get(i));
+    	}
+    	
+    	for (int i = 1; i < args.length; i++) {
+    		System.out.println("Showing (before)args[" + i +"]= " + args[i]);
+    		args[i] = temp.get(i-1);
+    		System.out.println("Showing (after)args[" + i +"]= " + args[i]);
+    	}
+    	return args;
+    }
 
     private AddCommand parseAddCommand(String args[]) {
         // Accepted 'add' syntaxes:
@@ -421,12 +459,16 @@ public class SuggestionManager {
     	MutableDateTime startDateTime = null;
     	MutableDateTime endDateTime = null;
         String description = null;
+        
+        if (!isDate(args[START_OF_DESCRIPTION_INDEX])) {
+        	args = moveDescriptionToBack(args);
+        }
 
         for (AddCommandFormats format : AddCommandFormats.values()) {
             Pattern regexPattern = Pattern.compile(format.format);
-
             Matcher inputRegexMatcher = regexPattern.matcher(join(args, ' '));
             if (inputRegexMatcher.matches()) {
+            	
                 switch (format) {
                 
                 case AddDateTimeDateTimeDescription:
