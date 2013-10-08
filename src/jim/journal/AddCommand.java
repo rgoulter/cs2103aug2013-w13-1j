@@ -28,6 +28,12 @@ public class AddCommand extends Command {
 
 
 
+    public AddCommand(Task task) {
+        taskToAdd = task;
+    }
+
+
+
     // TODO: If we have more constructors, may be easier to process other
     // command formats.
     // e.g. add <description> (for a floating task kindof thing).

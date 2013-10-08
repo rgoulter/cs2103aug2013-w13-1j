@@ -885,72 +885,16 @@ public class SuggestionManager {
     	return args;
     }
 
-    private AddCommand parseAddCommand(String args[]) {
+    private AddCommand parseAddCommand(String[] args) {
         // Accepted 'add' syntaxes:
-        // add <start-date> <start-time> <end-date> <end-time> <words describing
-        // event>
+        // add <task>
         // TODO: Add more syntaxes/formats for this command
 
-    	MutableDateTime startDateTime = null;
-    	MutableDateTime endDateTime = null;
-        String description = null;
+        String[] taskArgs = new String[args.length - 1];
+        System.arraycopy(args, 1, taskArgs, 0, taskArgs.length);
         
-        if (!isDate(args[START_OF_DESCRIPTION_INDEX])) {
-        	args = moveDescriptionToBack(args);
-        }
-
-        for (AddCommandFormats format : AddCommandFormats.values()) {
-            Pattern regexPattern = Pattern.compile(format.format);
-            Matcher inputRegexMatcher = regexPattern.matcher(join(args, ' '));
-            if (inputRegexMatcher.matches()) {
-            	
-                switch (format) {
-                
-                case AddDateTimeDateTimeDescription:
-                    startDateTime = parseDateTime(args[1], args[2]);
-                    endDateTime = parseDateTime(args[3], args[4]);
-                    description = join(args, ' ', 5);
-                    break;
-                
-                case AddDateDescription:
-                    startDateTime = parseDate(args[1]);
-
-                    endDateTime = startDateTime;
-                    description = join(args, ' ', 2);
-                    
-                    break;
-                    
-                case AddDateTimeToTimeDescription:
-                	startDateTime = parseDateTime(args[1], args[2]);
-                    endDateTime = parseDateTime(args[1], args[4]);
-                    description = join(args, ' ', 5);
-                    break;
-                    
-                case AddDateTimeTimeDescription:
-                	startDateTime = parseDateTime(args[1], args[2]);
-                    endDateTime = parseDateTime(args[1], args[3]);
-                    description = join(args, ' ', 4);
-                    break;
-                    
-                case AddDescription:
-                    description = join(args, ' ', 1);
-                    break;
-
-                default:
-                    throw new IllegalStateException("A new AddCommandFormat was added, but not handled in ParseCommand.");
-                }
-
-                break;
-            }
-        }
-
-        // TODO: Process values in a sensible way.
-        if (startDateTime == null && endDateTime == null) {
-            return new jim.journal.AddCommand(description);
-        } else
-            return new jim.journal.AddCommand(startDateTime,
-                                              endDateTime,
-                                              description);
+        jim.journal.Task taskToAdd = parseTask(taskArgs);
+    	return new AddCommand(taskToAdd);
     }
 
 
