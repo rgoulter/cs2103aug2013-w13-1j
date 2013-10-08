@@ -77,8 +77,9 @@ public class DisplayUnitTests {
     	dispCmd.execute(jManager);
     	String output = dispCmd.getOutput();
     	
-    	assertTrue("Display of Timed Task failed",
-    	           output.equals("Birthday Party 8/11/2013 00 00\n"));
+        assertEquals("Display of Timed Task failed",
+                     "Birthday Party 8/11/2013 00:00 to 00:00\n",
+                     output);
     }
 
     @Test
