@@ -676,9 +676,6 @@ public class SuggestionManager {
         String syntaxClassName = stripStringPrefixSuffix(syntaxLineParts[0], 1);
         String[] definedAsSyntaxTerms = syntaxLineParts[1].split(" \\| ");
         
-        for(String s : definedAsSyntaxTerms){
-            System.out.println(syntaxClassName + " := \'" + s + "\'");
-        }
         syntaxClassesMap.put(syntaxClassName,
                              Arrays.asList(definedAsSyntaxTerms));
     }
