@@ -37,8 +37,13 @@ public class TimedTask extends Task {
     }
     
     
-    public TimedTask(MutableDateTime date, String description) {
-        // TODO Auto-generated constructor stub
+    public TimedTask(MutableDateTime date, String desc) {
+        // It's unclear how to handle the difference between
+        // only one datetime, and having two datetimes.
+        
+        this.startTime = date;
+        this.endTime = date;
+        description = desc;
     }
 
     public MutableDateTime getStartTime() {

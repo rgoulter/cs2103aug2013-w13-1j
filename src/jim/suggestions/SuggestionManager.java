@@ -195,11 +195,11 @@ public class SuggestionManager {
                               public Object parse(String input) {
                                   String[] inputParts = input.split(" ");
                                   MutableDateTime date =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[1]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[1]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[3]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[3]);
                                   String description = join(inputParts, ' ', 4);
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
@@ -212,11 +212,11 @@ public class SuggestionManager {
                               public Object parse(String input) {
                                   String[] inputParts = input.split(" ");
                                   MutableDateTime date =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[1]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[1]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<time>", inputParts[2]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[2]);
                                   String description = join(inputParts, ' ', 3);
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
@@ -229,7 +229,7 @@ public class SuggestionManager {
                               public Object parse(String input) {
                                   String[] inputParts = input.split(" ");
                                   MutableDateTime date =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("<date>", inputParts[0]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
                                   String description = join(inputParts, ' ', 1);
                                   return new TimedTask(date, description);
                               }

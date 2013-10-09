@@ -58,9 +58,6 @@ public class SuggestionManagerTest {
         
         TimedTask parsedFloatingTask = (TimedTask) parsedTask;
         assertEquals("Parsed description should be the same.",
-                     inputString,
-                     parsedFloatingTask.getDescription());
-        assertEquals("Parsed description should be the same.",
                      expectedTask.getDescription(),
                      parsedFloatingTask.getDescription());
         assertEquals("Parsed time should be the same.",
