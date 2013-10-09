@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jim.journal.AddCommand;
+import jim.journal.Command;
 import jim.journal.CompleteCommand;
 import jim.journal.DisplayCommand;
 import jim.journal.EditCommand;
@@ -23,7 +24,7 @@ import org.joda.time.MutableDateTime;
 
 
 public class SuggestionManager {
-
+    
     private static final String BLACK_COLOR = "</font>"; // Only use this to
                                                          // return to black from
                                                          // other color
@@ -713,10 +714,11 @@ public class SuggestionManager {
             return parseDisplayCommand(args);
         } else if (args[0].equals("exit")) {
             System.exit(0);
+        } else if (args[0].equals("undo")){
+            return parseUndoCommand();
         }
         return null;
     }
-
 
 
     private static String removeAllSymbols(String tellDateOrTime) {
@@ -903,4 +905,12 @@ public class SuggestionManager {
 
         return null;
     }
+    
+    private Command parseUndoCommand() { //The
+                                         //"undo"
+                                         //command
+        // TODO Auto-generated method stub
+        return new jim.journal.UndoCommand();
+    }
+    
 }

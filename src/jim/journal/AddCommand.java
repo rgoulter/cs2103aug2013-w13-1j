@@ -41,6 +41,7 @@ public class AddCommand extends Command {
     @Override
     public void execute(JournalManager journalManager) {
         journalManager.addTask(taskToAdd);
+        
     }
 
 }

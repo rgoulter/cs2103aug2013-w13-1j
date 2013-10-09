@@ -17,13 +17,13 @@ public class RemoveCommand extends Command {
     }
 
 
-
+    
     @Override
     public void execute(JournalManager journalManager) {
         List<Task> taskToremove = new ArrayList<Task>();
         List<Task> allTasks = journalManager.getAllTasks();
         for (Task task : allTasks) {
-            if (task.getDescription().contains(description)) {
+            if (task.getDescription().equals(description)) {
                 taskToremove.add(task);
             }
         }

@@ -4,6 +4,7 @@ package jim.journal;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
@@ -12,7 +13,7 @@ import org.joda.time.DateTimeComparator;
 public class JournalManager {
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
     TaskStorage taskStorage = new TaskStorage("taskstorage.txt");
-    
+    private Stack<Command> ExecutedCommand = new Stack<Command>();
 
     /**
      * Returns a String representation of the current Journal state.
@@ -124,8 +125,6 @@ public class JournalManager {
         
     }
 
-
-
     public boolean removeTask(Task task) {
         boolean result = false;
         getAllTasks();
@@ -159,5 +158,33 @@ public class JournalManager {
         storeAllTasks.add(new_task);
         saveToStorage();
     }
+    
+    public Stack<Command> getPreviousCommand(){
+        return ExecutedCommand;
+    }
+    //only certain command need to push.
+    //add, edit, complete, remove.
+    public void pushCommand(Command command){
+        ExecutedCommand.push(command);
+    }
+    public void undoLastCommand(){
+        Command LastCommand = ExecutedCommand.pop();
+        //add, edit, remove, complete
+        if (LastCommand instanceof AddCommand){
+            
+        }else if (LastCommand instanceof EditCommand){
+            
+        }else if (LastCommand instanceof RemoveCommand){
+            
+        }else if (LastCommand instanceof CompleteCommand){
+            
+        }else{
+            //error
+        }
+        
+        
+        
+    }
+
 
 }
