@@ -256,9 +256,9 @@ public class SuggestionManager {
         return new MutableDateTime(date.getYear(),
                                    date.getMonthOfYear(),
                                    date.getDayOfMonth(),
-                                   date.getHourOfDay(),
-                                   date.getMinuteOfHour(),
-                                   date.getSecondOfMinute(),
+                                   time.getHourOfDay(),
+                                   time.getMinuteOfHour(),
+                                   time.getSecondOfMinute(),
                                    00);
     }
 
