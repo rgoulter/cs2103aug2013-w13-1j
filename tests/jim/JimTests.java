@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
                DisplayUnitTests.class,
                EditUnitTests.class,
                RemoveUnitTests.class,
-               SearchUnitTests.class})
+               SearchUnitTests.class,
+               SuggestionManagerTest.class})
 public class JimTests {
 }
