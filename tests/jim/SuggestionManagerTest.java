@@ -64,4 +64,32 @@ public class SuggestionManagerTest {
                      expectedTask.getEndTime(),
                      parsedFloatingTask.getEndTime());
     }
+    
+    @Test
+    public void testCanGrammarParseTask_TimedTask_DateTimeTimeDescription () {
+        // For grammar definition: <date> <time> <time> <description>
+        
+        String inputString = "31/12/13 2300 2359 Party until the new year";
+        MutableDateTime expectedStartDateTime = new MutableDateTime(2013, 12, 31, 23, 0, 0, 0);
+        MutableDateTime expectedEndDateTime = new MutableDateTime(2013, 12, 31, 23, 59, 0, 0);
+        TimedTask expectedTask = new TimedTask(expectedStartDateTime,
+                                               expectedEndDateTime,
+                                               "Party until the new year");
+        
+        SuggestionManager suggestionManager = new SuggestionManager();
+        Task parsedTask = suggestionManager.parseTask(inputString.split(" "));
+        
+        assertTrue("Parsed task should be a TimedTask.", parsedTask instanceof TimedTask);
+        
+        TimedTask parsedFloatingTask = (TimedTask) parsedTask;
+        assertEquals("Parsed description should be the same.",
+                     expectedTask.getDescription(),
+                     parsedFloatingTask.getDescription());
+        assertEquals("Parsed start datetime should be the same.",
+                     expectedTask.getStartTime(),
+                     parsedFloatingTask.getStartTime());
+        assertEquals("Parsed end datetime should be the same.",
+                     expectedTask.getEndTime(),
+                     parsedFloatingTask.getEndTime());
+    }
 }
