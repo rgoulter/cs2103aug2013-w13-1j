@@ -39,7 +39,7 @@ public class RemoveUnitTests {
         AddCommand addCmd2 = new AddCommand("CS2101 Sectional");
         addCmd2.execute(jManager);
 
-        RemoveCommand removeCmd = new RemoveCommand("Tutorial");
+        RemoveCommand removeCmd = new RemoveCommand("CS2103 Tutorial");
         removeCmd.execute(jManager);
 
         String output = removeCmd.getOutput();
@@ -59,7 +59,7 @@ public class RemoveUnitTests {
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
-        RemoveCommand removeCmd1 = new RemoveCommand("Lecture");
+        RemoveCommand removeCmd1 = new RemoveCommand("CS2103 Lecture");
         removeCmd1.execute(jManager);
 
         String output = removeCmd1.getOutput();
@@ -82,7 +82,7 @@ public class RemoveUnitTests {
 
         String output = removeCmd2.getOutput();
 
-        assertEquals("Removed task: CS2103 Lecture\nRemoved task: Lecture\n",
+        assertEquals("Removed task: Lecture\n",
                      output);
 
     }
