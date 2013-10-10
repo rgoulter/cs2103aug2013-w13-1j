@@ -46,21 +46,8 @@ public class SuggestionView extends JimView {
 
     public void updateViewWithContent() {
         displayedSuggestions = suggestionManager.getSuggestionsToDisplay();
-
-        // Build text from current suggestion content.
-        String output = "<html><font family='verdana'>";
-
-        for (int i = 0; i < displayedSuggestions.size(); i++) {
-            String suggestion = displayedSuggestions.get(i);
-            if (i == suggestionManager.getCurrentSuggestionIndex()) {
-                output = output + "<b>" + suggestion + "</b><br>";
-            } else {
-                output = output + suggestion + "<br>";
-            }
-        }
-
-        output = output + "</font></html>";
-        outputPane.setText(output);
+        SuggestionHints hintSet = suggestionManager.getSuggestionHints();
+        outputPane.setText(hintSet.toString());
     }
 
     /**

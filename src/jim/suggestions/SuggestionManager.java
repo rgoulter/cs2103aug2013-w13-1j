@@ -24,17 +24,9 @@ import org.joda.time.MutableDateTime;
 
 
 public class SuggestionManager {
-    
-    private static final String BLACK_COLOR = "</font>"; // Only use this to
-                                                         // return to black from
-                                                         // other color
-    private static final String RED_COLOR = "<font color='red'>";
-    private static final String BLUE_COLOR = "<font color='blue'>";
-    private static final String PURPLE_COLOR = "<font color='purple'>";
-    private static final String GREEN_COLOR = "<font color='green'>";
-    private static final String GREY_COLOR = "<font color='gray'>";
-
     private int highlightedLine = -1;
+    private SuggestionHints hints;
+    
     private static final int START_OF_DESCRIPTION_INDEX = 1;
     private static final int DEADLINE_TASK_DETECTED = 1;
     private static final int DEADLINE_TASK_WITHOUT_TIME = 0;
@@ -306,17 +298,26 @@ public class SuggestionManager {
     public List<String> getSuggestionsToDisplay() {
         // TODO: Stop cheating on this, as well =P
         List<String> displayedSuggestions = new ArrayList<String>();
-
-        displayedSuggestions.add("<h2><font color='red'>Please ignore suggestions for now! ~CC</font></h2>");
-        displayedSuggestions.add(BLUE_COLOR +
-                                 "add" +
-                                 BLACK_COLOR +
-                                 " (name) (date) (time)");
-        displayedSuggestions.add(RED_COLOR + "remove" + BLACK_COLOR + " (name)");
+        displayedSuggestions.add("Please ignore suggestions for now! ~CC");
+        displayedSuggestions.add("add (name) (date) (time)");
+        displayedSuggestions.add("remove (name)");
         displayedSuggestions.add("display");
         displayedSuggestions.add("exit");
-
+        
+        List<String> hintList = new ArrayList<String>();
+        hintList.add("edit");
+        hintList.add("add");
+        hintList.add("remove");
+        hintList.add("nil");
+        hintList.add("nil");
+        hints = new SuggestionHints(displayedSuggestions, hintList);
+        
         return displayedSuggestions;
+    }
+    
+    // Pre-Condition: Requires getSuggestionsToDisplay() to be called first
+    public SuggestionHints getSuggestionHints() {
+        return hints;
     }
 
 
@@ -335,6 +336,7 @@ public class SuggestionManager {
 
     public void setCurrentSuggestionIndex(int i) {
         highlightedLine = i;
+        hints.setSelected(i);
     }
 
 
