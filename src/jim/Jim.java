@@ -1,6 +1,8 @@
 
 package jim;
 
+import java.util.Scanner;
+
 import jim.journal.Command;
 import jim.journal.JournalManager;
 import jim.suggestions.SuggestionManager;
@@ -14,10 +16,26 @@ import jim.suggestions.SuggestionManager;
  */
 public class Jim {
 
+    static class CLIInputter extends JimInputter {
+        private static Scanner sc;
+        
+        public CLIInputter() {
+            sc = new Scanner(System.in);
+        }
+        
+        public String getInput() {
+            return sc.nextLine();
+        }
+    }
+    
     public static void main(String[] args) {
+        
         // Load Journal logic.
         SuggestionManager suggestionManager = new SuggestionManager();
         JournalManager journalManager = new JournalManager();
+        
+        JimInputter inputSource = new CLIInputter();
+        suggestionManager.setInputSource(inputSource);
 
         // Parse the command, try to execute it.
         Command cmd = suggestionManager.parseCommand(args);

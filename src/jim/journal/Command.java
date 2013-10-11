@@ -5,11 +5,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import jim.JimInputter;
+
 
 
 public abstract class Command {
 
     private StringBuilder outputStringBuilder;
+    protected JimInputter inputSource;
 
 
 
@@ -17,6 +20,9 @@ public abstract class Command {
         outputStringBuilder = new StringBuilder();
     }
 
+    public void setInputSource(JimInputter source) {
+        inputSource = source;
+    }
 
 
     public abstract void execute(JournalManager journalManager);
@@ -26,17 +32,7 @@ public abstract class Command {
     // Abstract reading input from command line (should we need it)
     // so that in UnitTests or in the GUI this can be overridden.
     protected String inputLine() {
-        try {
-            // Read a line of input from STDIN.
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            String line = reader.readLine();
-
-            return line;
-        } catch (IOException ioEx) {
-            ioEx.printStackTrace();
-        }
-
-        return "";
+        return inputSource.getInput();
     }
 
 

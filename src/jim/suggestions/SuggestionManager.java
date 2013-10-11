@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jim.JimInputter;
 import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.CompleteCommand;
@@ -26,6 +27,7 @@ import org.joda.time.MutableDateTime;
 public class SuggestionManager {
     private int highlightedLine = -1;
     private SuggestionHints hints;
+    private JimInputter inputSource;
     
     private static final int START_OF_DESCRIPTION_INDEX = 1;
     private static final int DEADLINE_TASK_DETECTED = 1;
@@ -65,6 +67,9 @@ public class SuggestionManager {
         initSyntax();
     }
 
+    public void setInputSource(JimInputter source) {
+        inputSource = source;
+    }
 
 
     private void initSyntax() {
@@ -865,7 +870,10 @@ public class SuggestionManager {
         // (Timed, floating, etc.)
 
         String description = join(args, ' ', 1);
-        return new EditCommand(description);
+        EditCommand editCmd = new EditCommand(description);
+        editCmd.setInputSource(inputSource);
+        
+        return editCmd;
     }
 
 

@@ -17,6 +17,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -35,6 +36,8 @@ public class JimMainPanel extends JPanel {
 
     private JEditorPane inputTextField;
     private JPanel viewPanel;
+    private boolean verbatimMode;
+    private JimInputter inputSource;
 
     private JournalView journalView;
     private SuggestionView suggestionView;
@@ -58,10 +61,21 @@ public class JimMainPanel extends JPanel {
     public static final int VIEW_AREA_WIDTH = 600;
     public static final int VIEW_AREA_HEIGHT = 400;
 
+    class GUIInputter extends JimInputter {
+        public String getInput() {
+            String result = (String)JOptionPane.showInputDialog("JIM!");
+            if (result == null) { result = "(no input provided)"; }
+            
+            return result;
+        }
+
+    }
+    
 
 
     public JimMainPanel() {
         initialiseUIComponents();
+        verbatimMode = false;
 
         // Initialise the logic
         suggestionManager = new SuggestionManager();
@@ -71,6 +85,10 @@ public class JimMainPanel extends JPanel {
         suggestionView = new SuggestionView();
         suggestionView.setSuggestionManager(suggestionManager);
 
+        // Setup GUIInputter
+        inputSource = new GUIInputter();
+        suggestionManager.setInputSource(inputSource);
+        
         journalView = new JournalView();
         journalView.setJournalManager(journalManager);
 
@@ -144,7 +162,12 @@ public class JimMainPanel extends JPanel {
 
                                               @Override
                                               public void actionPerformed(ActionEvent e) {
-                                                  executeInput();
+                                                  if (verbatimMode) {
+                                                      verbatimMode = false;
+                                                  }
+                                                  else {
+                                                      executeInput();
+                                                  }
                                                   inputTextField.setText("");
                                               }
                                           });
