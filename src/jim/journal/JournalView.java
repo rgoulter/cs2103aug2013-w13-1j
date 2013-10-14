@@ -30,6 +30,8 @@ public class JournalView extends JimView {
 
     public void setJournalManager(JournalManager journal) {
         this.journalManager = journal;
+        assert(journal != null);
+        assert(journal instanceof JournalManager);
     }
 
 
@@ -41,6 +43,8 @@ public class JournalView extends JimView {
 
 
     public void updateViewWithContent() {
+        assert(journalManager != null);
+        
         // Load up and display feedback, if any, from previous command
         // We also clear the feedback to prevent double-display of feedback
         String journalText = "";

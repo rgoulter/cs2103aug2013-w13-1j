@@ -40,22 +40,18 @@ public class SuggestionView extends JimView {
 
     public void setSuggestionManager(SuggestionManager suggestionManager) {
         this.suggestionManager = suggestionManager;
+        assert(suggestionManager != null);
+        assert(suggestionManager instanceof SuggestionManager);
     }
 
 
 
     public void updateViewWithContent() {
+        assert(suggestionManager != null);
+        
         displayedSuggestions = suggestionManager.getSuggestionsToDisplay();
         SuggestionHints hintSet = suggestionManager.getSuggestionHints();
         outputPane.setText(hintSet.toString());
     }
 
-    /**
-     * 
-     * @param lineNum
-     *            from 0 ... n-1 for n lines.
-     */
-    /*
-     * public void highlightLine(int lineNum){ highlightedLine = lineNum; }
-     */
 }
