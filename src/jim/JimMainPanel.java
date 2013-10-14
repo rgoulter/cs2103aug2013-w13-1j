@@ -54,6 +54,8 @@ public class JimMainPanel extends JPanel {
     private static final String ACTION_EXECUTE_INPUT = "execute input";
     private static final String ACTION_SUGGESTIONS_FORWARD = "suggestions forward";
     private static final String ACTION_SUGGESTIONS_BACKWARD = "suggestions backward";
+    private static final String ACTION_JOURNAL_UNDO = "undo";
+    private static final String ACTION_JOURNAL_REDO = "redo";
 
     private static final String CARDLAYOUT_JOURNAL_VIEW = "journal view";
     private static final String CARDLAYOUT_SUGGESTION_VIEW = "suggestion view";
@@ -204,8 +206,37 @@ public class JimMainPanel extends JPanel {
                                                   refreshUI();
                                               }
                                           });
+        
+     // Bind CTRL+Z to undo (Work in progress; Waiting for Undo to be implemented)
+        inputTextField.getInputMap()
+                      .put(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
+                                                  java.awt.event.InputEvent.CTRL_DOWN_MASK),
+                                                  ACTION_JOURNAL_UNDO);
+        inputTextField.getActionMap().put(ACTION_JOURNAL_UNDO,
+                                          new AbstractAction() {
 
-        // inputTextField.setContentType("text/html");
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  JOptionPane.showMessageDialog(null, "Undo!", "Work In Progress", 1);
+                                                  refreshUI();
+                                              }
+                                          });
+        
+        // Bind CTRL+Y to undo (Work in progress; Waiting for Redo to be implemented)
+        inputTextField.getInputMap()
+                      .put(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
+                                                  java.awt.event.InputEvent.CTRL_DOWN_MASK),
+                                                  ACTION_JOURNAL_REDO);
+        inputTextField.getActionMap().put(ACTION_JOURNAL_REDO,
+                                          new AbstractAction() {
+
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  JOptionPane.showMessageDialog(null, "Redo!", "Work In Progress", 1);
+                                                  refreshUI();
+                                              }
+                                          });
+
         add(inputTextField, BorderLayout.NORTH);
 
         // The viewPanel here is to contain the "Views" which JIM! may need to
