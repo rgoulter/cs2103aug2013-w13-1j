@@ -22,6 +22,7 @@ import jim.journal.FloatingTask;
 import jim.journal.RemoveCommand;
 import jim.journal.SearchCommand;
 import jim.journal.TimedTask;
+import jim.journal.UndoCommand;
 
 import org.joda.time.MutableDateTime;
 
@@ -313,7 +314,13 @@ public class SuggestionManager {
         addSyntax("<floatingtask> := <description>");
         addSyntax("<task> := <timedtask> | <deadlinetask> | <floatingtask>");
         addSyntax("<addcmd> := 'add' <task>");
-
+        addSyntax("<completecmd> := 'complete' <description>");
+        addSyntax("<removecmd> := 'remove' <description>");
+        addSyntax("<editcmd> := 'edit' <description>");
+        addSyntax("<searchcmd> := 'search' <description>");
+        addSyntax("<displaycmd> := 'display' | 'display' <date>");
+        addSyntax("<undocmd> := 'undo'");
+        
         initSyntaxParsers();
     }
 
@@ -473,6 +480,78 @@ public class SuggestionManager {
                                   return new AddCommand(taskToAdd);
                               }
                           });
+        
+        
+        syntaxParsers.put("completecmd => 'complete' <description>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                            	  return new jim.journal.CompleteCommand(input[1]);
+                              }
+                          });
+        
+        
+        syntaxParsers.put("removecmd => 'remove' <description>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                            	  return new jim.journal.RemoveCommand(input[1]);
+                              }
+                          });
+        
+        
+        syntaxParsers.put("editcmd => 'edit' <description>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                                  String description = input[1];
+                                  EditCommand editCmd = new EditCommand(description);
+                                  editCmd.setInputSource(inputSource);
+                                  
+                                  return editCmd;
+                              }
+                          });
+        
+        
+        syntaxParsers.put("searchcmd => 'search' <description>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                                  return new SearchCommand(input[1]);
+                              }
+                          });
+        
+        
+        syntaxParsers.put("displaycmd => 'display'",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                                  return new jim.journal.DisplayCommand();
+                              }
+                          });
+        
+        
+        syntaxParsers.put("displaycmd => 'display' <date>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                            	  MutableDateTime date =
+                        			  	(MutableDateTime) parseInputTermWithSyntaxClass("date", input[1]);
+
+                                  return new jim.journal.DisplayCommand(date);
+                              }
+                          });
+        
+        
+        syntaxParsers.put("undocmd => 'undo'",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                            	  return new UndoCommand();
+                              }
+                          });
+        
+
     }
     
     
@@ -962,7 +1041,7 @@ public class SuggestionManager {
         } else if (args[0].equals("display")) {
             return parseDisplayCommand(args);
         } else if (args[0].equals("undo")){
-            return parseUndoCommand();
+            return parseUndoCommand(args);
         }
         return null;
     }
@@ -1001,89 +1080,34 @@ public class SuggestionManager {
 
 
 
-    private CompleteCommand parseCompleteCommand(String args[]) { // The
-                                                                  // "Complete"
-                                                                  // commands
-        // Accepted 'complete' syntaxes:
-        // complete <description>
-
-        String description = join(args, ' ', 1);
-        return new jim.journal.CompleteCommand(description);
+    private CompleteCommand parseCompleteCommand(String args[]) {
+        return (CompleteCommand) doParse("<completecmd>", args);
     }
 
-    private RemoveCommand parseRemoveCommand(String args[]) { // The "Remove"
-                                                              // commands
-        // Accepted 'remove' syntaxes:
-        // remove <description>
-        // TODO: Add more syntaxes/formats for this command
-
-        String description = join(args, ' ', 1);
-        return new jim.journal.RemoveCommand(description);
+    private RemoveCommand parseRemoveCommand(String args[]) {
+        return (RemoveCommand) doParse("<removecmd>", args);
     }
 
 
 
-    private EditCommand parseEditCommand(String args[]) { // The "Edit"
-                                                          // commands
-        // Accepted 'edit' syntaxes:
-        // edit <description of old task>
-        // (then read in from input what to replace it with).
-        // TODO: Add more syntaxes/formats for this command
-        // NOTE THAT: The format read in is a format which describes a Task.
-        // (Timed, floating, etc.)
-
-        String description = join(args, ' ', 1);
-        EditCommand editCmd = new EditCommand(description);
-        editCmd.setInputSource(inputSource);
-        
-        return editCmd;
+    private EditCommand parseEditCommand(String args[]) {
+        return (EditCommand) doParse("<editcmd>", args);
     }
 
 
 
-    private SearchCommand parseSearchCommand(String args[]) { // The "Search"
-                                                              // commands
-        // Accepted 'search' syntaxes:
-        // search <description>
-        // TODO: Add more syntaxes/formats for this command
-
-        String description = join(args, ' ', 1);
-        return new jim.journal.SearchCommand(description);
+    private SearchCommand parseSearchCommand(String args[]) {
+        return (SearchCommand) doParse("<searchcmd>", args);
     }
 
 
 
-    private DisplayCommand parseDisplayCommand(String args[]) { // The
-                                                                // "Display"
-                                                                // commands
-        // Accepted 'display' syntaxes:
-        // display
-        // display <date>
-        // TODO: Basic display command currently displays everything; Ideally we
-        // want to limit this ~CC
-        // TODO: Add more syntaxes/formats for this command
-
-        if (args.length == 1) {
-            // User asks to perform a plain display, which displays everything
-            return new jim.journal.DisplayCommand();
-        } else if (args.length == 2) {
-            // User asks to perform display given a particular date
-
-            // TODO: Currently, display expects a date in DD-MM-YY format; We
-            // should change that ~CC
-            MutableDateTime date = (MutableDateTime) parseInputTermWithSyntaxClass("date", args[1]);
-
-            return new jim.journal.DisplayCommand(date);
-        }
-
-        return null;
+    private DisplayCommand parseDisplayCommand(String args[]) {
+    	return (DisplayCommand) doParse("<displaycmd>", args);
     }
     
-    private Command parseUndoCommand() { //The
-                                         //"undo"
-                                         //command
-        // TODO Auto-generated method stub
-        return new jim.journal.UndoCommand();
+    private UndoCommand parseUndoCommand(String args[]) {
+    	return (UndoCommand) doParse("<undocmd>", args);
     }
     
 }
