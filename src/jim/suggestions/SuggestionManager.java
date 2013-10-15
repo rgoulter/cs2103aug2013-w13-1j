@@ -191,15 +191,18 @@ public class SuggestionManager {
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 return inputTerm;
             } else {
-                StringBuilder result = new StringBuilder(childrenNodes.get(0).getMatchedInput());
-
-                for (int i = 1; i < childrenNodes.size(); i++) {
-                    result.append(' ');
-                    result.append(childrenNodes.get(i).getMatchedInput());
-                }
-
-                return result.toString();
+                return join(getMatchedInputOfChildren(), ' ');
             }
+        }
+        
+        public String[] getMatchedInputOfChildren() {
+        	String[] result = new String[childrenNodes.size()];
+        	
+        	for (int i = 0; i < childrenNodes.size(); i++) {
+        		result[i] = childrenNodes.get(i).getMatchedInput();
+        	}
+        	
+        	return result;
         }
 
         public boolean isTerminal() {
@@ -849,16 +852,52 @@ public class SuggestionManager {
         // defined syntax formats.
         return null;
     }
+    
+    
+    
+    // node -> "className => ..." 
+    private String getSyntaxParserKeyForSyntaxNode(SyntaxNode node) {
+    	StringBuilder result = new StringBuilder();
+    	
+    	String syntaxClassName = stripStringPrefixSuffix(node.syntaxTerm, 1);
+    	result.append(syntaxClassName);
+    	result.append(" =>"); // MAGIC
+    	
+    	for(SyntaxNode childNode : node.getChildren()){
+    		result.append(' ');
+    		result.append(childNode.syntaxTerm);
+    	}
+    	
+    	return result.toString();
+    }
 
 
 
     private Object doParseWithMatchedSearchNode(SearchNode searchNode){
         assert searchNode.getMatchedState() == SearchMatchState.YES;
 
+        // TODO: SLAP This away.
+        // Get root SyntaxNode from search.
+        SyntaxNode root = searchNode.syntaxFormat.get(0);
+        while (root.parent != null) {
+        	root = root.parent;
+        }
         
-
-        // If we get here, we couldn't find a relevant parser.
-        return null;
+        SyntaxNode node = root;
+        
+        while (true) {
+        	SyntaxParser parser = syntaxParsers.get(getSyntaxParserKeyForSyntaxNode(node));
+        	
+        	if (parser != null) {
+        		// Match terms of children, pass to parser.
+        		String[] input = node.getMatchedInputOfChildren();
+        		return parser.parse(input);
+        	} else if(node.getChildren().size() == 1) {
+        		node = node.getChildren().get(0);
+        	} else {
+        		throw new IllegalStateException("Unable to parse against matched node.");
+        	}
+        }
     }
 
 
