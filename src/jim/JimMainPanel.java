@@ -128,8 +128,20 @@ public class JimMainPanel extends JPanel {
             // Catches keystrokes as the user inputs them
             @Override
             public void keyReleased(KeyEvent arg0) {
-                suggestionManager.updateBuffer(inputTextField.getText());
-                refreshUI();
+                int keyCode = arg0.getKeyCode();
+                int keyModifiers = arg0.getModifiers();
+                
+                switch (keyCode) {
+                case KeyEvent.VK_SHIFT:
+                case KeyEvent.VK_CONTROL:
+                case KeyEvent.VK_ALT:
+                case KeyEvent.VK_META:
+                    break;
+                default:
+                    suggestionManager.updateBuffer(inputTextField.getText());
+                    refreshUI();
+                    break;
+                }
             }
 
 
@@ -220,7 +232,7 @@ public class JimMainPanel extends JPanel {
                                                   inputTextField.setText("undo");
                                                   executeInput();
                                                   inputTextField.setText("");
-                                                  refreshUI();
+                                                  // refreshUI();
                                               }
                                           });
         
