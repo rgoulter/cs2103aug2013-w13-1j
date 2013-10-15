@@ -25,6 +25,8 @@ import jim.journal.TimedTask;
 
 import org.joda.time.MutableDateTime;
 
+import com.sun.corba.se.impl.orbutil.graph.Node;
+
 
 
 public class SuggestionManager {
@@ -127,15 +129,35 @@ public class SuggestionManager {
                 return false;
             }
 
+            boolean isAllMatched = true;
+            
             for (int i = 0; i < syntaxFormat.size(); i++) {
                 SyntaxNode node = syntaxFormat.get(i);
                 
                 if (!node.isMatched(inputArray[i])) {
-                    return false;
+                	isAllMatched = false;
+                	break;
                 }
             }
+            
+            
+            if (isAllMatched) {
+            	// TODO: SLAP this away?
+            	// Add all the nodes to their parents.
+            	for (int i = 0; i < syntaxFormat.size(); i++) {
+                    SyntaxNode node = syntaxFormat.get(i);
+                    node.ensureAddedToParent();
+            	}
+            } else {
+            	// TODO: SLAP this away?
+            	// Since we didn't successfully match, reset.
+            	for (int i = 0; i < syntaxFormat.size(); i++) {
+                    SyntaxNode node = syntaxFormat.get(i);
+                    node.inputTerm = null;
+            	}
+            }
 
-            return true;
+            return isAllMatched;
         }
 
         public List<SearchNode> nextNodes() {
@@ -151,15 +173,25 @@ public class SuggestionManager {
                     List<SyntaxNode> preList = syntaxFormat.subList(0, i);
                     List<SyntaxNode> postList = syntaxFormat.subList(i + 1, syntaxFormat.size());
 
-                    List<SyntaxNode> replacementNodes = node.getChildren();
+                    String syntaxClassName = stripStringPrefixSuffix(node.syntaxTerm, 1);
+                    List<String> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxClassName);
+                    
+                    if (syntaxClassDefinitionsList == null) {
+                        throw new IllegalArgumentException("Given a syntax term with unknown class: " + node.syntaxTerm);
+                    }
 
-                    List<SearchNode> nextSearchNodes = new ArrayList<SearchNode> (replacementNodes.size());
+                    List<SearchNode> nextSearchNodes = new ArrayList<SearchNode> (syntaxClassDefinitionsList.size());
 
-                    for (SyntaxNode nextSyntaxNode : replacementNodes) {
+
+                    for (String nextSyntaxDefinition : syntaxClassDefinitionsList) {
                         List<SyntaxNode> nextSyntaxNodes = new LinkedList<SyntaxNode>();
                         
                         nextSyntaxNodes.addAll(preList);
-                        nextSyntaxNodes.add(nextSyntaxNode);
+                        for(String syntaxTerm : nextSyntaxDefinition.split(" ")){
+                        	SyntaxNode newNode = new SyntaxNode(syntaxTerm);
+                        	newNode.parent = node;
+                        	nextSyntaxNodes.add(newNode);
+                        }
                         nextSyntaxNodes.addAll(postList);
 
                         SearchNode nextSearchNode = new SearchNode(nextSyntaxNodes, inputArray);
@@ -172,17 +204,39 @@ public class SuggestionManager {
 
             throw new IllegalStateException("Illegal state: Should have found a non-terminal in: " + join(syntaxFormat.toArray(new String[]{}), ' '));
         }
+        
+        public String toString() {
+        	StringBuilder result = new StringBuilder();
+
+        	for (SyntaxNode synTerm : syntaxFormat) {
+    			result.append(synTerm.syntaxTerm);
+    			result.append(" ");
+        	}
+        	
+			result.append("<-");
+			
+        	for (String inputStr : inputArray) {
+    			result.append(" ");
+    			result.append(inputStr);
+        	}
+        	
+        	return result.toString();
+        }
     }
 
 
 
     private class SyntaxNode {
         SyntaxNode parent;
-        private List<SyntaxNode> childrenNodes = null;
+        private boolean hasBeenAddedToParent = false;
+        
+        private List<SyntaxNode> childrenNodes = new ArrayList<SyntaxNode>();
         String syntaxTerm; // e.g. <date>, "add", /abc/, ...
         String inputTerm = null;
 
         public SyntaxNode(String syntax) {
+        	assert !syntax.contains(" "); // Cannot have spaces..
+        	
             syntaxTerm = syntax;
         }
 
@@ -207,29 +261,25 @@ public class SuggestionManager {
 
         public boolean isTerminal() {
             // "if not a syntax class", <...> -> false, else -> true
-            return isSyntaxLiteral(inputTerm) ||
-                   isSyntaxRegex(inputTerm);
+            return isSyntaxLiteral(syntaxTerm) ||
+                   isSyntaxRegex(syntaxTerm);
         }
 
         public List<SyntaxNode> getChildren() {
-            assert !isTerminal(); // only call this from non-terminals.
-
-            if (childrenNodes == null) {
-                // We should only need to initialise the children nodes once.
-                
-                childrenNodes = new ArrayList<SyntaxNode>();
-
-                String syntaxClassName = stripStringPrefixSuffix(syntaxTerm, 1);
-                List<String> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxClassName);
-
-                for (String nextSyntaxTerm : syntaxClassDefinitionsList) {
-                    SyntaxNode nextNode = new SyntaxNode(nextSyntaxTerm);
-                    nextNode.parent = this;
-                    childrenNodes.add(nextNode);
-                }
-            }
+            assert !isTerminal(); // only call this from non-terminals. (i.e. syntax classes..).
 
             return childrenNodes;
+        }
+        
+        protected void ensureAddedToParent() {
+        	if (!hasBeenAddedToParent) {
+        		if (parent != null) {
+        			parent.childrenNodes.add(this);
+        			parent.ensureAddedToParent(); // recurse..
+        		}
+        		
+        		hasBeenAddedToParent = true;
+        	}
         }
 
         public boolean isMatched(String input) {
@@ -357,65 +407,61 @@ public class SuggestionManager {
 
 
         syntaxParsers.put("timedtask => <date> <time> <date> <time> <description>",
-                          new SyntaxTermParser() {
+                          new SyntaxParser() {
                               @Override
-                              public Object parse(String input) {
-                                  String[] inputParts = input.split(" ");
+                              public Object parse(String[] input) {
                                   MutableDateTime startDate =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", input[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[1]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", input[1]);
                                   MutableDateTime endDate =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[2]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", input[2]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[3]);
-                                  String description = join(inputParts, ' ', 4);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", input[3]);
+                                  String description = input[4];
                                   return new TimedTask(datetime(startDate, startTime),
                                                        datetime(endDate, endTime), description);
                               }
                           });
         syntaxParsers.put("timedtask => <date> <time> 'to' <time> <description>",
-                          new SyntaxTermParser() {
+                          new SyntaxParser() {
                               @Override
-                              public Object parse(String input) {
-                                  String[] inputParts = input.split(" ");
+                              public Object parse(String[] input) {
                                   MutableDateTime date =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", input[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[1]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", input[1]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[3]);
-                                  String description = join(inputParts, ' ', 4);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", input[3]);
+                                  String description = input[4];
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
                                                        description);
                               }
                           });
         syntaxParsers.put("timedtask => <date> <time> <time> <description>",
-                          new SyntaxTermParser() {
+                          new SyntaxParser() {
                               @Override
-                              public Object parse(String input) {
-                                  String[] inputParts = input.split(" ");
+                              public Object parse(String[] input) {
                                   MutableDateTime date =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", input[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[1]);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", input[1]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", inputParts[2]);
-                                  String description = join(inputParts, ' ', 3);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("time", input[2]);
+                                  String description = input[3];
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
                                                        description);
                               }
                           });
         syntaxParsers.put("deadlinetask => <date> <description>",
-                          new SyntaxTermParser() {
+                          new SyntaxParser() {
                               @Override
-                              public Object parse(String input) {
-                                  String[] inputParts = input.split(" ");
+                              public Object parse(String[] input) {
                                   MutableDateTime date =
-                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
-                                  String description = join(inputParts, ' ', 1);
+                                          (MutableDateTime) parseInputTermWithSyntaxClass("date", input[0]);
+                                  String description = input[1];
                                   return new DeadlineTask(date, description);
                               }
                           });
@@ -833,14 +879,18 @@ public class SuggestionManager {
                     continue;
 
                 case YES:
+                	//TODO: LOG HERE
                     return doParseWithMatchedSearchNode(searchNode);
 
                 case MAYBE:
                     List<SearchNode> nextNodes = searchNode.nextNodes();
 
-                    for (SearchNode nextNode : nextNodes) {
+                    for (int i = nextNodes.size() - 1; i >= 0; i--) {
+                    	SearchNode nextNode = nextNodes.get(i);
                         searchNodes.push(nextNode);
                     }
+                    
+                    break;
 
                 default:
                     throw new IllegalStateException("Unknown SearchMatchState: " + searchState);
@@ -882,7 +932,7 @@ public class SuggestionManager {
         while (root.parent != null) {
         	root = root.parent;
         }
-        
+
         SyntaxNode node = root;
         
         while (true) {
@@ -935,41 +985,7 @@ public class SuggestionManager {
 
 
     public jim.journal.Task parseTask(String[] input) {
-        // This is ugly, but temporary due to limitations of the grammar parser.
-
-        List<String> timedTaskDefinitions = syntaxClassesMap.get("timedtask");
-        List<String> deadlineTaskDefinitions = syntaxClassesMap.get("deadlinetask");
-        for (String timedTaskDefinition : timedTaskDefinitions) {
-            String[] parsed = tryMatchInputWithSyntax(timedTaskDefinition, input);
-            
-            if (parsed != null) {
-                // KEY: syntaxTerm + " => " + nextSyntaxTerm
-            	SyntaxParser parser = syntaxParsers.get("timedtask => " + timedTaskDefinition);
-                
-                if (parser != null) {
-                    return (TimedTask) parser.parse(new String[]{join(input, ' ')});
-                }
-            }
-        }
-        
-        for (String deadlineTaskDefinition : deadlineTaskDefinitions) {
-            String[] parsed = tryMatchInputWithSyntax(deadlineTaskDefinition, input);
-            
-            if (parsed != null) {
-                // KEY: syntaxTerm + " => " + nextSyntaxTerm
-            	SyntaxParser parser = syntaxParsers.get("deadlinetask => " + deadlineTaskDefinition);
-                if (parser != null) {
-                    return (DeadlineTask) parser.parse(new String[]{join(input, ' ')});
-                } else {
-                    throw new IllegalStateException("Parser not implemented: deadlinetask => " + deadlineTaskDefinition);
-                }
-            }
-        }
-        
-        // If it reaches here and it's a task..
-        // The only other accepted task is <floatingtask> which is defined
-        //  only by a description. Any words can be a description..
-        return new FloatingTask(join(input, ' '));
+        return (jim.journal.Task) doParse(new String[]{"<task>"}, input);
     }
 
 
