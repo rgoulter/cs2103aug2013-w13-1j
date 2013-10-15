@@ -8,6 +8,8 @@ public class AddCommand extends Command {
 
     private Task taskToAdd;
 
+
+
     /**
      * Adds a Task with specified start date+time, end date+time, and
      * description.
@@ -38,8 +40,12 @@ public class AddCommand extends Command {
 
     @Override
     public void execute(JournalManager journalManager) {
+        
         journalManager.addTask(taskToAdd);
         journalManager.addCommandHistory("add", taskToAdd);
+
+        
+        
     }
 
 }

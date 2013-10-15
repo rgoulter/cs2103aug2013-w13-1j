@@ -29,7 +29,7 @@ public class CompleteUnitTests {
 
         String output = completeCmd.getOutput();
 
-        assertEquals("Description was not matched.\n", output);
+        assertEquals("No tasks was not matched.\n", output);
     }
 
 

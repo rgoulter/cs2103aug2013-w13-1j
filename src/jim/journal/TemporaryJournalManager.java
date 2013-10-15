@@ -8,8 +8,9 @@ import org.joda.time.DateTimeComparator;
 
 
 public class TemporaryJournalManager extends JournalManager {
-    private List<Task> storeAllTasks = new ArrayList<Task>();
+    private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
 
+    
 
 
     /**
@@ -44,8 +45,8 @@ public class TemporaryJournalManager extends JournalManager {
     }
 
 
-
-    public List<Task> getAllTasks() {
+    @Override
+    public ArrayList<Task> getAllTasks() {
         // TODO: Not cheat on this.
         /*
          * Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
@@ -62,8 +63,8 @@ public class TemporaryJournalManager extends JournalManager {
 
 
 
-    public List<Task> getuncompletedTasks() {
-        List<Task> uncompletedTasks = new ArrayList<Task>();
+    public ArrayList<Task> getuncompletedTasks() {
+        ArrayList<Task> uncompletedTasks = new ArrayList<Task>();
         for (Task t : storeAllTasks) {
             if (!t.isCompleted()) {
                 uncompletedTasks.add(t);
@@ -74,8 +75,8 @@ public class TemporaryJournalManager extends JournalManager {
 
 
 
-    public List<Task> getcompletedTasks() {
-        List<Task> completedTasks = new ArrayList<Task>();
+    public ArrayList<Task> getcompletedTasks() {
+        ArrayList<Task> completedTasks = new ArrayList<Task>();
         for (Task t : storeAllTasks) {
             if (t.isCompleted()) {
                 completedTasks.add(t);

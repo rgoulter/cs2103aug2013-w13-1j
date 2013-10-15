@@ -43,12 +43,8 @@ public class RemoveUnitTests {
         removeCmd.execute(jManager);
 
         String output = removeCmd.getOutput();
-        boolean result = false;
 
-        if (output.equals("Description was not matched.\n")) {
-            result = true;
-        }
-        assertTrue("Search for absent item has failed", result);
+        assertEquals("Description was not matched.\n",output);
     }
 
 
