@@ -461,6 +461,18 @@ public class SuggestionManager {
                               }
                           });
         
+        
+        syntaxParsers.put("addcmd => 'add' <task>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(String[] input) {
+                                  String[] taskArgs = new String[input.length - 1];
+                                  System.arraycopy(input, 1, taskArgs, 0, taskArgs.length);
+                                  
+                                  jim.journal.Task taskToAdd = parseTask(taskArgs);
+                                  return new AddCommand(taskToAdd);
+                              }
+                          });
     }
     
     
@@ -986,15 +998,7 @@ public class SuggestionManager {
     }
 
     private AddCommand parseAddCommand(String[] args) {
-        // Accepted 'add' syntaxes:
-        // add <task>
-        // TODO: Add more syntaxes/formats for this command
-
-        String[] taskArgs = new String[args.length - 1];
-        System.arraycopy(args, 1, taskArgs, 0, taskArgs.length);
-        
-        jim.journal.Task taskToAdd = parseTask(taskArgs);
-    	return new AddCommand(taskToAdd);
+        return (AddCommand) doParse("<addcmd>", args);
     }
 
 
