@@ -13,6 +13,7 @@ import jim.JimInputter;
 import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.CompleteCommand;
+import jim.journal.DeadlineTask;
 import jim.journal.DisplayCommand;
 import jim.journal.EditCommand;
 import jim.journal.FloatingTask;
@@ -71,7 +72,6 @@ public class SuggestionManager {
         inputSource = source;
     }
 
-
     private void initSyntax() {
         // Initialise our syntax classes dictionary.
         // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
@@ -84,11 +84,10 @@ public class SuggestionManager {
         addSyntax("<timedtask> := " +
                   "<date> <time> <date> <time> <description> | " +
                   "<date> <time> 'to' <time> <description> | " +
-                  "<date> <time> <time> <description> | " +
-                  "<date> <description>");
+                  "<date> <time> <time> <description>");
+        addSyntax("<deadlinetask> := <date> <description>");
         addSyntax("<floatingtask> := <description>");
-        addSyntax("<task> := <timedtask> | <floatingtask>");
-
+        addSyntax("<task> := <timedtask> | <floatingtask> | <deadlinetask>");
         addSyntax("<addcmd> := 'add' <task>");
 
         initSyntaxParsers();
@@ -221,7 +220,7 @@ public class SuggestionManager {
                                                        description);
                               }
                           });
-        syntaxParsers.put("timedtask => <date> <description>",
+        syntaxParsers.put("deadlinetask => <date> <description>",
                           new SyntaxTermParser() {
                               @Override
                               public Object parse(String input) {
@@ -229,7 +228,7 @@ public class SuggestionManager {
                                   MutableDateTime date =
                                           (MutableDateTime) parseInputTermWithSyntaxClass("date", inputParts[0]);
                                   String description = join(inputParts, ' ', 1);
-                                  return new TimedTask(date, description);
+                                  return new DeadlineTask(date, description);
                               }
                           });
         
@@ -259,8 +258,6 @@ public class SuggestionManager {
                                    time.getSecondOfMinute(),
                                    00);
     }
-
-
 
     /**
      * This finds the appropriate parser of the syntaxClass for the inputTerm.
@@ -565,9 +562,6 @@ public class SuggestionManager {
         return tryMatchInputWithSyntax(syntaxTerms, input);
     }
 
-
-
-
     /**
      * Will try and match the given input-arguments with the given syntax.
      * 
@@ -659,6 +653,7 @@ public class SuggestionManager {
         // This is ugly, but temporary due to limitations of the grammar parser.
 
         List<String> timedTaskDefinitions = syntaxClassesMap.get("timedtask");
+        List<String> deadlineTaskDefinitions = syntaxClassesMap.get("deadlinetask");
         for (String timedTaskDefinition : timedTaskDefinitions) {
             String[] parsed = tryMatchInputWithSyntax(timedTaskDefinition, input);
             
@@ -668,8 +663,20 @@ public class SuggestionManager {
                 
                 if (parser != null) {
                     return (TimedTask) parser.parse(join(input, ' '));
+                }
+            }
+        }
+        
+        for (String deadlineTaskDefinition : deadlineTaskDefinitions) {
+            String[] parsed = tryMatchInputWithSyntax(deadlineTaskDefinition, input);
+            
+            if (parsed != null) {
+                // KEY: syntaxTerm + " => " + nextSyntaxTerm
+                SyntaxTermParser parser = syntaxParsers.get("deadlinetask => " + deadlineTaskDefinition);
+                if (parser != null) {
+                    return (DeadlineTask) parser.parse(join(input, ' '));
                 } else {
-                    throw new IllegalStateException("Parser not implemented: timedtask => " + timedTaskDefinition);
+                    throw new IllegalStateException("Parser not implemented: deadlinetask => " + deadlineTaskDefinition);
                 }
             }
         }

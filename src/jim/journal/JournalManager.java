@@ -32,30 +32,39 @@ public class JournalManager {
             e.printStackTrace();
         }
     }
+    
+    public boolean compareDate(MutableDateTime taskTime, MutableDateTime current) {
+    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == 0) {
+    		return true;
+    	} else return false;
+    }
+    
     public String getDisplayString() {
         //List<Task> upcomingTasks = storeAllTasks;
         List<Task> upcomingTasks = this.getAllTasks();
-        String timedTasks = "";
-        String floatingTasks = "";
+        String timedTasks = "", floatingTasks = "", deadlineTasks = "";
         String output = "Upcoming Events:\n";
 
         MutableDateTime today = new MutableDateTime();
 
         for (Task current : upcomingTasks) {
             if (current instanceof TimedTask) {
-            	MutableDateTime taskTime = ((TimedTask) current).getStartTime();                
-                if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, today) == 0
-        				/*taskTime.year() == today.year() &&
-     		           taskTime.dayOfYear()  == today.dayOfYear() */) {
+            	MutableDateTime taskTime = ((TimedTask) current).getStartTime();    
+                if (compareDate(taskTime, today)) {
      				   timedTasks = timedTasks + current.toString() + "\n";
      			   }
             } else if (current instanceof FloatingTask) {
                 floatingTasks = floatingTasks + current.toString() + "\n";
+            } else if (current instanceof DeadlineTask) {
+            	MutableDateTime taskTime = ((DeadlineTask) current).getEndDate();    
+                if (compareDate(taskTime, today)) {
+                	deadlineTasks = deadlineTasks + current.toString() + "\n";
+     			   }
             }
 
         }
 
-        output = output + timedTasks + "\n\nTodo:\n" + floatingTasks;
+        output = output + deadlineTasks + timedTasks + "\n\nTodo:\n" + floatingTasks;
         return output;
     }
 

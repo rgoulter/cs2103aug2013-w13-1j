@@ -20,13 +20,13 @@ public class AddCommand extends Command {
         taskToAdd = new TimedTask(startTime, endTime, description);
     }
 
-
+    public AddCommand(MutableDateTime endDate, String description) {
+        taskToAdd = new DeadlineTask(endDate, description);
+    }
 
     public AddCommand(String description) {
         taskToAdd = new FloatingTask(description);
     }
-
-
 
     public AddCommand(Task task) {
         taskToAdd = task;

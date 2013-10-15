@@ -22,8 +22,13 @@ public class DisplayCommand extends Command {
     public DisplayCommand() {
         this(null);
     }
-
-
+    
+    public void compareDate(MutableDateTime taskTime, Task current) {
+    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0) {
+    		outputln(current.toString());
+    	}
+    }
+    
 
     @Override
     public void execute(JournalManager journalManager) {
@@ -38,11 +43,10 @@ public class DisplayCommand extends Command {
 
                     // Workaround to check if two events are on the same day,
                     // ignoring time
-                	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0
-            				/*	   taskTime.year() == dateLimit.year() &&
-            		           taskTime.dayOfYear() == dateLimit.dayOfYear()*/){
-            				   outputln(current.toString());
-                    }
+                	compareDate(taskTime, current);
+                } else if (current instanceof DeadlineTask){ 
+                	MutableDateTime taskTime =((DeadlineTask) current).getEndDate();
+                	compareDate(taskTime, current);
                 }
             }
 

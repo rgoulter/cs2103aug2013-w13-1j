@@ -41,7 +41,7 @@ public class TimedTask extends Task {
         // It's unclear how to handle the difference between
         // only one datetime, and having two datetimes.
         
-        this.startTime = date;
+        this.startTime = null;
         this.endTime = date;
         description = desc;
     }
@@ -66,9 +66,17 @@ public class TimedTask extends Task {
 
     public String toString() {
     	String taskName = "%s %d/%d/%d %02d:%02d to %02d:%02d";
-    	return String.format(taskName, getDescription(), endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
-    						startTime.getHourOfDay(), startTime.getMinuteOfHour(),
-    						endTime.getHourOfDay(), endTime.getMinuteOfHour());
+    	String taskNameNoStartTime = "%s %d/%d/%d %02d:%02d";
+    	if (this.startTime == null) {
+        	return String.format(taskNameNoStartTime, getDescription(), 
+        						 endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
+        						 endTime.getHourOfDay(), endTime.getMinuteOfHour());
+    	} else {
+        	return String.format(taskName, getDescription(), endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
+					startTime.getHourOfDay(), startTime.getMinuteOfHour(),
+					endTime.getHourOfDay(), endTime.getMinuteOfHour());
+    	}
+
     	//return getDescription() +"  "+ startTime.toString() +" to " + endTime.toString();
     }
 
