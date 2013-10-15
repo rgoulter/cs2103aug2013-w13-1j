@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -784,11 +785,72 @@ public class SuggestionManager {
         boolean matchedSuccessfully = syntaxPtr == syntax.length;
         return matchedSuccessfully ? result.toArray(new String[]{}) : null;
     }
-    
-    
+
+
+
+    private Object doParse(String syntax, String[] input){
+        return doParse(syntax.split(" "), input);
+    }
+
+
+
+    private Object doParse(String syntax[], String[] input){
+        // Our search-tree is implemented as a STACK,
+        // (i.e. a DFS exploration of solution space).
+        // A PriorityQueue may make more sense?
+        Stack<SearchNode> searchNodes = new Stack<SearchNode>();
+
+        List<SyntaxNode> initialSyntaxFormat = new ArrayList<SyntaxNode>(syntax.length);
+        for (int i = 0; i < syntax.length; i++) {
+            initialSyntaxFormat.add(new SyntaxNode(syntax[i]));
+        }
+        searchNodes.push(new SearchNode(initialSyntaxFormat, input));
+
+        while(!searchNodes.isEmpty()) {
+            SearchNode searchNode = searchNodes.pop();
+
+            SearchMatchState searchState = searchNode.getMatchedState();
+
+            switch (searchState) {
+                case NO:
+                    continue;
+
+                case YES:
+                    return doParseWithMatchedSearchNode(searchNode);
+
+                case MAYBE:
+                    List<SearchNode> nextNodes = searchNode.nextNodes();
+
+                    for (SearchNode nextNode : nextNodes) {
+                        searchNodes.push(nextNode);
+                    }
+
+                default:
+                    throw new IllegalStateException("Unknown SearchMatchState: " + searchState);
+            }
+        }
+
+        // If we get to here, then
+        // the input could not be matched with any of the
+        // defined syntax formats.
+        return null;
+    }
+
+
+
+    private Object doParseWithMatchedSearchNode(SearchNode searchNode){
+        assert searchNode.getMatchedState() == SearchMatchState.YES;
+
+        
+
+        // If we get here, we couldn't find a relevant parser.
+        return null;
+    }
+
+
     
     /**
-     * 
+     *
      * @param syntaxLine
      *            in format "<syntaxClassName> := somesyntax [| somesyntax]*"
      */
