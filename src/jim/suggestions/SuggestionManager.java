@@ -58,8 +58,22 @@ public class SuggestionManager {
      */
     private static final String REGEX_PHRASE = "(?:\\S+\\s?)+";
 
-    private interface SyntaxTermParser {
-        public Object parse(String inputTerm);
+    private interface SyntaxParser {
+        public Object parse(String[] input);
+    }
+
+    private abstract class SyntaxTermParser implements SyntaxParser {
+        public abstract Object parse(String inputTerm);
+        
+        public Object parse(String[] input){
+        	if (input.length != 1) {
+        		// To keep in line with the assumption of SyntaxTermParser
+        		throw new IllegalArgumentException("Only 1-length arrays allowed for SyntaxTermParser");
+        	}
+        	
+			return parse(input[0]);
+        	
+        }
     }
 
 
@@ -232,7 +246,7 @@ public class SuggestionManager {
 
 
     private final Map<String, List<String>> syntaxClassesMap = new HashMap<String, List<String>>();
-    private final Map<String, SyntaxTermParser> syntaxParsers = new HashMap<String, SyntaxTermParser>();
+    private final Map<String, SyntaxParser> syntaxParsers = new HashMap<String, SyntaxParser>();
 
 
     public SuggestionManager() {
@@ -446,10 +460,10 @@ public class SuggestionManager {
         for (String nextSyntaxTerm : syntaxClassDefinitionsList) {
             if(isMatchSyntaxTermWithInputTerm(nextSyntaxTerm, inputTerm)){
                 // KEY: syntaxTerm + " => " + nextSyntaxTerm
-                SyntaxTermParser parser = syntaxParsers.get(syntaxTerm + " => " + nextSyntaxTerm);
+                SyntaxParser parser = syntaxParsers.get(syntaxTerm + " => " + nextSyntaxTerm);
                 
                 if (parser != null) {
-                    return parser.parse(inputTerm);
+                    return parser.parse(new String[]{inputTerm});
                 } else {
                     // This would reach if we don't have '<someclass> => <matchedDefn>' parser.
                     // e.g. "<timedtask> => <date> <time> <description>".
@@ -891,10 +905,10 @@ public class SuggestionManager {
             
             if (parsed != null) {
                 // KEY: syntaxTerm + " => " + nextSyntaxTerm
-                SyntaxTermParser parser = syntaxParsers.get("timedtask => " + timedTaskDefinition);
+            	SyntaxParser parser = syntaxParsers.get("timedtask => " + timedTaskDefinition);
                 
                 if (parser != null) {
-                    return (TimedTask) parser.parse(join(input, ' '));
+                    return (TimedTask) parser.parse(new String[]{join(input, ' ')});
                 }
             }
         }
@@ -904,9 +918,9 @@ public class SuggestionManager {
             
             if (parsed != null) {
                 // KEY: syntaxTerm + " => " + nextSyntaxTerm
-                SyntaxTermParser parser = syntaxParsers.get("deadlinetask => " + deadlineTaskDefinition);
+            	SyntaxParser parser = syntaxParsers.get("deadlinetask => " + deadlineTaskDefinition);
                 if (parser != null) {
-                    return (DeadlineTask) parser.parse(join(input, ' '));
+                    return (DeadlineTask) parser.parse(new String[]{join(input, ' ')});
                 } else {
                     throw new IllegalStateException("Parser not implemented: deadlinetask => " + deadlineTaskDefinition);
                 }
