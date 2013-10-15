@@ -642,7 +642,7 @@ public class SuggestionManager {
      */
     private static boolean isSyntaxClass(String s) {
         // TODO: Eliminate magic values.
-        return isStringSurroundedBy(s, '<', '>');
+        return isStringSurroundedBy(s, '<', '>') && !s.contains(" ");
     }
 
 
