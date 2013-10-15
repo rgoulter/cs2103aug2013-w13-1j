@@ -33,6 +33,7 @@ public class RemoveCommand extends Command {
 
         for (Task t : taskToremove) {
             if (journalManager.removeTask(t)) {
+                journalManager.addCommandHistory("remove", t);
                 outputln("Removed task: " + t.toString());
             } else {
                 outputln("Removing task was not successful.");

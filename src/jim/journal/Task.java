@@ -9,21 +9,15 @@ public abstract class Task {
     public boolean isCompleted() {
         return completed;
     }
-
-
-
     public void markAsCompleted() {
         completed = true;
     }
-
-
-
+    public void markAsIncompleted() {
+        completed = false;
+    }
     public String getDescription() {
         return description;
     }
-
-
-
     public String toString() {
         return description;
     }

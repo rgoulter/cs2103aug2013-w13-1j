@@ -4,16 +4,19 @@ package jim.journal;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
 
 public class JournalManager {
+	private static final int NO_COMMAND_EXECUTED_YET = -1;
+	
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
     TaskStorage taskStorage = new TaskStorage("taskstorage.txt");
-    private Stack<Command> ExecutedCommand = new Stack<Command>();
+    private int historyIndex = NO_COMMAND_EXECUTED_YET; 
+    
+    private List<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
 
     /**
      * Returns a String representation of the current Journal state.
@@ -158,8 +161,18 @@ public class JournalManager {
             return "Completed Task: " + task.toString();
         }
     }
-
-
+    
+    public String incompleteTask(Task task) {
+        if (!task.isCompleted()) {
+            return "Task " +
+                   task.toString() +
+                   " is currently incomplete.";
+        } else {
+            task.markAsIncompleted();
+            saveToStorage();
+            return "Incompleted Task: " + task.toString();
+        }
+    }
 
     public void editTask(Task old_task, Task new_task) {
         getAllTasks();
@@ -168,32 +181,49 @@ public class JournalManager {
         saveToStorage();
     }
     
-    public Stack<Command> getPreviousCommand(){
-        return ExecutedCommand;
+    public String getPreviousCommand(){
+        return historyOfCommand.get(historyOfCommand.size()-1).getCommand();
     }
     //only certain command need to push.
     //add, edit, complete, remove.
-    public void pushCommand(Command command){
-        ExecutedCommand.push(command);
+    public void addCommandHistory(String cmd, Task someTask){
+    	Command_Task command = new Command_Task(cmd, someTask);
+    	historyIndex++;
+    	historyOfCommand.add(historyIndex, command);
     }
     public void undoLastCommand(){
-        Command LastCommand = ExecutedCommand.pop();
-        //add, edit, remove, complete
-        if (LastCommand instanceof AddCommand){
-            
-        }else if (LastCommand instanceof EditCommand){
-            
-        }else if (LastCommand instanceof RemoveCommand){
-            
-        }else if (LastCommand instanceof CompleteCommand){
-            
-        }else{
-            //error
-        }
-        
-        
-        
+    	// get the last command in historyOfCommand
+    	if (historyIndex == NO_COMMAND_EXECUTED_YET) {
+    		// do nothing
+    	} else {
+			Command_Task LastCommand = historyOfCommand.get(historyIndex--);
+		    //add, edit, remove, complete
+		    if (LastCommand.getCommand().equals("add")){
+		    	removeTask(LastCommand.getTask());
+		    } else if (LastCommand.getCommand().equals("edit")){
+		        
+		    } else if (LastCommand.getCommand().equals("remove")){
+		    	addTask(LastCommand.getTask());
+		    } else if (LastCommand.getCommand().equals("complete")){
+		    	incompleteTask(LastCommand.getTask());
+		    } else {
+		        //error
+		    }
+    	}
     }
+    
+	class Command_Task {
+		String cmd;
+		Task someTask;
+	
+		public Command_Task(String cmd, Task temp) {
+			this.cmd = cmd;
+			someTask = temp;
+		}
+	
+		String getCommand() { return cmd; }
+		Task getTask() { return someTask; }
+	}
 
 
 }

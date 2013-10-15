@@ -4,19 +4,13 @@ package jim.journal;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class CompleteCommand extends Command {
 
     String description;
 
-
-
     public CompleteCommand(String des) {
         description = des;
     }
-
-
 
     @Override
     public void execute(JournalManager journalManager) {
@@ -34,6 +28,7 @@ public class CompleteCommand extends Command {
         }
         for (Task t : tasksCompleted) {
             String feedback = journalManager.completeTask(t);
+            journalManager.addCommandHistory("complete", t);
             outputln(feedback);
         }
 

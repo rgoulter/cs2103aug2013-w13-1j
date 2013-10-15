@@ -853,8 +853,6 @@ public class SuggestionManager {
         return new jim.journal.CompleteCommand(description);
     }
 
-
-
     private RemoveCommand parseRemoveCommand(String args[]) { // The "Remove"
                                                               // commands
         // Accepted 'remove' syntaxes:

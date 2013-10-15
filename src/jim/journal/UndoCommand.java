@@ -1,9 +1,8 @@
 package jim.journal;
 
-
 public class UndoCommand extends Command{
-    public UndoCommand(){
-        
+	
+    public UndoCommand() {
     }
     @Override
     public void execute(JournalManager journalManager) {
