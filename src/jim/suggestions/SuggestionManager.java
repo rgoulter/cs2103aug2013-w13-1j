@@ -961,8 +961,6 @@ public class SuggestionManager {
             return parseSearchCommand(args);
         } else if (args[0].equals("display")) {
             return parseDisplayCommand(args);
-        } else if (args[0].equals("exit")) {
-            System.exit(0);
         } else if (args[0].equals("undo")){
             return parseUndoCommand();
         }
