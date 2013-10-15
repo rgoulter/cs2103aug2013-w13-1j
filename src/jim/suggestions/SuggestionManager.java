@@ -308,6 +308,7 @@ public class SuggestionManager {
 
         addSyntax("<timedtask> := " +
                   "<date> <time> <date> <time> <description> | " +
+                  "<description> <date> <time> <date> <time> | " +
                   "<date> <time> 'to' <time> <description> | " +
                   "<date> <time> <time> <description>");
         addSyntax("<deadlinetask> := <date> <description>");
@@ -421,6 +422,23 @@ public class SuggestionManager {
                                                        datetime(endDate, endTime), description);
                               }
                           });
+        syntaxParsers.put("timedtask => <description> <date> <time> <date> <time>",
+                new SyntaxParser() {
+                    @Override
+                    public Object parse(String[] input) {
+                        String description = input[0];
+                        MutableDateTime startDate =
+                                (MutableDateTime) parseInputTermWithSyntaxClass("date", input[1]);
+                        MutableDateTime startTime =
+                                (MutableDateTime) parseInputTermWithSyntaxClass("time", input[2]);
+                        MutableDateTime endDate =
+                                (MutableDateTime) parseInputTermWithSyntaxClass("date", input[3]);
+                        MutableDateTime endTime =
+                                (MutableDateTime) parseInputTermWithSyntaxClass("time", input[4]);
+                        return new TimedTask(datetime(startDate, startTime),
+                                             datetime(endDate, endTime), description);
+                    }
+                });
         syntaxParsers.put("timedtask => <date> <time> 'to' <time> <description>",
                           new SyntaxParser() {
                               @Override
