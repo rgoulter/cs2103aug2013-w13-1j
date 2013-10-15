@@ -33,18 +33,9 @@ public class SuggestionManager {
     private int highlightedLine = -1;
     private SuggestionHints hints;
     private JimInputter inputSource;
-    
-    private static final int START_OF_DESCRIPTION_INDEX = 1;
-    private static final int DEADLINE_TASK_DETECTED = 1;
-    private static final int DEADLINE_TASK_WITHOUT_TIME = 0;
     private static final int LENGTH_OF_DATE = 3; // [DD][MM][YY]
-    private static final int LENGTH_OF_TIME = 2; // [22(hrs)][00(mins)]
     private static final int INDICATE_YEAR = 2;
     private static final int INDICATE_MONTH = 1;
-    private static final int INDICATE_TIME_STRING = 4;
-    private static final int INDICATE_DATE_STRING = 6;
-    private static final int INDICATE_TASK_ENDS_IN_A_DAY = 1;
-
     /**
      * Matches DD/MM/YY.
      */
@@ -54,11 +45,6 @@ public class SuggestionManager {
      * Matches four digits in a row. e.g. HHMM.
      */
     private static final String REGEX_TIME_HHMM = "\\d\\d\\d\\d";
-
-    /**
-     * "Phrase" here is a minimal amount of words.
-     */
-    private static final String REGEX_PHRASE = "(?:\\S+\\s?)+";
 
     private interface SyntaxParser {
         public Object parse(String[] input);
@@ -787,70 +773,6 @@ public class SuggestionManager {
 
 
 
-    /**
-     * @param syntaxDefn the definition of a syntax class,
-     *      e.g. "<date> <time> <date> <time> <description>"
-     */
-    private String[] tryMatchInputWithSyntax(String syntaxDefn, String input[]){
-        String[] syntaxTerms = syntaxDefn.split(" ");
-        return tryMatchInputWithSyntax(syntaxTerms, input);
-    }
-
-    /**
-     * Will try and match the given input-arguments with the given syntax.
-     * 
-     * e.g.
-     * syntax = {"<date>",   "<time>", "<description>"}
-     * input  = {"10/10/13", "2359",   "Must", "submit", "homework."}
-     * will match, and return:
-     * {"10/10/13", "2359", "Must submit homework."}
-     *
-     * CAVEAT: ONLY WORKS WITH <description> AT THE END!!
-     *
-     * @return Strings which match the syntax IF MATCHED; null, otherwise.
-     */
-    private String[] tryMatchInputWithSyntax(String[] syntax, String input[]){
-        List<String> result = new ArrayList<String>();
-        int syntaxPtr = 0;
-        int inputPtr = 0;
-
-        if (input.length < syntax.length) {
-            return null;
-        }
-
-        // We check that the input matches/satisfies the given syntax
-        //  by checking each term one by one.
-        // If they ever don't match, we return null.
-        
-        while (syntaxPtr < syntax.length) {
-            String currentSyntaxTerm = syntax[syntaxPtr];
-            String currentInputTerm = input[inputPtr];
-
-            // BY OUR ASSUMPTIONS, ONLY THE LAST ITEM CAN BE A <description>,
-            if (syntaxPtr == syntax.length - 1 && currentSyntaxTerm.equals("<description>")) {
-                String description = join(input, ' ', inputPtr);
-                
-                result.add(description);
-                syntaxPtr++;
-                inputPtr = input.length;
-                break;
-            }
-
-            if (isMatchSyntaxTermWithInputTerm(currentSyntaxTerm, currentInputTerm)) {
-                result.add(currentInputTerm);
-                syntaxPtr++;
-                inputPtr++;
-            } else {
-                return null;
-            }
-        }
-
-        boolean matchedSuccessfully = syntaxPtr == syntax.length;
-        return matchedSuccessfully ? result.toArray(new String[]{}) : null;
-    }
-
-
-
     private Object doParse(String syntax, String[] input){
         return doParse(syntax.split(" "), input);
     }
@@ -1043,17 +965,6 @@ public class SuggestionManager {
 
 
 
-    private static boolean isInteger(String s) {
-        try {
-            Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
-
-
-
     private int[] splitDate(String date_in_string) {
         // we will accept date format of 090913 - DDMMYY
         int[] dates = new int[LENGTH_OF_DATE];
@@ -1072,62 +983,6 @@ public class SuggestionManager {
             }
         }
         return dates;
-    }
-
-
-
-    private int[] splitTime(String time_in_string) {
-        // we will accept time format of 24 hours - 2200 hrs, default seconds is
-        // 00
-        int[] time_24hours = new int[LENGTH_OF_TIME];
-        String[] temp = time_in_string.split("");
-        int counter = 1; // temp[0] is a spacing
-        for (int i = 0; i < LENGTH_OF_TIME; i++) {
-            time_24hours[i] = Integer.parseInt(temp[counter++] +
-                                               temp[counter++]);
-        }
-        return time_24hours;
-    }
-    
-    private boolean isDate(String isItDate){
-    	String temp = removeAllSymbols(isItDate);
-    	if (isInteger(temp)) {
-    		if (temp.length() == INDICATE_DATE_STRING) {
-    			return true;
-    		} else {
-    			return false;
-    		}
-    	} else {
-    		return false;
-    	}
-    }
-
-    private String[] moveDescriptionToBack(String args[]) {
-    	ArrayList<String> temp = new ArrayList<>(); 
-    	int startIndex = START_OF_DESCRIPTION_INDEX, endIndex = START_OF_DESCRIPTION_INDEX;
-    	for (int i = 2; i < args.length; i++) {
-    		if (isDate(args[i])) {
-    			System.out.println("Date is found at " + i + "!!!");
-    			endIndex = i;
-    			break;
-    		}
-    	}
-    	for (int i = endIndex; i < args.length; i++) {
-    		temp.add(args[i]);
-    	}
-    	for (int i = startIndex; i < endIndex + 1; i++) {
-    		temp.add(args[i]);
-    	}
-    	for (int i = 0; i < args.length - 1; i++) {
-    		System.out.println("Showing TEMP-ArrayList[" + i +"]= " + temp.get(i));
-    	}
-    	
-    	for (int i = 1; i < args.length; i++) {
-    		System.out.println("Showing (before)args[" + i +"]= " + args[i]);
-    		args[i] = temp.get(i-1);
-    		System.out.println("Showing (after)args[" + i +"]= " + args[i]);
-    	}
-    	return args;
     }
 
     private AddCommand parseAddCommand(String[] args) {
