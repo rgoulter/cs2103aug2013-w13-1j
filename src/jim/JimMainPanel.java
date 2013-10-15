@@ -217,7 +217,9 @@ public class JimMainPanel extends JPanel {
 
                                               @Override
                                               public void actionPerformed(ActionEvent e) {
-                                                  JOptionPane.showMessageDialog(null, "Undo!", "Work In Progress", 1);
+                                                  inputTextField.setText("undo");
+                                                  executeInput();
+                                                  inputTextField.setText("");
                                                   refreshUI();
                                               }
                                           });
@@ -293,8 +295,6 @@ public class JimMainPanel extends JPanel {
     private void executeInput() {
         // Discussion: One thing which may have been neglected is 'feedback' to
         // user.
-        // This can be managed/displayed from here, however it's implemented.
-        // (Possibly just using 'Alert' message-boxes for early stages?)
         // Feedback mechanism now implemented! Read commit log for details ~CC
 
         String input = inputTextField.getText();

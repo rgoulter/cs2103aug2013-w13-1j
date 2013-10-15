@@ -8,6 +8,7 @@ public class UndoCommand extends Command{
     public void execute(JournalManager journalManager) {
         // TODO Auto-generated method stub
         journalManager.undoLastCommand();
+        outputln("Undo Successful");
     }
 
 }
