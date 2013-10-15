@@ -2,6 +2,7 @@
 package jim.suggestions;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,175 @@ public class SuggestionManager {
     private interface SyntaxTermParser {
         public Object parse(String inputTerm);
     }
+
+
+
+    private enum SearchMatchState {
+        YES, NO, MAYBE;
+    }
+
+
+
+    /**
+     * SearchNode class helps us match input with the
+     * syntax tree.
+     */
+    private class SearchNode {
+        List<SyntaxNode> syntaxFormat;
+        String[] inputArray;
+
+        public SearchNode(List<SyntaxNode> syntax, String[] input){
+            syntaxFormat = syntax;
+            inputArray = input;
+        }
+
+        public SearchMatchState getMatchedState() {
+            if (syntaxFormat.size() > inputArray.length) {
+                // Cannot have more terms to match against than we have terms.
+                return SearchMatchState.NO;
+            } else if(!isAllSyntaxNodesTerminal()) {
+                return SearchMatchState.MAYBE;
+            } else {
+                return isMatched() ?
+                       SearchMatchState.YES :
+                       SearchMatchState.NO;
+            }
+        }
+
+        private boolean isAllSyntaxNodesTerminal() {
+            for (SyntaxNode node : syntaxFormat) {
+                if (!node.isTerminal()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private boolean isMatched() {
+            assert isAllSyntaxNodesTerminal();
+            
+            if (syntaxFormat.size() < inputArray.length) {
+                return false;
+            }
+
+            for (int i = 0; i < syntaxFormat.size(); i++) {
+                SyntaxNode node = syntaxFormat.get(i);
+                
+                if (!node.isMatched(inputArray[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public List<SearchNode> nextNodes() {
+            assert !isAllSyntaxNodesTerminal();
+
+            // For each definition of the first syntax class found,
+            //    expand format with these....
+            for (int i = 0; i < syntaxFormat.size(); i++) {
+                SyntaxNode node = syntaxFormat.get(i);
+
+                // Expand the first non-terminal term.
+                if (!node.isTerminal()) {
+                    List<SyntaxNode> preList = syntaxFormat.subList(0, i);
+                    List<SyntaxNode> postList = syntaxFormat.subList(i + 1, syntaxFormat.size());
+
+                    List<SyntaxNode> replacementNodes = node.getChildren();
+
+                    List<SearchNode> nextSearchNodes = new ArrayList<SearchNode> (replacementNodes.size());
+
+                    for (SyntaxNode nextSyntaxNode : replacementNodes) {
+                        List<SyntaxNode> nextSyntaxNodes = new LinkedList<SyntaxNode>();
+                        
+                        nextSyntaxNodes.addAll(preList);
+                        nextSyntaxNodes.add(nextSyntaxNode);
+                        nextSyntaxNodes.addAll(postList);
+
+                        SearchNode nextSearchNode = new SearchNode(nextSyntaxNodes, inputArray);
+                        nextSearchNodes.add(nextSearchNode);
+                    }
+
+                    return nextSearchNodes;
+                }
+            }
+
+            throw new IllegalStateException("Illegal state: Should have found a non-terminal in: " + join(syntaxFormat.toArray(new String[]{}), ' '));
+        }
+    }
+
+
+
+    private class SyntaxNode {
+        SyntaxNode parent;
+        private List<SyntaxNode> childrenNodes = null;
+        String syntaxTerm; // e.g. <date>, "add", /abc/, ...
+        String inputTerm = null;
+
+        public SyntaxNode(String syntax) {
+            syntaxTerm = syntax;
+        }
+
+        // Return in-order walk of inputTerm
+        public String getMatchedInput() {
+            if (childrenNodes == null || childrenNodes.isEmpty()) {
+                return inputTerm;
+            } else {
+                StringBuilder result = new StringBuilder(childrenNodes.get(0).getMatchedInput());
+
+                for (int i = 1; i < childrenNodes.size(); i++) {
+                    result.append(' ');
+                    result.append(childrenNodes.get(i).getMatchedInput());
+                }
+
+                return result.toString();
+            }
+        }
+
+        public boolean isTerminal() {
+            // "if not a syntax class", <...> -> false, else -> true
+            return isSyntaxLiteral(inputTerm) ||
+                   isSyntaxRegex(inputTerm);
+        }
+
+        public List<SyntaxNode> getChildren() {
+            assert !isTerminal(); // only call this from non-terminals.
+
+            if (childrenNodes == null) {
+                // We should only need to initialise the children nodes once.
+                
+                childrenNodes = new ArrayList<SyntaxNode>();
+
+                String syntaxClassName = stripStringPrefixSuffix(syntaxTerm, 1);
+                List<String> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxClassName);
+
+                for (String nextSyntaxTerm : syntaxClassDefinitionsList) {
+                    SyntaxNode nextNode = new SyntaxNode(nextSyntaxTerm);
+                    nextNode.parent = this;
+                    childrenNodes.add(nextNode);
+                }
+            }
+
+            return childrenNodes;
+        }
+
+        public boolean isMatched(String input) {
+            // Get the logic here from isMatchSyntaxTermWithInputTerm...
+            boolean matched = isMatchSyntaxTermWithInputTerm(syntaxTerm, input);
+
+            if (matched) {
+                // We record the last input term we successfully matched against.
+                inputTerm = input;
+            }
+            
+            return matched;
+        }
+    }
+
+
+
 
     private final Map<String, List<String>> syntaxClassesMap = new HashMap<String, List<String>>();
     private final Map<String, SyntaxTermParser> syntaxParsers = new HashMap<String, SyntaxTermParser>();
