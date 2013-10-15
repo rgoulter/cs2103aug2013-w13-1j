@@ -313,6 +313,7 @@ public class SuggestionManager {
         addSyntax("<deadlinetask> := <date> <description>");
         addSyntax("<floatingtask> := <description>");
         addSyntax("<task> := <timedtask> | <deadlinetask> | <floatingtask>");
+        
         addSyntax("<addcmd> := 'add' <task>");
         addSyntax("<completecmd> := 'complete' <description>");
         addSyntax("<removecmd> := 'remove' <description>");
@@ -320,6 +321,10 @@ public class SuggestionManager {
         addSyntax("<searchcmd> := 'search' <description>");
         addSyntax("<displaycmd> := 'display' | 'display' <date>");
         addSyntax("<undocmd> := 'undo'");
+        
+        addSyntax("<cmd> := " +
+                  "<addcmd> | <completecmd> | <removecmd> | " + 
+        		  "<editcmd> | <searchcmd> | <displaycmd>");
         
         initSyntaxParsers();
     }
@@ -1010,40 +1015,8 @@ public class SuggestionManager {
      * TODO: Potentially throw some kind of "Poor format exception" as a better
      * way of giving feedback than return-null.
      */
-    public jim.journal.Command parseCommand(String args[]) {
-        /*
-         * TODO: Here is where some of our time will be spent in V0.0, getting
-         * stuff like "add lunch Monday" (or some sensible command) to work.
-         * 
-         * Adding logic in TDD fashion is *ideal* for this kind of thing, I
-         * would think.
-         * 
-         * Once basic format rules have been established, (e.g. strict syntax
-         * for add, remove, etc.), THEN Any language logic here can infer fairly
-         * sensibly how to access Journal API. Journal API can then trust that
-         * this will be done sensibly by language logic.
-         */
-
-        // Parse the words into a Command object.
-        // STRICT ASSUMPTION is that the first word is the "operating word".
-        // (e.g. add, remove, etc.)
-        // Naturally, this assumption will be broken with more flexible inputs.
-        if (args[0].equals("add")) {
-            return parseAddCommand(args);
-        } else if (args[0].equals("complete")) {
-            return parseCompleteCommand(args);
-        } else if (args[0].equals("remove")) {
-            return parseRemoveCommand(args);
-        } else if (args[0].equals("edit")) {
-            return parseEditCommand(args);
-        } else if (args[0].equals("search")) {
-            return parseSearchCommand(args);
-        } else if (args[0].equals("display")) {
-            return parseDisplayCommand(args);
-        } else if (args[0].equals("undo")){
-            return parseUndoCommand(args);
-        }
-        return null;
+    public Command parseCommand(String args[]) {
+        return (Command) doParse("<cmd>", args);
     }
 
 
@@ -1072,42 +1045,6 @@ public class SuggestionManager {
             }
         }
         return dates;
-    }
-
-    private AddCommand parseAddCommand(String[] args) {
-        return (AddCommand) doParse("<addcmd>", args);
-    }
-
-
-
-    private CompleteCommand parseCompleteCommand(String args[]) {
-        return (CompleteCommand) doParse("<completecmd>", args);
-    }
-
-    private RemoveCommand parseRemoveCommand(String args[]) {
-        return (RemoveCommand) doParse("<removecmd>", args);
-    }
-
-
-
-    private EditCommand parseEditCommand(String args[]) {
-        return (EditCommand) doParse("<editcmd>", args);
-    }
-
-
-
-    private SearchCommand parseSearchCommand(String args[]) {
-        return (SearchCommand) doParse("<searchcmd>", args);
-    }
-
-
-
-    private DisplayCommand parseDisplayCommand(String args[]) {
-    	return (DisplayCommand) doParse("<displaycmd>", args);
-    }
-    
-    private UndoCommand parseUndoCommand(String args[]) {
-    	return (UndoCommand) doParse("<undocmd>", args);
     }
     
 }
