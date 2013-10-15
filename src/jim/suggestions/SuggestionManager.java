@@ -275,7 +275,7 @@ public class SuggestionManager {
                   "<date> <time> <time> <description>");
         addSyntax("<deadlinetask> := <date> <description>");
         addSyntax("<floatingtask> := <description>");
-        addSyntax("<task> := <timedtask> | <floatingtask> | <deadlinetask>");
+        addSyntax("<task> := <timedtask> | <deadlinetask> | <floatingtask>");
         addSyntax("<addcmd> := 'add' <task>");
 
         initSyntaxParsers();
