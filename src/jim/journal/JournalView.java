@@ -2,14 +2,17 @@
 package jim.journal;
 
 import jim.JimView;
+
 import java.awt.BorderLayout;
+
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 
 
 public class JournalView extends JimView {
 
-    private JTextArea outputTextArea;
+    private JTextPane outputTextArea;
     private JournalManager journalManager;
     private String lastFeedback = "";
 
@@ -18,7 +21,8 @@ public class JournalView extends JimView {
     public JournalView() {
         setLayout(new BorderLayout(0, 0));
 
-        outputTextArea = new JTextArea();
+        outputTextArea = new JTextPane();
+        outputTextArea.setContentType("text/html");
         outputTextArea.setText("Current:");
         outputTextArea.setEditable(false);
         add(outputTextArea, BorderLayout.CENTER);
@@ -49,14 +53,18 @@ public class JournalView extends JimView {
         // We also clear the feedback to prevent double-display of feedback
         String journalText = "";
         if (!lastFeedback.equals("")) {
-            journalText = lastFeedback + "\n\n";
+            journalText = lastFeedback + "<p />";
             lastFeedback = "";
         }
 
         // Build text from current journal content.
-        journalText = journalText + journalManager.getDisplayString();
+        String outputText = journalManager.getDisplayString();
+        outputText = outputText.replace("\n", "<br>");
+        outputText = outputText.replace("Upcoming Events:", "<b><u>Upcoming Events:</u></b>");
+        outputText = outputText.replace("Todo:", "<b><u>Todo:</u></b>");
+        journalText = journalText + outputText;
 
-        // Output to the Text Area (or whatever output component).
+        // Output to the Text Area
         outputTextArea.setText(journalText);
     }
 
