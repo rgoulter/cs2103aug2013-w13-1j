@@ -48,7 +48,9 @@ public class TaskStorage {
 		    TaskType = "TimedTask";
 			StartTime = ((TimedTask) task).getStartTime().toString();
 			EndTime = ((TimedTask) task).getEndTime().toString();
-			
+		}else if(task instanceof DeadlineTask){
+		    TaskType = "DeadlineTask";
+		    EndTime = ((DeadlineTask) task).getEndDate().toString();
 		}else{
 			TaskType = "FloatingTask";
 		}
@@ -119,9 +121,13 @@ public class TaskStorage {
 			
 			//create Task object
 			if (TaskType.equals("TimedTask")){
-			//TODO modify to use the joda time.
+			
 				currentTask = new TimedTask(StartTime, EndTime, Description);
 				
+			}else if (TaskType.equals("DeadlineTask")){
+			    
+			    currentTask = new DeadlineTask(EndTime, Description);
+			    
 			}else if (TaskType.equals("FloatingTask")){
 				
 			    currentTask = new FloatingTask(Description);

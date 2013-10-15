@@ -3,6 +3,7 @@ package jim;
 
 import static org.junit.Assert.*;
 import jim.journal.Command;
+import jim.journal.DeadlineTask;
 import jim.journal.FloatingTask;
 import jim.journal.RemoveCommand;
 import jim.journal.Task;
@@ -54,15 +55,15 @@ public class SuggestionManagerTest {
         SuggestionManager suggestionManager = new SuggestionManager();
         Task parsedTask = suggestionManager.parseTask(inputString.split(" "));
         
-        assertTrue("Parsed task should be a TimedTask.", parsedTask instanceof TimedTask);
+        assertTrue("Parsed task should be a DeadlineTask.", parsedTask instanceof DeadlineTask);
         
-        TimedTask parsedFloatingTask = (TimedTask) parsedTask;
+        DeadlineTask parsedFloatingTask = (DeadlineTask) parsedTask;
         assertEquals("Parsed description should be the same.",
                      expectedTask.getDescription(),
                      parsedFloatingTask.getDescription());
         assertEquals("Parsed time should be the same.",
                      expectedTask.getEndTime(),
-                     parsedFloatingTask.getEndTime());
+                     parsedFloatingTask.getEndDate());
     }
     
     @Test

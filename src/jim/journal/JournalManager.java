@@ -69,17 +69,6 @@ public class JournalManager {
     }
 
 
-
-    public List<Task> getAllTasks() {
-        try {
-            storeAllTasks = taskStorage.getAllTasks();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return storeAllTasks; 
-    }
-
     public void saveToStorage(){
         try {
             this.taskStorage.writeToFile(storeAllTasks);
@@ -89,35 +78,16 @@ public class JournalManager {
         }
     }
 
-    public List<Task> getuncompletedTasks() {
-        
-        List<Task> uncompletedTasks = new ArrayList<Task>();
-        getAllTasks();
-        for (Task t : storeAllTasks) {
-            if (!t.isCompleted()) {
-                uncompletedTasks.add(t);
-            }
+    public ArrayList<Task> getAllTasks() {
+        try {
+            storeAllTasks = taskStorage.getAllTasks();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        saveToStorage();
-        return uncompletedTasks;
+        return storeAllTasks; 
     }
-
-
-
-    public List<Task> getcompletedTasks() {
-        List<Task> completedTasks = new ArrayList<Task>();
-        getAllTasks();
-        for (Task t : storeAllTasks) {
-            if (t.isCompleted()) {
-                completedTasks.add(t);
-            }
-        }
-        saveToStorage();
-        return completedTasks;
-    }
-
-
-
+    
     /*
      * Following methods update the storeAllTasks, uncompletedTasks,
      * completedTasks.
@@ -194,6 +164,7 @@ public class JournalManager {
         
         
     }
+
 
 
 }

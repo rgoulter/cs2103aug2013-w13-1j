@@ -1,6 +1,7 @@
 
 package jim.journal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,15 +21,12 @@ public class SearchCommand extends Command {
     @Override
     public void execute(JournalManager journalManager) {
         String output = "";
-        List<Task> allTasks = journalManager.getAllTasks();
-
-        for (Task current : allTasks) {
-            String currentName = current.getDescription();
-            if (currentName.contains(searchTerm)) {
-                output = output + currentName + "\n";
-            }
+        ArrayList<Task> matchingTasks = new ArrayList<Task>();
+        SearchTool searchTool = new SearchTool(journalManager);
+        matchingTasks = searchTool.searchByNonStrictDescription(searchTerm);
+        for (Task task : matchingTasks){
+            output = output + task.toString() + "\n";
         }
-
         if (output.equals("")) {
             outputln("Search term '" + searchTerm + "' was not found.");
         } else {

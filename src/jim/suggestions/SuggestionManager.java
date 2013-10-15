@@ -17,8 +17,10 @@ import jim.journal.DeadlineTask;
 import jim.journal.DisplayCommand;
 import jim.journal.EditCommand;
 import jim.journal.FloatingTask;
+import jim.journal.JournalManager;
 import jim.journal.RemoveCommand;
 import jim.journal.SearchCommand;
+import jim.journal.Task;
 import jim.journal.TimedTask;
 
 import org.joda.time.MutableDateTime;
@@ -387,19 +389,7 @@ public class SuggestionManager {
      * @param description
      * @return
      */
-    public List<jim.journal.Task> searchForTasksByDescription(jim.journal.JournalManager journal,
-                                                              String description) {
-        // TODO: check with user if the result matched what they really want???
-        List<jim.journal.Task> matchingTasks = new ArrayList<>();
-
-        for (jim.journal.Task task : journal.getAllTasks()) {
-            if (task.getDescription().equals(description)) {
-                matchingTasks.add(task);
-            }
-        }
-
-        return matchingTasks;
-    }
+    
 
 
 
@@ -928,6 +918,12 @@ public class SuggestionManager {
                                          //command
         // TODO Auto-generated method stub
         return new jim.journal.UndoCommand();
+    }
+
+    public List<Task> searchForTasksByDescription(JournalManager journalManager,
+                                                  String description) {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }
