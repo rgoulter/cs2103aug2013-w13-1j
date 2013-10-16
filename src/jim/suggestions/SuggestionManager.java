@@ -891,6 +891,8 @@ public class SuggestionManager {
 
 
     private Object doParse(String syntax[], String[] input){
+    	LOGGER.log(Level.INFO, "doParse: " + join(syntax, ' ') + " " + join(input, ' '));
+    	
         // Our search-tree is implemented as a STACK,
         // (i.e. a DFS exploration of solution space).
         // A PriorityQueue may make more sense?
@@ -933,7 +935,7 @@ public class SuggestionManager {
         // If we get to here, then
         // the input could not be matched with any of the
         // defined syntax formats.
-        return null;
+        throw new IllegalArgumentException("Given arguments do not conform to any defined syntax: " + join(input, ' '));
     }
     
     
