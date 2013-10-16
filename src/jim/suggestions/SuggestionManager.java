@@ -501,10 +501,7 @@ public class SuggestionManager {
                           new SyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
-                                  String[] taskArgs = new String[input.length - 1];
-                                  System.arraycopy(input, 1, taskArgs, 0, taskArgs.length);
-                                  
-                                  jim.journal.Task taskToAdd = parseTask(taskArgs);
+                                  jim.journal.Task taskToAdd = parseTask(input[1].split(" "));
                                   return new AddCommand(taskToAdd);
                               }
                           });
