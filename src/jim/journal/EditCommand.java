@@ -58,6 +58,7 @@ public class EditCommand extends Command {
                 //For now,
                 assert(IndexesInInteger.length == 1);
                 assert((IndexesInInteger[0] <= matchingTasks.size()) && (IndexesInInteger[0] >= 0) );
+                assert(false);
                 outputln("This Task is the choosen task by you: ");
                 outputln(matchingTasks.get(IndexesInInteger[0]).toString());
                 taskToEdit = matchingTasks.get(IndexesInInteger[0]);
