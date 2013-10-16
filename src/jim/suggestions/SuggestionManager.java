@@ -26,7 +26,8 @@ import jim.journal.UndoCommand;
 
 import org.joda.time.MutableDateTime;
 
-import com.sun.corba.se.impl.orbutil.graph.Node;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -46,6 +47,10 @@ public class SuggestionManager {
      * Matches four digits in a row. e.g. HHMM.
      */
     private static final String REGEX_TIME_HHMM = "\\d\\d\\d\\d";
+    
+
+    //assumes the current class is called logger
+    private final static Logger LOGGER = Logger.getLogger(SuggestionManager.class .getName()); 
 
     private interface SyntaxParser {
         public Object parse(String[] input);
@@ -915,7 +920,7 @@ public class SuggestionManager {
                     continue;
 
                 case YES:
-                	//TODO: LOG HERE
+                	LOGGER.log(Level.INFO, "Matched SearchNode: " + searchNode.toString());
                     return doParseWithMatchedSearchNode(searchNode);
 
                 case MAYBE:
@@ -970,8 +975,10 @@ public class SuggestionManager {
         }
 
         SyntaxNode node = root;
+    	LOGGER.log(Level.INFO, "Parsing, matching search node, root node: " + root.syntaxTerm);
         
         while (true) {
+        	LOGGER.log(Level.INFO, "Parsing, looking for parser: " + getSyntaxParserKeyForSyntaxNode(node));
         	SyntaxParser parser = syntaxParsers.get(getSyntaxParserKeyForSyntaxNode(node));
         	
         	if (parser != null) {
