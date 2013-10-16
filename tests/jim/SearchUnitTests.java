@@ -63,14 +63,12 @@ public class SearchUnitTests {
         searchCmd1.execute(jManager);
 
         String output = searchCmd1.getOutput();
-        boolean result = false;
 
-        if (output.equals("Matches for 'Lecture':\nCS2103 Lecture\n\n")) {
-            result = true;
-        }
-        assertTrue("Basic search has failed", result);
 
-        result = false;
+        assertEquals("Matches for 'Lecture':\nCS2103 Lecture\n\n", output); 
+            
+
+
         AddCommand addCmd2 = new AddCommand("CS2103 Tutorial");
         addCmd2.execute(jManager);
 
@@ -78,12 +76,9 @@ public class SearchUnitTests {
         searchCmd2.execute(jManager);
 
         output = searchCmd2.getOutput();
-        if (output.equals("Matches for 'Lecture':\nCS2103 Lecture\n\n")) {
-            result = true;
-        }
-        assertTrue("Search with non-matches failed", result);
+        assertEquals("Matches for 'Lecture':\nCS2103 Lecture\n\n", output);
 
-        result = false;
+
         AddCommand addCmd3 = new AddCommand("CS2101 Lecture");
         addCmd3.execute(jManager);
 
@@ -91,10 +86,7 @@ public class SearchUnitTests {
         searchCmd3.execute(jManager);
 
         output = searchCmd3.getOutput();
-        if (output.equals("Matches for 'Lecture':\nCS2103 Lecture\nCS2101 Lecture\n\n")) {
-            result = true;
-        }
-        assertTrue("Search with multiple matches failed", result);
+        assertEquals("Matches for 'Lecture':\nCS2103 Lecture\nCS2101 Lecture\n\n", output);
 
     }
 

@@ -728,16 +728,8 @@ public class SuggestionManager {
      */
     public List<jim.journal.Task> searchForTasksByDescription(jim.journal.JournalManager journal,
                                                               String description) {
-        // TODO: check with user if the result matched what they really want???
-        List<jim.journal.Task> matchingTasks = new ArrayList<>();
-
-        for (jim.journal.Task task : journal.getAllTasks()) {
-            if (task.getDescription().equals(description)) {
-                matchingTasks.add(task);
-            }
-        }
-
-        return matchingTasks;
+    	// As changed in commit 80154c9c7110
+        return null;
     }
 
 

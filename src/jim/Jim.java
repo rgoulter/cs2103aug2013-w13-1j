@@ -39,13 +39,14 @@ public class Jim {
 
         // Parse the command, try to execute it.
         Command cmd = suggestionManager.parseCommand(args);
-
+        
         if (cmd != null) {
             cmd.execute(journalManager);
             System.out.print(cmd.getOutput());
         } else {
             System.out.println("Unable to parse arguments.");
         }
+        
     }
 
 }

@@ -13,7 +13,7 @@ public abstract class Command {
 
     private StringBuilder outputStringBuilder;
     protected JimInputter inputSource;
-
+    String ExecutionState = "Pending";
 
 
     public Command() {
@@ -23,11 +23,15 @@ public abstract class Command {
     public void setInputSource(JimInputter source) {
         inputSource = source;
     }
-
-
+    public String getCommandState(){
+        return ExecutionState;
+    }
+    
+    //Can only be "CanExecute", 
+    public void changeCommandState(String d){
+        ExecutionState = d;
+    }
     public abstract void execute(JournalManager journalManager);
-
-
 
     // Abstract reading input from command line (should we need it)
     // so that in UnitTests or in the GUI this can be overridden.
