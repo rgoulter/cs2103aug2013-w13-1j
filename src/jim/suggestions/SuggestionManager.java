@@ -26,8 +26,6 @@ import jim.journal.UndoCommand;
 
 import org.joda.time.MutableDateTime;
 
-import com.sun.corba.se.impl.orbutil.graph.Node;
-
 
 
 public class SuggestionManager {

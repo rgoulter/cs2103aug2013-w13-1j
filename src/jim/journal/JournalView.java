@@ -59,10 +59,11 @@ public class JournalView extends JimView {
 
         // Build text from current journal content.
         String outputText = journalManager.getDisplayString();
-        outputText = outputText.replace("\n", "<br>");
-        outputText = outputText.replace("Upcoming Events:", "<b><u>Upcoming Events:</u></b>");
-        outputText = outputText.replace("Todo:", "<b><u>Todo:</u></b>");
         journalText = journalText + outputText;
+        
+        journalText = journalText.replace("\n", "<br>");
+        journalText = journalText.replace("Upcoming Events:", "<b><u>Upcoming Events:</u></b>");
+        journalText = journalText.replace("Todo:", "<b><u>Todo:</u></b>");
 
         // Output to the Text Area
         outputTextArea.setText(journalText);
