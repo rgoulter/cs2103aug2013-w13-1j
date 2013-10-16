@@ -45,7 +45,7 @@ public class SuggestionManagerTest {
     }
     
     @Test
-    public void testCanGrammarParseTask_DeadlineTask () {
+    public void testCanGrammarParseTask_DeadlineTask_DateDescription () {
         // For grammar definition: <date> <description>
         String inputString = "31/12/13 Celebrate New Years Eve";
         MutableDateTime expectedDate = new MutableDateTime(2013, 12, 31, 0, 0, 0, 0);
@@ -55,7 +55,7 @@ public class SuggestionManagerTest {
         SuggestionManager suggestionManager = new SuggestionManager();
         Task parsedTask = suggestionManager.parseTask(inputString.split(" "));
         
-        assertTrue("Parsed task should be a TimedTask.", parsedTask instanceof DeadlineTask);
+        assertTrue("Parsed task should be a DeadlineTask.", parsedTask instanceof DeadlineTask);
         
         DeadlineTask parsedFloatingTask = (DeadlineTask) parsedTask;
         assertEquals("Parsed description should be the same.",
