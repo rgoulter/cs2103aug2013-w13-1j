@@ -3,6 +3,7 @@ package jim;
 
 import static org.junit.Assert.*;
 import jim.journal.Command;
+import jim.journal.DeadlineTask;
 import jim.journal.FloatingTask;
 import jim.journal.RemoveCommand;
 import jim.journal.Task;
@@ -44,25 +45,25 @@ public class SuggestionManagerTest {
     }
     
     @Test
-    public void testCanGrammarParseTask_TimedTask_DateDescription () {
+    public void testCanGrammarParseTask_DeadlineTask_DateDescription () {
         // For grammar definition: <date> <description>
         String inputString = "31/12/13 Celebrate New Years Eve";
         MutableDateTime expectedDate = new MutableDateTime(2013, 12, 31, 0, 0, 0, 0);
-        TimedTask expectedTask = new TimedTask(expectedDate,
+        DeadlineTask expectedTask = new DeadlineTask(expectedDate,
                                                "Celebrate New Years Eve");
         
         SuggestionManager suggestionManager = new SuggestionManager();
         Task parsedTask = suggestionManager.parseTask(inputString.split(" "));
         
-        assertTrue("Parsed task should be a TimedTask.", parsedTask instanceof TimedTask);
+        assertTrue("Parsed task should be a DeadlineTask.", parsedTask instanceof DeadlineTask);
         
-        TimedTask parsedFloatingTask = (TimedTask) parsedTask;
+        DeadlineTask parsedFloatingTask = (DeadlineTask) parsedTask;
         assertEquals("Parsed description should be the same.",
                      expectedTask.getDescription(),
                      parsedFloatingTask.getDescription());
         assertEquals("Parsed time should be the same.",
-                     expectedTask.getEndTime(),
-                     parsedFloatingTask.getEndTime());
+                     expectedTask.getEndDate(),
+                     parsedFloatingTask.getEndDate());
     }
     
     @Test
