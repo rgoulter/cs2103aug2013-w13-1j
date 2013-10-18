@@ -5,7 +5,7 @@ import jim.util.StringUtils;
 
 import org.junit.Test;
 
-public class StringUtilsTest {
+public class StringUtilsTests {
 
 	@Test
 	public void testJoinStringArrayChar() {
