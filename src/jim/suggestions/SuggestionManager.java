@@ -39,7 +39,6 @@ public class SuggestionManager {
     private int highlightedLine = -1;
     private SuggestionHints hints;
     private Parser inputParser;
-    private JimInputter inputSource;
     
 
     //assumes the current class is called logger
@@ -49,10 +48,6 @@ public class SuggestionManager {
 
     public SuggestionManager() {
     	inputParser = new Parser();
-    }
-
-    public void setInputSource(JimInputter source) {
-        inputSource = source;
     }
 
 

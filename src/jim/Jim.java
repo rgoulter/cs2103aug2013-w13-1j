@@ -35,12 +35,12 @@ public class Jim {
         JournalManager journalManager = new JournalManager();
         
         JimInputter inputSource = new CLIInputter();
-        suggestionManager.setInputSource(inputSource);
 
         // Parse the command, try to execute it.
         Command cmd = suggestionManager.parseCommand(args);
         
         if (cmd != null) {
+        	cmd.setInputSource(inputSource);
             cmd.execute(journalManager);
             System.out.print(cmd.getOutput());
         } else {

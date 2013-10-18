@@ -89,7 +89,6 @@ public class JimMainPanel extends JPanel {
 
         // Setup GUIInputter
         inputSource = new GUIInputter();
-        suggestionManager.setInputSource(inputSource);
         
         journalView = new JournalView();
         journalView.setJournalManager(journalManager);
@@ -315,6 +314,7 @@ public class JimMainPanel extends JPanel {
         jim.journal.Command command = suggestionManager.parseCommand(inputTokens);
 
         if (command != null) {
+        	command.setInputSource(inputSource);
             command.execute(journalManager);
             String feedback = command.getOutput();
             journalView.setFeedbackMessage(feedback);
