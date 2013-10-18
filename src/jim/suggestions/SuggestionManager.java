@@ -29,6 +29,10 @@ import org.joda.time.MutableDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static jim.util.StringUtils.isStringSurroundedBy;
+import static jim.util.StringUtils.join;
+import static jim.util.StringUtils.stripStringPrefixSuffix;
+
 
 
 public class SuggestionManager {
@@ -727,69 +731,6 @@ public class SuggestionManager {
                                                               String description) {
     	// As changed in commit 80154c9c7110
         return null;
-    }
-
-
-
-    /**
-     * Inverse of String.split(). Joins an array of Strings to one string. e.g.
-     * {"abc", "def"} joinwith ' ' -> "abc def".
-     */
-    private static String join(String arrayOfStrings[], char joinChar) {
-        return join(arrayOfStrings, joinChar, 0);
-    }
-
-
-
-    /**
-     * Inverse of String.split(). Joins an array of Strings to one string. e.g.
-     * {"abc", "def"} joinwith ' ' -> "abc def".
-     */
-    private static String join(String arrayOfStrings[],
-                               char joinChar,
-                               int startIndex) {
-        return join(arrayOfStrings, joinChar, startIndex, arrayOfStrings.length);
-    }
-
-
-
-    /**
-     * Inverse of String.split(). Joins an array of Strings to one string. e.g.
-     * {"abc", "def"} joinwith ' ' -> "abc def".
-     */
-    private static String join(String arrayOfStrings[],
-                               char joinChar,
-                               int startIndex,
-                               int endIndex) {
-        StringBuilder result = new StringBuilder();
-
-        for (int i = startIndex; i < endIndex - 1; i++) {
-            result.append(arrayOfStrings[i]);
-            result.append(joinChar);
-        }
-
-        result.append(arrayOfStrings[endIndex - 1]);
-
-        return result.toString();
-    }
-
-
-
-    private static boolean isStringSurroundedBy(String str, char begin, char end) {
-        return str.charAt(0) == begin && str.charAt(str.length() - 1) == end;
-    }
-
-
-
-    private static String stripStringPrefixSuffix(String str, int n){
-        // Not an efficient solution. <3 Recursion, though
-        if (n <= 0) {
-            return str;
-        } else {
-            // May not make sense if we just strip by n?
-            String inner = str.substring(1, str.length() - 1);
-            return stripStringPrefixSuffix(inner, n - 1);
-        }
     }
 
 
