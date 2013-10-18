@@ -64,4 +64,37 @@ public class StringUtils {
             return stripStringPrefixSuffix(inner, n - 1);
         }
     }
+    
+    
+    
+    public static String removeAllSymbols(String tellDateOrTime) {
+        String findDate = tellDateOrTime.replaceAll("[^\\p{L}\\p{Nd}]", "");
+        return findDate;
+    }
+
+
+
+    public static int[] splitDate(String date_in_string) {
+        final int LENGTH_OF_DATE = 3; // [DD][MM][YY]
+        final int INDICATE_YEAR = 2;
+        final int INDICATE_MONTH = 1;
+        
+        // we will accept date format of 090913 - DDMMYY
+        int[] dates = new int[LENGTH_OF_DATE];
+        String[] temp = date_in_string.split("");
+        int counter = 1; // temp[0] is a spacing
+        for (int i = 0; i < LENGTH_OF_DATE; i++) {
+            if (i == INDICATE_YEAR) {
+                dates[i] = Integer.parseInt("20" +
+                                            temp[counter++] +
+                                            temp[counter++]);
+            } else if (i == INDICATE_MONTH) {
+                dates[i] = Integer.parseInt(temp[counter++] + temp[counter++]);
+                dates[i] = dates[i];
+            } else {
+                dates[i] = Integer.parseInt(temp[counter++] + temp[counter++]);
+            }
+        }
+        return dates;
+    }
 }
