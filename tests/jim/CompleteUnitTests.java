@@ -29,7 +29,7 @@ public class CompleteUnitTests {
 
         String output = completeCmd.getOutput();
 
-        assertEquals("No tasks was not matched.\n", output);
+        assertEquals("Description was not matched.\n", output);
     }
 
 
@@ -40,12 +40,19 @@ public class CompleteUnitTests {
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
-        CompleteCommand completeCmd1 = new CompleteCommand("Lecture");
+        CompleteCommand completeCmd1 = new CompleteCommand("Lecture"){
+
+            protected String inputLine () {
+                return "0";
+            }
+        };
         completeCmd1.execute(jManager);
 
         String output = completeCmd1.getOutput();
 
-        assertEquals("Completed Task: CS2103 Lecture\n", output);
+        assertEquals("Give the index of the task you wish to remove.\n" +
+				     "0, CS2103 Lecture\n" +
+				     "Completed Task: CS2103 Lecture\n", output);
     }
 
 
@@ -58,12 +65,20 @@ public class CompleteUnitTests {
         AddCommand addCmd2 = new AddCommand("Lecture");
         addCmd2.execute(jManager);
 
-        CompleteCommand completeCmd = new CompleteCommand("Lecture");
+        CompleteCommand completeCmd = new CompleteCommand("Lecture") {
+
+            protected String inputLine () {
+                return "0";
+            }
+        };
         completeCmd.execute(jManager);
 
         String output = completeCmd.getOutput();
 
-        assertEquals("Completed Task: CS2103 Lecture\nCompleted Task: Lecture\n",
+        assertEquals("Give the index of the task you wish to remove.\n" +
+				     "0, CS2103 Lecture\n" +
+				     "1, Lecture\n" +
+				     "Completed Task: CS2103 Lecture\nCompleted Task: Lecture\n",
                      output);
 
     }
@@ -76,14 +91,26 @@ public class CompleteUnitTests {
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
-        CompleteCommand completeCmd1 = new CompleteCommand("Lecture");
+        CompleteCommand completeCmd1 = new CompleteCommand("Lecture") {
+
+            protected String inputLine () {
+                return "0";
+            }
+        };
         completeCmd1.execute(jManager);
-        CompleteCommand completeCmd2 = new CompleteCommand("Lecture");
+        CompleteCommand completeCmd2 = new CompleteCommand("Lecture") {
+
+            protected String inputLine () {
+                return "0";
+            }
+        };
         completeCmd2.execute(jManager);
 
         String output = completeCmd2.getOutput();
 
-        assertEquals("Task CS2103 Lecture has already been marked as completed.\n",
+        assertEquals("Give the index of the task you wish to remove.\n" +
+				     "0, CS2103 Lecture\n" +
+				     "Task CS2103 Lecture has already been marked as completed.\n",
                      output);
 
     }

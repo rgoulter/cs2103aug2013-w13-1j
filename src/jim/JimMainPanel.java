@@ -154,7 +154,7 @@ public class JimMainPanel extends JPanel {
         inputTextField.addFocusListener(new FocusListener() {
 
             public void focusLost(FocusEvent e) {
-                inputTextField.requestFocus();
+                inputTextField.requestFocusInWindow();
             }
 
 

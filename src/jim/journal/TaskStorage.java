@@ -48,11 +48,15 @@ public class TaskStorage {
 		    TaskType = "TimedTask";
 			StartTime = ((TimedTask) task).getStartTime().toString();
 			EndTime = ((TimedTask) task).getEndTime().toString();
+		
 		}else if(task instanceof DeadlineTask){
+		    
 		    TaskType = "DeadlineTask";
 		    EndTime = ((DeadlineTask) task).getEndDate().toString();
+		
 		}else{
-			TaskType = "FloatingTask";
+		
+		    TaskType = "FloatingTask";
 		}
 		
 		Description = task.getDescription();

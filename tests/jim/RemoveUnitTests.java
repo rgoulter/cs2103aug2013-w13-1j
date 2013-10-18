@@ -55,12 +55,19 @@ public class RemoveUnitTests {
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
-        RemoveCommand removeCmd1 = new RemoveCommand("CS2103 Lecture");
+        RemoveCommand removeCmd1 = new RemoveCommand("CS2103 Lecture") {
+
+            protected String inputLine () {
+                return "0";
+            }
+        };
         removeCmd1.execute(jManager);
 
         String output = removeCmd1.getOutput();
 
-        assertEquals("Removed task: CS2103 Lecture\n", output);
+        assertEquals("Give the number of which task you wish to remove.\n" +
+				     "0, CS2103 Lecture\n" +
+				     "Removed task: CS2103 Lecture\n", output);
     }
 
 
@@ -73,12 +80,20 @@ public class RemoveUnitTests {
         AddCommand addCmd2 = new AddCommand("Lecture");
         addCmd2.execute(jManager);
 
-        RemoveCommand removeCmd2 = new RemoveCommand("Lecture");
+        RemoveCommand removeCmd2 = new RemoveCommand("Lecture") {
+
+            protected String inputLine () {
+                return "1";
+            }
+        };
         removeCmd2.execute(jManager);
 
         String output = removeCmd2.getOutput();
 
-        assertEquals("Removed task: Lecture\n",
+        assertEquals("Give the number of which task you wish to remove.\n" +
+        		     "0, CS2103 Lecture\n" +
+        		     "1, Lecture\n" +
+        		     "Removed task: Lecture\n",
                      output);
 
     }

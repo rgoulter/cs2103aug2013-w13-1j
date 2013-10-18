@@ -2,7 +2,6 @@
 package jim.journal;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 

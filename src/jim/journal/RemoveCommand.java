@@ -2,7 +2,6 @@
 package jim.journal;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 
@@ -26,16 +25,17 @@ public class RemoveCommand extends Command {
         matchingTasks = searchTool.searchByNonStrictDescription(description);
         
        
-        /*
+       
             if (matchingTasks.size() == 0){
                 outputln("Description was not matched.");
+                this.changeCommandState("Failure");
             }else{
                 outputln("Give the number of which task you wish to remove.");
                 for (int i = 0; i < matchingTasks.size(); i++){
                     Task task = matchingTasks.get(i);
                     outputln(i + ", " + task.toString());
                 }
-               
+                this.changeCommandState("Pending");
                 String IndexOfTasks = inputLine();
                 String[] Indexes = IndexOfTasks.split(",");
                 
@@ -44,14 +44,11 @@ public class RemoveCommand extends Command {
                     assert((j <= matchingTasks.size()) && (j >= 0) );
                     taskToRemove.add(matchingTasks.get(j));
                 }
-                
+                this.changeCommandState("Success");
                 
             }
-        */
-        taskToRemove = searchTool.searchByDescription(description);
-        if (taskToRemove.isEmpty()){
-            outputln("Description was not matched.");
-        }else{
+        
+       
         
             for (Task t : taskToRemove) {
                 if (journalManager.removeTask(t)) {
@@ -61,7 +58,7 @@ public class RemoveCommand extends Command {
                     outputln("Removing task was not successful.");
                 }
             }
-        }
+        
 
     }
 

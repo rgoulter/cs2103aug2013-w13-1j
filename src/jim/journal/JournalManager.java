@@ -4,6 +4,8 @@ package jim.journal;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
@@ -17,7 +19,8 @@ public class JournalManager {
     private int historyIndex = NO_COMMAND_EXECUTED_YET; 
     
     private List<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
-
+    private static Logger Logger = java.util.logging.Logger.getLogger("JournalManager");
+     
     /**
      * Returns a String representation of the current Journal state.
      * 
@@ -28,6 +31,7 @@ public class JournalManager {
      */
    
     public void initializeJournalManager(){
+        
         try {
             storeAllTasks = taskStorage.getAllTasks();
         } catch (Exception e) {
@@ -73,12 +77,14 @@ public class JournalManager {
 
 
     public void saveToStorage(){
+        Logger.log(Level.INFO, "going to save to storage");
         try {
             this.taskStorage.writeToFile(storeAllTasks);
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            Logger.log(Level.WARNING, "file error");
         }
+        Logger.log(Level.INFO, "end of processing");
     }
 
     public ArrayList<Task> getAllTasks() {

@@ -8,14 +8,21 @@ import org.joda.time.MutableDateTime;
 public class SearchTool {
     ArrayList<Task> AllTasks = new ArrayList<Task>();
     JournalManager JManager;
-    
+    SearchTool theOne;
     public SearchTool(JournalManager journal){
         JManager = journal;
         
             AllTasks = JManager.getAllTasks();
         
-    }
-   
+    }/*
+   public static SearchTool getInstance(){
+      if (theOne == null){
+          theOne = new SearchTool();
+      }
+   }*/
+   public void setJournalManager(JournalManager JM){
+       this.JManager = JM;
+   }
     
     /*
      * SearchTool methods which are supposed to be used by Command class and SuggestionManager.

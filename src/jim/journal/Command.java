@@ -1,10 +1,6 @@
 
 package jim.journal;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import jim.JimInputter;
 
 
@@ -27,10 +23,13 @@ public abstract class Command {
         return ExecutionState;
     }
     
-    //Can only be "CanExecute", 
+    //Can only be "Pending", "Failure" or "Success". 
     public void changeCommandState(String d){
         ExecutionState = d;
     }
+    
+    
+    
     public abstract void execute(JournalManager journalManager);
 
     // Abstract reading input from command line (should we need it)
