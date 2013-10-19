@@ -16,22 +16,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jim.journal.AddCommand;
-import jim.journal.DeadlineTask;
-import jim.journal.EditCommand;
-import jim.journal.FloatingTask;
-import jim.journal.SearchCommand;
-import jim.journal.TimedTask;
-import jim.journal.UndoCommand;
-
-import org.joda.time.MutableDateTime;
-
-import static jim.suggestions.SyntaxParsers.SyntaxTermParser;
+import static jim.suggestions.SyntaxGrammar.initSyntax;
 import static jim.suggestions.SyntaxParsers.SyntaxParserKey;
 import static jim.suggestions.SyntaxParsers.SyntaxParser;
 import static jim.suggestions.SyntaxParsers.initSyntaxParsers;
-import static jim.util.DateUtils.REGEX_DATE_DDMMYY;
-import static jim.util.DateUtils.REGEX_TIME_HHMM;
 
 public class Parser {
     
@@ -434,42 +422,7 @@ public class Parser {
     
     
     public Parser() {
-        initSyntax();
-    }
-    
-    
-
-
-    private void initSyntax() {
-        // Initialise our syntax classes dictionary.
-        // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
-        addSyntax("<date> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/");
-        addSyntax("<time> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
-        addSyntax("<word> := /\\S+/"); // non whitespace
-        addSyntax("<phrase> := <word> | <word> <phrase>");
-        addSyntax("<description> := <phrase>");
-
-        addSyntax("<timedtask> := " +
-                  "<date> <time> <date> <time> <description> | " +
-                  "<description> <date> <time> <date> <time> | " +
-                  "<date> <time> 'to' <time> <description> | " +
-                  "<date> <time> <time> <description>");
-        addSyntax("<deadlinetask> := <date> <description>");
-        addSyntax("<floatingtask> := <description>");
-        addSyntax("<task> := <timedtask> | <deadlinetask> | <floatingtask>");
-        
-        addSyntax("<addcmd> := 'add' <task>");
-        addSyntax("<completecmd> := 'complete' <description>");
-        addSyntax("<removecmd> := 'remove' <description>");
-        addSyntax("<editcmd> := 'edit' <description>");
-        addSyntax("<searchcmd> := 'search' <description>");
-        addSyntax("<displaycmd> := 'display' | 'display' <date>");
-        addSyntax("<undocmd> := 'undo'");
-        
-        addSyntax("<cmd> := " +
-                  "<addcmd> | <completecmd> | <removecmd> | " + 
-                  "<editcmd> | <searchcmd> | <displaycmd>");
-        
+        initSyntax(this);
         initSyntaxParsers(this);
     }
 
@@ -631,7 +584,7 @@ public class Parser {
      * @param syntaxLine
      *            in format "<syntaxClassName> := somesyntax [| somesyntax]*"
      */
-    private void addSyntax(String syntaxLine) {
+    protected void addSyntax(String syntaxLine) {
         String[] syntaxLineParts = syntaxLine.split(" := ");
         String syntaxClassName = stripStringPrefixSuffix(syntaxLineParts[0], 1);
         String[] definedAsSyntaxTerms = syntaxLineParts[1].split(" \\| ");

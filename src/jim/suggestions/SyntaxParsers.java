@@ -5,7 +5,6 @@ import static jim.util.DateUtils.datetime;
 import org.joda.time.MutableDateTime;
 
 import jim.journal.AddCommand;
-import jim.journal.Task;
 import jim.journal.DeadlineTask;
 import jim.journal.EditCommand;
 import jim.journal.FloatingTask;
