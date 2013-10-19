@@ -34,15 +34,15 @@ import jim.journal.JournalView;
 
 public class JimMainPanel extends JPanel {
 
-    private JEditorPane inputTextField;
-    private JPanel viewPanel;
-    private boolean verbatimMode;
-    private JimInputter inputSource;
+    protected JEditorPane inputTextField;
+    protected JPanel viewPanel;
+    protected boolean verbatimMode;
+    protected JimInputter inputSource;
 
-    private JournalView journalView;
-    private SuggestionView suggestionView;
-    private SuggestionManager suggestionManager;
-    private JournalManager journalManager;
+    protected JournalView journalView;
+    protected SuggestionView suggestionView;
+    protected SuggestionManager suggestionManager;
+    protected JournalManager journalManager;
 
     // Border Objects
     private static final Color BORDER_DARK_BLUE = new Color(100, 100, 188);
@@ -325,6 +325,8 @@ public class JimMainPanel extends JPanel {
 
     // To be lazy, this method is called to run the JIM! GUI
     public static void runWindow() {
+
+        
         final JFrame applicationWindow = new JFrame("JIM!");
         applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

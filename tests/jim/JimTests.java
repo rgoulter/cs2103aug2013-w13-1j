@@ -21,6 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
                RemoveUnitTests.class,
                SearchUnitTests.class,
                StringUtilsTests.class,
-               SuggestionManagerTest.class})
+               SuggestionManagerTest.class,
+               ViewTests.class})
 public class JimTests {
 }
