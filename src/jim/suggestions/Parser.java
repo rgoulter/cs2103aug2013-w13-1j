@@ -26,9 +26,6 @@ import jim.journal.UndoCommand;
 
 import org.joda.time.MutableDateTime;
 
-import static jim.util.StringUtils.isStringSurroundedBy;
-import static jim.util.StringUtils.join;
-import static jim.util.StringUtils.stripStringPrefixSuffix;
 import static jim.util.StringUtils.splitDate;
 import static jim.util.StringUtils.removeAllSymbols;
 import static jim.util.DateUtils.datetime;
@@ -45,6 +42,122 @@ public class Parser {
     private static final String REGEX_TIME_HHMM = "\\d\\d\\d\\d";
     
     private final static Logger LOGGER = Logger.getLogger(Parser.class .getName()); 
+
+
+    
+    private static abstract class SyntaxTerm {
+        public abstract boolean matches(String s);
+
+        public boolean isDisplayable() {
+            return false;
+        }
+
+        public String generate() {
+            throw new UnsupportedOperationException("Not implemented.");
+        }
+
+        public static SyntaxTerm valueOf(String syntaxTerm) {
+            String strippedTerm = stripStringPrefixSuffix(syntaxTerm, 1);
+
+            if (isSyntaxLiteral(syntaxTerm)) {
+                return new LiteralSyntaxTerm(strippedTerm);
+            } else if (isSyntaxRegex(syntaxTerm)) {
+                return new RegexSyntaxTerm(strippedTerm);
+            } else if(isSyntaxClass(syntaxTerm)) {
+                return new SyntaxClassSyntaxTerm(strippedTerm);
+            } else {
+                throw new IllegalStateException("An invalid syntax was given: " +
+                                                syntaxTerm);
+            }
+        }
+    }
+
+
+
+	private static  class LiteralSyntaxTerm extends SyntaxTerm {
+        private String literalValue;
+
+        /**
+         * The "escaped" value. e.g. "'a'" -> LiteralSyntaxTerm("a").
+         */
+        public LiteralSyntaxTerm(String value) {
+            literalValue = value;
+        }
+
+        @Override
+        public boolean matches(String inputTerm) {
+            return literalValue.equals(inputTerm);
+        }
+
+        @Override
+        public boolean isDisplayable() {
+            return true;
+        }
+
+        @Override
+        public String generate() {
+            return literalValue;
+        }
+
+        @Override
+        public String toString() {
+        	return "'" + literalValue + "'";
+        }
+    }
+
+
+
+	private static class RegexSyntaxTerm extends SyntaxTerm {
+        private Pattern regexPattern;
+
+        public RegexSyntaxTerm(String regexStr) {
+            regexPattern = Pattern.compile(regexStr);
+        }
+
+        @Override
+        public boolean matches(String inputTerm) {
+            Matcher regexMatcher = regexPattern.matcher(inputTerm);
+
+            return regexMatcher.matches();
+        }
+
+        @Override
+        public String toString() {
+        	return "/" + regexPattern.toString() + "/";
+        }
+    }
+
+
+
+	private static class SyntaxClassSyntaxTerm extends SyntaxTerm {
+		private String syntaxClassName;
+		
+        public SyntaxClassSyntaxTerm(String className) {
+        	syntaxClassName = className;
+        }
+
+        @Override
+        public boolean matches(String inputTerm) {
+            throw new UnsupportedOperationException("Don't match against syntax class.");
+        }
+
+        @Override
+        public boolean isDisplayable() {
+            return "date time description".contains(syntaxClassName);
+        }
+
+        @Override
+        public String generate() {
+            throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        @Override
+        public String toString() {
+        	return "<" + syntaxClassName + ">";
+        }
+    }
+
+
 
     private interface SyntaxParser {
         public Object parse(String[] input);
@@ -121,10 +234,10 @@ public class Parser {
      * syntax tree.
      */
     private class SearchNode {
-        List<SyntaxNode> syntaxFormat;
+        List<SyntaxTermSearchNode> syntaxFormat;
         String[] inputArray;
 
-        public SearchNode(List<SyntaxNode> syntax, String[] input){
+        public SearchNode(List<SyntaxTermSearchNode> syntax, String[] input){
             syntaxFormat = syntax;
             inputArray = input;
         }
@@ -143,7 +256,7 @@ public class Parser {
         }
 
         protected boolean isDisplayable() {
-            for (SyntaxNode node : syntaxFormat) {
+            for (SyntaxTermSearchNode node : syntaxFormat) {
                 if (!node.isDisplayable()) {
                     return false;
                 }
@@ -153,7 +266,7 @@ public class Parser {
         }
 
         private boolean isAllSyntaxNodesTerminal() {
-            for (SyntaxNode node : syntaxFormat) {
+            for (SyntaxTermSearchNode node : syntaxFormat) {
                 if (!node.isTerminal()) {
                     return false;
                 }
@@ -172,7 +285,7 @@ public class Parser {
             boolean isAllMatched = true;
             
             for (int i = 0; i < syntaxFormat.size(); i++) {
-                SyntaxNode node = syntaxFormat.get(i);
+                SyntaxTermSearchNode node = syntaxFormat.get(i);
                 
                 if (!node.isMatched(inputArray[i])) {
                     isAllMatched = false;
@@ -185,14 +298,14 @@ public class Parser {
                 // TODO: SLAP this away?
                 // Add all the nodes to their parents.
                 for (int i = 0; i < syntaxFormat.size(); i++) {
-                    SyntaxNode node = syntaxFormat.get(i);
+                    SyntaxTermSearchNode node = syntaxFormat.get(i);
                     node.ensureAddedToParent();
                 }
             } else {
                 // TODO: SLAP this away?
                 // Since we didn't successfully match, reset.
                 for (int i = 0; i < syntaxFormat.size(); i++) {
-                    SyntaxNode node = syntaxFormat.get(i);
+                    SyntaxTermSearchNode node = syntaxFormat.get(i);
                     node.inputTerm = null;
                 }
             }
@@ -206,14 +319,15 @@ public class Parser {
             // For each definition of the first syntax class found,
             //    expand format with these....
             for (int i = 0; i < syntaxFormat.size(); i++) {
-                SyntaxNode node = syntaxFormat.get(i);
+                SyntaxTermSearchNode node = syntaxFormat.get(i);
 
                 // Expand the first non-terminal term.
                 if (!node.isTerminal()) {
-                    List<SyntaxNode> preList = syntaxFormat.subList(0, i);
-                    List<SyntaxNode> postList = syntaxFormat.subList(i + 1, syntaxFormat.size());
+                    List<SyntaxTermSearchNode> preList = syntaxFormat.subList(0, i);
+                    List<SyntaxTermSearchNode> postList = syntaxFormat.subList(i + 1, syntaxFormat.size());
 
-                    String syntaxClassName = stripStringPrefixSuffix(node.syntaxTerm, 1);
+                    SyntaxClassSyntaxTerm classNode = (SyntaxClassSyntaxTerm) node.syntaxTerm;
+                    String syntaxClassName = classNode.syntaxClassName;
                     List<String> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxClassName);
                     
                     if (syntaxClassDefinitionsList == null) {
@@ -224,11 +338,11 @@ public class Parser {
 
 
                     for (String nextSyntaxDefinition : syntaxClassDefinitionsList) {
-                        List<SyntaxNode> nextSyntaxNodes = new LinkedList<SyntaxNode>();
+                        List<SyntaxTermSearchNode> nextSyntaxNodes = new LinkedList<SyntaxTermSearchNode>();
                         
                         nextSyntaxNodes.addAll(preList);
                         for(String syntaxTerm : nextSyntaxDefinition.split(" ")){
-                            SyntaxNode newNode = new SyntaxNode(syntaxTerm);
+                            SyntaxTermSearchNode newNode = new SyntaxTermSearchNode(SyntaxTerm.valueOf(syntaxTerm));
                             newNode.parent = node;
                             nextSyntaxNodes.add(newNode);
                         }
@@ -248,7 +362,7 @@ public class Parser {
         public String toString() {
             StringBuilder result = new StringBuilder();
 
-            for (SyntaxNode synTerm : syntaxFormat) {
+            for (SyntaxTermSearchNode synTerm : syntaxFormat) {
                 result.append(synTerm.syntaxTerm);
                 result.append(" ");
             }
@@ -266,17 +380,15 @@ public class Parser {
 
 
 
-    private class SyntaxNode {
-        SyntaxNode parent;
+    private class SyntaxTermSearchNode {
+        SyntaxTermSearchNode parent;
         private boolean hasBeenAddedToParent = false;
         
-        private List<SyntaxNode> childrenNodes = new ArrayList<SyntaxNode>();
-        String syntaxTerm; // e.g. <date>, "add", /abc/, ...
+        private List<SyntaxTermSearchNode> childrenNodes = new ArrayList<SyntaxTermSearchNode>();
+        SyntaxTerm syntaxTerm; // e.g. <date>, "add", /abc/, ...
         String inputTerm = null;
 
-        public SyntaxNode(String syntax) {
-            assert !syntax.contains(" "); // Cannot have spaces..
-            
+        public SyntaxTermSearchNode(SyntaxTerm syntax) {
             syntaxTerm = syntax;
         }
 
@@ -300,18 +412,16 @@ public class Parser {
         }
 
         protected boolean isDisplayable() {
-            return isSyntaxLiteral(syntaxTerm) ||
-                   (isSyntaxClass(syntaxTerm) &&
-                    "date time description".contains(stripStringPrefixSuffix(syntaxTerm, 1)));
+            return syntaxTerm.isDisplayable();
         }
 
         public boolean isTerminal() {
-            // "if not a syntax class", <...> -> false, else -> true
-            return isSyntaxLiteral(syntaxTerm) ||
-                   isSyntaxRegex(syntaxTerm);
+            // "if not a syntax class"
+            return syntaxTerm instanceof LiteralSyntaxTerm ||
+                   syntaxTerm instanceof RegexSyntaxTerm;
         }
 
-        public List<SyntaxNode> getChildren() {
+        public List<SyntaxTermSearchNode> getChildren() {
             assert !isTerminal(); // only call this from non-terminals. (i.e. syntax classes..).
 
             return childrenNodes;
@@ -330,7 +440,7 @@ public class Parser {
 
         public boolean isMatched(String input) {
             // Get the logic here from isMatchSyntaxTermWithInputTerm...
-            boolean matched = isMatchSyntaxTermWithInputTerm(syntaxTerm, input);
+            boolean matched = syntaxTerm.matches(input);
 
             if (matched) {
                 // We record the last input term we successfully matched against.
@@ -672,70 +782,6 @@ public class Parser {
 
 
 
-    /**
-     * Checks whether the given input term matches the syntax term.
-     * 
-     * There are currently THREE types of syntax terms:
-     * - Literals: e.g. 'add', matches "add" only.
-     * - Regular Exrpessions: e.g. /a[bc]/, matches ab, ac
-     * - Syntax classes: e.g. <date>, matches 11/22/33, etc.
-     * 
-     * LIMITATIONS:
-     * * This can only handle single-word single-word matches.
-     *   This limits both syntax, and input.
-     *   It is expected this will be resolved in future.
-     */
-    private boolean isMatchSyntaxTermWithInputTerm(String syntaxTerm, String inputTerm) {
-        // TODO: assert & debug.
-        if (syntaxTerm.length() == 0) {
-            return false;
-        }
-        
-        //TODO: Memoization of results?
-        String strippedTerm = stripStringPrefixSuffix(syntaxTerm, 1);
-
-        if (isSyntaxLiteral(syntaxTerm)) {
-            // syntaxTerm == 'something'
-            String literal = strippedTerm;
-
-            return literal.equals(inputTerm);
-        } else if (isSyntaxRegex(syntaxTerm)) {
-            // syntaxTerm = /something/
-            // NOTE: Regex can only match one word/term at a time.
-            String regex = strippedTerm;
-            Pattern regexPattern = Pattern.compile(regex);
-            Matcher regexMatcher = regexPattern.matcher(inputTerm);
-
-            return regexMatcher.matches();
-        } else if (isSyntaxClass(syntaxTerm)) {
-            // syntaxTerm = <something> e.g. <date>, <time>, <task>, ...
-            String syntaxClassName = strippedTerm;
-
-            // Get the enum(?) for the current class name,
-            //   for each item in that,
-            //     try matching the current item...
-            List<String> listOfSyntaxTerms = syntaxClassesMap.get(syntaxClassName);
-
-            if (listOfSyntaxTerms == null) {
-                throw new IllegalArgumentException("Given a syntax term with unknown class: " + syntaxTerm);
-            } else {
-                // Descend through the syntax terms.
-                for (String nextSyntaxTerm : listOfSyntaxTerms) {
-                    if (isMatchSyntaxTermWithInputTerm(nextSyntaxTerm, inputTerm)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-        } else {
-            throw new IllegalStateException("An invalid syntax was given: " +
-                                            syntaxTerm);
-        }
-    }
-
-
-
     protected Object doParse(String syntax, String input){
         return doParse(syntax.split(" "), input.split(" "));
     }
@@ -756,9 +802,9 @@ public class Parser {
         // A PriorityQueue may make more sense?
         Stack<SearchNode> searchNodes = new Stack<SearchNode>();
 
-        List<SyntaxNode> initialSyntaxFormat = new ArrayList<SyntaxNode>(syntax.length);
+        List<SyntaxTermSearchNode> initialSyntaxFormat = new ArrayList<SyntaxTermSearchNode>(syntax.length);
         for (int i = 0; i < syntax.length; i++) {
-            initialSyntaxFormat.add(new SyntaxNode(syntax[i]));
+            initialSyntaxFormat.add(new SyntaxTermSearchNode(SyntaxTerm.valueOf(syntax[i])));
         }
         searchNodes.push(new SearchNode(initialSyntaxFormat, input));
 
@@ -799,12 +845,13 @@ public class Parser {
     
     
     // node -> "className => ..." 
-    private SyntaxParserKey getSyntaxParserKeyForSyntaxNode(SyntaxNode node) {
+    private SyntaxParserKey getSyntaxParserKeyForSyntaxNode(SyntaxTermSearchNode node) {
+        assert node.syntaxTerm instanceof SyntaxClassSyntaxTerm;
         
-        String syntaxClassName = stripStringPrefixSuffix(node.syntaxTerm, 1);
+        String syntaxClassName = ((SyntaxClassSyntaxTerm) node.syntaxTerm).syntaxClassName;
         
         StringBuilder synFormat = new StringBuilder();
-        for(SyntaxNode childNode : node.getChildren()){
+        for(SyntaxTermSearchNode childNode : node.getChildren()){
             synFormat.append(childNode.syntaxTerm);
             synFormat.append(' ');
         }
@@ -820,12 +867,12 @@ public class Parser {
 
         // TODO: SLAP This away.
         // Get root SyntaxNode from search.
-        SyntaxNode root = searchNode.syntaxFormat.get(0);
+        SyntaxTermSearchNode root = searchNode.syntaxFormat.get(0);
         while (root.parent != null) {
             root = root.parent;
         }
 
-        SyntaxNode node = root;
+        SyntaxTermSearchNode node = root;
         LOGGER.log(Level.INFO, "Parsing, matching search node, root node: " + root.syntaxTerm);
         
         while (true) {
@@ -950,8 +997,8 @@ public class Parser {
         // A PriorityQueue may make more sense?
         Stack<SearchNode> searchNodes = new Stack<SearchNode>();
 
-        List<SyntaxNode> initialSyntaxFormat = new ArrayList<SyntaxNode>();
-        initialSyntaxFormat.add(new SyntaxNode("<cmd>")); // <cmd> as the root.
+        List<SyntaxTermSearchNode> initialSyntaxFormat = new ArrayList<SyntaxTermSearchNode>();
+        initialSyntaxFormat.add(new SyntaxTermSearchNode(SyntaxTerm.valueOf("<cmd>"))); // <cmd> as the root.
         searchNodes.push(new SearchNode(initialSyntaxFormat, new String[]{}));
 
         while(!searchNodes.isEmpty()) {
