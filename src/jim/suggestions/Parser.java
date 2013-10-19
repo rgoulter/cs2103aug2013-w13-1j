@@ -156,6 +156,50 @@ public class Parser {
         	return "<" + syntaxClassName + ">";
         }
     }
+	
+	
+	
+	/**
+	 * Abstraction for sequences of terms.
+	 * e.g. Strings like:
+	 * "'add' <date> <time> <description>"
+	 */
+	private static class SyntaxFormat {
+		private SyntaxTerm[] syntaxTerms;
+		
+		public SyntaxFormat(SyntaxTerm[] terms) {
+			syntaxTerms = terms;
+		}
+		
+		public SyntaxTerm[] getSyntaxTerms() {
+			return syntaxTerms;
+		}
+		
+		@Override
+		public String toString() {
+			String[] syntaxTermStrings = new String[syntaxTerms.length];
+			
+			for (int i = 0; i < syntaxTermStrings.length; i++) {
+				syntaxTermStrings[i] = syntaxTerms[i].toString();
+			}
+			
+			return join(syntaxTermStrings, ' ');
+		}
+		
+		public static SyntaxFormat valueOf(String formatStr) {
+			return valueOf(formatStr.split(" "));
+		}
+		
+		public static SyntaxFormat valueOf(String[] syntaxTermStrings) {
+			SyntaxTerm[] syntaxTerms = new SyntaxTerm[syntaxTermStrings.length];
+			
+			for (int i = 0; i < syntaxTermStrings.length; i++) {
+				syntaxTerms[i] = SyntaxTerm.valueOf(syntaxTermStrings[i]);
+			}
+			
+			return new SyntaxFormat(syntaxTerms);
+		}
+	}
 
 
 
@@ -181,9 +225,9 @@ public class Parser {
 
     private static class SyntaxParserKey {
         private String synClass;
-        private String synFormat;
+        private SyntaxFormat synFormat;
 
-        public SyntaxParserKey(String syntaxClassName, String syntaxFormat) {
+        public SyntaxParserKey(String syntaxClassName, SyntaxFormat syntaxFormat) {
             synClass = syntaxClassName;
             synFormat = syntaxFormat;
         }
@@ -193,7 +237,7 @@ public class Parser {
             if (o instanceof SyntaxParserKey) {
                 SyntaxParserKey otherKey = (SyntaxParserKey) o;
                 return synClass.equals(otherKey.synClass) &&
-                       synFormat.equals(otherKey.synFormat);
+                       synFormat.toString().equals(otherKey.synFormat.toString());
             }
 
             return false;
@@ -201,12 +245,12 @@ public class Parser {
         
         @Override
         public int hashCode() {
-            return (synClass + synFormat).hashCode();
+            return (synClass + synFormat.toString()).hashCode();
         }
 
         @Override
         public String toString() {
-            return synClass + " => " + synFormat;
+            return synClass + " => " + synFormat.toString();
         }
 
         /**
@@ -215,7 +259,7 @@ public class Parser {
         public static SyntaxParserKey valueOf(String keyString) {
             String[] parts = keyString.split(" => ");
             String className = parts[0];
-            String format = parts[1];
+            SyntaxFormat format = SyntaxFormat.valueOf(parts[1]);
 
             return new SyntaxParserKey(className, format);
         }
@@ -783,28 +827,31 @@ public class Parser {
 
 
     protected Object doParse(String syntax, String input){
-        return doParse(syntax.split(" "), input.split(" "));
+        return doParse(SyntaxFormat.valueOf(syntax), input.split(" "));
     }
 
 
 
     protected Object doParse(String syntax, String[] input){
-        return doParse(syntax.split(" "), input);
+        return doParse(SyntaxFormat.valueOf(syntax), input);
     }
 
 
 
-    protected Object doParse(String syntax[], String[] input){
-        LOGGER.log(Level.INFO, "doParse: " + join(syntax, ' ') + " " + join(input, ' '));
+    protected Object doParse(SyntaxFormat syntaxFormat, String[] input){
+        LOGGER.log(Level.INFO, "doParse: " + syntaxFormat + " " + join(input, ' '));
         
         // Our search-tree is implemented as a STACK,
         // (i.e. a DFS exploration of solution space).
         // A PriorityQueue may make more sense?
         Stack<SearchNode> searchNodes = new Stack<SearchNode>();
 
-        List<SyntaxTermSearchNode> initialSyntaxFormat = new ArrayList<SyntaxTermSearchNode>(syntax.length);
-        for (int i = 0; i < syntax.length; i++) {
-            initialSyntaxFormat.add(new SyntaxTermSearchNode(SyntaxTerm.valueOf(syntax[i])));
+        // TODO: SLAP derive searchFormatFromSyntaxFormat
+        List<SyntaxTermSearchNode> initialSyntaxFormat =
+        		new ArrayList<SyntaxTermSearchNode>(syntaxFormat.getSyntaxTerms().length);
+        for (int i = 0; i < syntaxFormat.getSyntaxTerms().length; i++) {
+        	SyntaxTerm term = syntaxFormat.getSyntaxTerms()[i];
+            initialSyntaxFormat.add(new SyntaxTermSearchNode(term));
         }
         searchNodes.push(new SearchNode(initialSyntaxFormat, input));
 
@@ -844,20 +891,21 @@ public class Parser {
     
     
     
-    // node -> "className => ..." 
+    // node -> (className, syntaxFormat) 
     private SyntaxParserKey getSyntaxParserKeyForSyntaxNode(SyntaxTermSearchNode node) {
         assert node.syntaxTerm instanceof SyntaxClassSyntaxTerm;
         
-        String syntaxClassName = ((SyntaxClassSyntaxTerm) node.syntaxTerm).syntaxClassName;
+        SyntaxTerm[] syntaxTerms = new SyntaxTerm[node.getChildren().size()];
+        List<SyntaxTermSearchNode> childNodes = node.getChildren();
         
-        StringBuilder synFormat = new StringBuilder();
-        for(SyntaxTermSearchNode childNode : node.getChildren()){
-            synFormat.append(childNode.syntaxTerm);
-            synFormat.append(' ');
+        for(int i = 0; i < syntaxTerms.length; i++){
+    		syntaxTerms[i] = childNodes.get(i).syntaxTerm;
         }
-        synFormat.deleteCharAt(synFormat.length() - 1); // remove last ' '
+        
+        String syntaxClassName = ((SyntaxClassSyntaxTerm) node.syntaxTerm).syntaxClassName;
+        SyntaxFormat syntaxFormat = new SyntaxFormat(syntaxTerms);
 
-        return new SyntaxParserKey(syntaxClassName, synFormat.toString());
+        return new SyntaxParserKey(syntaxClassName, syntaxFormat);
     }
 
 
@@ -894,7 +942,7 @@ public class Parser {
 
 
     protected jim.journal.Task parseTask(String[] input) {
-        return (jim.journal.Task) doParse(new String[]{"<task>"}, input);
+        return (jim.journal.Task) doParse("<task>", input);
     }
 
 
