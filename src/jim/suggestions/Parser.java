@@ -98,6 +98,16 @@ public class Parser {
             }
         }
 
+        protected boolean isDisplayable() {
+            for (SyntaxNode node : syntaxFormat) {
+                if (!node.isDisplayable()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private boolean isAllSyntaxNodesTerminal() {
             for (SyntaxNode node : syntaxFormat) {
                 if (!node.isTerminal()) {
@@ -243,6 +253,12 @@ public class Parser {
         	}
         	
         	return result;
+        }
+
+        protected boolean isDisplayable() {
+            return isSyntaxLiteral(syntaxTerm) ||
+                   (isSyntaxClass(syntaxTerm) &&
+                    "date time description".contains(stripStringPrefixSuffix(syntaxTerm, 1)));
         }
 
         public boolean isTerminal() {
@@ -838,5 +854,126 @@ public class Parser {
         /*result.setDateTime(dateFormat.parse(date));*/
 
         return result;
+    }
+
+
+
+
+    private String getUserFriendlyDefinitonString(String definition) {
+        assert syntaxClassesMap.containsKey(definition);
+        List<String> listOfDefns = syntaxClassesMap.get(definition);
+
+        StringBuilder result = new StringBuilder();
+        result.append(String.format("%16s", "<" + definition + ">"));
+        result.append(" := ");
+
+        result.append(listOfDefns.get(0));
+
+        for (int i = 1; i < listOfDefns.size(); i++) {
+            result.append(" | ");
+            result.append(listOfDefns.get(i));
+        }
+
+        return result.toString();
+    }
+
+
+
+    /**
+     * Returns a user-friendly representation oft the definitions.
+     */
+    private String getUserFriendlyDefinitionsString() {
+        // TODO: Remove magic here, by being able to sort keys in order.
+        
+        String[] definitionClassNames = new String[]{"date",
+                                                    "time",
+                                                    "word",
+                                                    "phrase",
+                                                    "description",
+                                                    "timedtask",
+                                                    "deadlinetask",
+                                                    "floatingtask",
+                                                    "task",
+                                                    "addcmd",
+                                                    "completecmd",
+                                                    "removecmd",
+                                                    "editcmd",
+                                                    "searchcmd",
+                                                    "displaycmd",
+                                                    "undocmd",
+                                                    "cmd"};
+        
+        StringBuilder result = new StringBuilder();
+
+        for (String defnClassName : definitionClassNames) {
+            result.append(getUserFriendlyDefinitonString(defnClassName));
+            result.append('\n');
+        }
+
+        return result.toString();
+    }
+
+
+
+    public List<SearchNode> getDisplayableSyntaxTreeLeafNodes() {
+
+        List<SearchNode> result = new ArrayList<SearchNode>();
+
+        // Our search-tree is implemented as a STACK,
+        // (i.e. a DFS exploration of solution space).
+        // A PriorityQueue may make more sense?
+        Stack<SearchNode> searchNodes = new Stack<SearchNode>();
+
+        List<SyntaxNode> initialSyntaxFormat = new ArrayList<SyntaxNode>();
+        initialSyntaxFormat.add(new SyntaxNode("<cmd>")); // <cmd> as the root.
+        searchNodes.push(new SearchNode(initialSyntaxFormat, new String[]{}));
+
+        while(!searchNodes.isEmpty()) {
+            SearchNode searchNode = searchNodes.pop();
+
+            if (searchNode.isDisplayable()) {
+                // output
+                result.add(searchNode);
+            } else {
+                List<SearchNode> nextNodes = searchNode.nextNodes();
+
+                for (int i = nextNodes.size() - 1; i >= 0; i--) {
+                    SearchNode nextNode = nextNodes.get(i);
+                    searchNodes.push(nextNode);
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+
+    public List<String> getDisplayableSyntaxTreeLeafs() {
+        List<String> result = new ArrayList<String>();
+
+        for (SearchNode node : getDisplayableSyntaxTreeLeafNodes()) {
+            // - 3 is a MAGIC hack so that the " <-" from SearchNode doesn't show.
+            result.add(node.toString().substring(0, node.toString().length() - 3));
+        }
+
+        return result;
+    }
+
+
+
+    public static void main(String args[]) {
+        System.out.println("Parser:");
+
+        Parser p = new Parser();
+
+        System.out.println("Syntax Definition:");
+        System.out.println(p.getUserFriendlyDefinitionsString());
+
+        System.out.println("\n\n");
+        System.out.println("Displayable Formats:");
+        for (String s : p.getDisplayableSyntaxTreeLeafs()) {
+            System.out.println(s);
+        }
     }
 }
