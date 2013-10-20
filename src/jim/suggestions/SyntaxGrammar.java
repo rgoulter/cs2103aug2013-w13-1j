@@ -16,8 +16,24 @@ public class SyntaxGrammar {
     protected static void initSyntax(Parser p) {
         // Initialise our syntax classes dictionary.
         // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
-        p.addSyntax("<date> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/");
-        p.addSyntax("<time> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
+        p.addSyntax("<monthname> := " +
+                    "'January' | 'Jan' | 'Jan.' | " +
+                    "'February' | 'Feb' | 'Feb.' | " +
+                    "'March' | 'Mar' | 'Mar.' | " +
+                    "'April' | 'Apr' | 'Apr.' | " +
+                    "'May' | " +
+                    "'June' | 'Jun' | 'Jun.' | " +
+                    "'July' | 'Jul' | 'Jul.' | " +
+                    "'August' | 'Aug' | 'Aug.' | " +
+                    "'September' | 'Sep' | 'Sep.' | 'Sept' | 'Sept.' | " +
+                    "'October' | 'Oct' | 'Oct.' | " +
+                    "'November' | 'Nov' | 'Nov.' | " +
+                    "'December' | 'Dec' | 'Dec.'");
+        p.addSyntax("<dayofmonth> := /(\\d?\\d)(st|nd|rd|th)?/");
+        p.addSyntax("<ddmmyy> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/");
+        p.addSyntax("<date> := <ddmmyy> | <monthname> <dayofmonth> | <dayofmonth> <monthname>");
+        p.addSyntax("<hhmm> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
+        p.addSyntax("<time> := <hhmm>");
         p.addSyntax("<word> := /\\S+/"); // non whitespace
         p.addSyntax("<phrase> := <word> | <word> <phrase>");
         p.addSyntax("<description> := <phrase>");

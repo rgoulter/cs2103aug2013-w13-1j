@@ -39,6 +39,7 @@ public class Parser {
         }
 
         public static SyntaxTerm valueOf(String syntaxTerm) {
+        	assert syntaxTerm.length() >= 3 : "Given SyntaxTerm: " + syntaxTerm;
             String strippedTerm = stripStringPrefixSuffix(syntaxTerm, 1);
 
             if (isSyntaxLiteral(syntaxTerm)) {
@@ -176,6 +177,7 @@ public class Parser {
 			SyntaxTerm[] syntaxTerms = new SyntaxTerm[syntaxTermStrings.length];
 			
 			for (int i = 0; i < syntaxTermStrings.length; i++) {
+				assert syntaxTermStrings[i].length() > 0 : "SyntaxFormat given syntax term is zero length";
 				syntaxTerms[i] = SyntaxTerm.valueOf(syntaxTermStrings[i]);
 			}
 			
@@ -290,7 +292,7 @@ public class Parser {
 
                     SyntaxClassSyntaxTerm classNode = (SyntaxClassSyntaxTerm) node.syntaxTerm;
                     String syntaxClassName = classNode.syntaxClassName;
-                    List<String> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxClassName);
+                    List<SyntaxFormat> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxClassName);
                     
                     if (syntaxClassDefinitionsList == null) {
                         throw new IllegalArgumentException("Given a syntax term with unknown class: " + node.syntaxTerm);
@@ -299,12 +301,12 @@ public class Parser {
                     List<SearchNode> nextSearchNodes = new ArrayList<SearchNode> (syntaxClassDefinitionsList.size());
 
 
-                    for (String nextSyntaxDefinition : syntaxClassDefinitionsList) {
+                    for (SyntaxFormat nextSyntaxDefinition : syntaxClassDefinitionsList) {
                         List<SyntaxTermSearchNode> nextSyntaxNodes = new LinkedList<SyntaxTermSearchNode>();
                         
                         nextSyntaxNodes.addAll(preList);
-                        for(String syntaxTerm : nextSyntaxDefinition.split(" ")){
-                            SyntaxTermSearchNode newNode = new SyntaxTermSearchNode(SyntaxTerm.valueOf(syntaxTerm));
+                        for(SyntaxTerm syntaxTerm : nextSyntaxDefinition.getSyntaxTerms()){
+                            SyntaxTermSearchNode newNode = new SyntaxTermSearchNode(syntaxTerm);
                             newNode.parent = node;
                             nextSyntaxNodes.add(newNode);
                         }
@@ -416,7 +418,7 @@ public class Parser {
 
 
 
-    private final Map<String, List<String>> syntaxClassesMap = new HashMap<String, List<String>>();
+    private final Map<String, List<SyntaxFormat>> syntaxClassesMap = new HashMap<String, List<SyntaxFormat>>();
     private final Map<SyntaxParserKey, SyntaxParser> syntaxParsers = new HashMap<SyntaxParserKey, SyntaxParser>();
     
     
@@ -589,8 +591,14 @@ public class Parser {
         String syntaxClassName = stripStringPrefixSuffix(syntaxLineParts[0], 1);
         String[] definedAsSyntaxTerms = syntaxLineParts[1].split(" \\| ");
         
+        List<SyntaxFormat> definitions = new ArrayList<SyntaxFormat>(definedAsSyntaxTerms.length);
+        
+        for(int i = 0; i < definedAsSyntaxTerms.length; i++) {
+        	definitions.add(SyntaxFormat.valueOf(definedAsSyntaxTerms[i]));
+        }
+        
         syntaxClassesMap.put(syntaxClassName,
-                             Arrays.asList(definedAsSyntaxTerms));
+                             definitions);
     }
 
 
@@ -598,7 +606,7 @@ public class Parser {
 
     private String getUserFriendlyDefinitonString(String definition) {
         assert syntaxClassesMap.containsKey(definition);
-        List<String> listOfDefns = syntaxClassesMap.get(definition);
+        List<SyntaxFormat> listOfDefns = syntaxClassesMap.get(definition);
 
         StringBuilder result = new StringBuilder();
         result.append(String.format("%16s", "<" + definition + ">"));

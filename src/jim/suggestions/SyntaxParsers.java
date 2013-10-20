@@ -1,6 +1,11 @@
 package jim.suggestions;
 
 import static jim.util.DateUtils.datetime;
+import static jim.util.DateUtils.getCurrentYear;
+import static jim.util.DateUtils.getMonthOfYearFromMonthName;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.joda.time.MutableDateTime;
 
@@ -96,22 +101,55 @@ public class SyntaxParsers {
         new SyntaxTermParser(){
             @Override
             public Object parse(String inputTerm) {
-                return parseDate(inputTerm);
+                return parseDDMMYY(inputTerm);
             }
         };
         registerSyntaxParser(p,
-                          "date => /" + REGEX_DATE_DDMMYY + "/",
+                          "ddmmyy => /" + REGEX_DATE_DDMMYY + "/",
                           genericDDMMYYParser);
         registerSyntaxParser(p,
-                          "date => /\\d\\d\\d\\d\\d\\d/",
+                          "ddmmyy => /\\d\\d\\d\\d\\d\\d/",
                           genericDDMMYYParser);
         registerSyntaxParser(p,
-                          "date => /\\d\\d-\\d\\d-\\d\\d/",
+                          "ddmmyy => /\\d\\d-\\d\\d-\\d\\d/",
                           genericDDMMYYParser);
+
+        registerSyntaxParser(p,
+                             "date => <monthname> <dayofmonth>",
+							 new SyntaxParser() {
+						 		 @Override
+								 public Object parse(String[] inputTerm) {
+						 			 String monthName = inputTerm[0];
+						 			 String dayOfMonth = inputTerm[1];
+									 return new MutableDateTime(getCurrentYear(),
+											 					getMonthOfYearFromMonthName(monthName),
+											 					parseDayOfMonth(dayOfMonth),
+											 					0,
+											 					0,
+											 					0,
+											 					0);
+								 }
+							 });
+        registerSyntaxParser(p,
+			                 "date => <dayofmonth> <monthname>",
+							  new SyntaxParser() {
+						 		  @Override
+								  public Object parse(String[] inputTerm) {
+						 			  String monthName = inputTerm[1];
+						 			  String dayOfMonth = inputTerm[0];
+									  return new MutableDateTime(getCurrentYear(),
+											 					 getMonthOfYearFromMonthName(monthName),
+											 					 parseDayOfMonth(dayOfMonth),
+											 					 0,
+											 					 0,
+											 					 0,
+											 					 0);
+								  }
+							  });
 
 
         registerSyntaxParser(p,
-                          "time => /" + REGEX_TIME_HHMM + "/",
+                          "hhmm => /" + REGEX_TIME_HHMM + "/",
                           new SyntaxTermParser() {
 
                               @Override
@@ -123,7 +161,7 @@ public class SyntaxParsers {
                               }
                           });
         registerSyntaxParser(p,
-                          "time => /\\d\\d:\\d\\d/",
+                          "hhmm => /\\d\\d:\\d\\d/",
                           new SyntaxTermParser() {
 
                               @Override
@@ -365,7 +403,7 @@ public class SyntaxParsers {
 
 
 
-    private static MutableDateTime parseDate(String date) {
+    private static MutableDateTime parseDDMMYY(String date) {
         // TODO: Abstract Date parsing like AddCommand
         // ACCEPTED FORMATS: dd/mm/yy
         //SimpleDateFormat dateFormat = new SimpleDateFormat(DATEFORMAT_DATE_DDMMYY);
@@ -377,5 +415,18 @@ public class SyntaxParsers {
         /*result.setDateTime(dateFormat.parse(date));*/
 
         return result;
+    }
+    
+    
+    
+    private static int parseDayOfMonth(String dayOfMonthStr) {
+    	Pattern dayOfMonthRegex = Pattern.compile("(\\d?\\d)(st|nd|rd|th)?");
+    	Matcher matcher = dayOfMonthRegex.matcher(dayOfMonthStr);
+    	
+    	if (matcher.matches()) {
+    		return Integer.parseInt(matcher.group(1));
+    	} else {
+    		throw new IllegalArgumentException("Not in appropriate format: " + dayOfMonthStr);
+    	}
     }
 }

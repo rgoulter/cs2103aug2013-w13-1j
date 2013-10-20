@@ -147,6 +147,12 @@ public class SuggestionManager {
     	// As changed in commit 80154c9c7110
         return null;
     }
+    
+    
+    
+    public MutableDateTime parseDate(String input) {
+    	return (MutableDateTime) inputParser.doParse("<date>", input);
+    }
 
 
 

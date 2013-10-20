@@ -1,5 +1,7 @@
 package jim.util;
 
+import java.util.Arrays;
+
 import org.joda.time.MutableDateTime;
 
 public class DateUtils {
@@ -27,5 +29,21 @@ public class DateUtils {
                                    time.getMinuteOfHour(),
                                    time.getSecondOfMinute(),
                                    00);
+    }
+    
+    public static int getMonthOfYearFromMonthName(String monthName) {
+    	final String MONTHS_OF_YEAR = "jan feb mar apr may jun jul aug sep oct nov dec";
+    	
+    	int zeroBasedMonthOfYear = MONTHS_OF_YEAR.indexOf(monthName.toLowerCase().substring(0, 3)) / 4;
+    	
+    	return zeroBasedMonthOfYear + 1;
+    }
+    
+    public static int getCurrentYear() {
+    	return new MutableDateTime().getYear();
+    }
+    
+    // Not to be instantiated.
+    private DateUtils() {
     }
 }
