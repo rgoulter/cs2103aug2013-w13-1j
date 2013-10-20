@@ -45,4 +45,27 @@ public class ParserDateTimeTests {
         assertEquals(31, dateTime.getDayOfMonth());
         assertEquals(12, dateTime.getMonthOfYear());
     }
+
+    @Test
+    public void testCanParseVariousTimeFormats () {
+        SuggestionManager suggMan = new SuggestionManager();
+        
+        MutableDateTime dateTime;
+        
+        dateTime = suggMan.parseTime("0600");
+        assertEquals(6, dateTime.getHourOfDay());
+        assertEquals(0, dateTime.getMinuteOfHour());
+        
+        dateTime = suggMan.parseTime("0600h");
+        assertEquals(6, dateTime.getHourOfDay());
+        assertEquals(0, dateTime.getMinuteOfHour());
+        
+        dateTime = suggMan.parseTime("6:00");
+        assertEquals(18, dateTime.getHourOfDay());
+        assertEquals(0, dateTime.getMinuteOfHour());
+        
+        dateTime = suggMan.parseTime("06:00");
+        assertEquals(6, dateTime.getHourOfDay());
+        assertEquals(0, dateTime.getMinuteOfHour());
+    }
 }

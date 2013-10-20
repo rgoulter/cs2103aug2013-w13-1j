@@ -153,6 +153,12 @@ public class SuggestionManager {
     public MutableDateTime parseDate(String input) {
     	return (MutableDateTime) inputParser.doParse("<date>", input);
     }
+    
+    
+    
+    public MutableDateTime parseTime(String input) {
+    	return (MutableDateTime) inputParser.doParse("<time>", input);
+    }
 
 
 

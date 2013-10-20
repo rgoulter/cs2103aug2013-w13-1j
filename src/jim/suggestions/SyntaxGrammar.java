@@ -34,7 +34,7 @@ public class SyntaxGrammar {
         p.addSyntax("<yyyymmdd> := /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/");
         p.addSyntax("<monthday> := /\\d\\d/\\d\\d/ | <monthname> <dayofmonth> | <dayofmonth> <monthname>");
         p.addSyntax("<date> := <ddmmyy> | <yyyymmdd> | <monthday>");
-        p.addSyntax("<hhmm> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
+        p.addSyntax("<hhmm> := /(\\d\\d):?(\\d\\d)[Hh]/ | /(\\d?\\d):?(\\d\\d)/");
         p.addSyntax("<time> := <hhmm>");
         p.addSyntax("<word> := /\\S+/"); // non whitespace
         p.addSyntax("<phrase> := <word> | <word> <phrase>");

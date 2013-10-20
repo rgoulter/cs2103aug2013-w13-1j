@@ -43,6 +43,14 @@ public class DateUtils {
     	return new MutableDateTime().getYear();
     }
     
+    public static boolean isHourLikelyToBePM(int h) {
+    	return !(8 <= h && h <= 11);
+    }
+    
+    public static int ensureHourIsPM(int h) {
+    	return (h + 12) % 12 + 12;
+    }
+    
     // Not to be instantiated.
     private DateUtils() {
     }

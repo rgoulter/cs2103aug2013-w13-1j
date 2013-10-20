@@ -19,6 +19,8 @@ import jim.journal.UndoCommand;
 import jim.suggestions.Parser.SyntaxFormat;
 import static jim.util.DateUtils.REGEX_DATE_DDMMYY;
 import static jim.util.DateUtils.REGEX_TIME_HHMM;
+import static jim.util.DateUtils.isHourLikelyToBePM;
+import static jim.util.DateUtils.ensureHourIsPM;
 import static jim.util.StringUtils.removeAllSymbols;
 import static jim.util.StringUtils.splitDate;
 
@@ -186,29 +188,34 @@ public class SyntaxParsers {
 								  }
 							  });
 
-
         registerSyntaxParser(p,
-                          "hhmm => /" + REGEX_TIME_HHMM + "/",
+                          "hhmm => /(\\d\\d):?(\\d\\d)[Hh]/",
                           new SyntaxTermParser() {
 
                               @Override
                               public Object parse(String inputTerm) {
-                                  int hh = Integer.parseInt(inputTerm.substring(0, 2));
-                                  int mm = Integer.parseInt(inputTerm.substring(2));
+         			 			 Matcher m = Pattern.compile("(\\d\\d):?(\\d\\d)[Hh]").matcher(inputTerm);
+        			 			 if(!m.matches()) { throw new IllegalArgumentException(); };
+
+        			 			 int hh = Integer.parseInt(m.group(1));
+        			 			 int mm = Integer.parseInt(m.group(2));
                                   
                                   return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
                               }
                           });
         registerSyntaxParser(p,
-                          "hhmm => /\\d\\d:\\d\\d/",
+                          "hhmm => /(\\d?\\d):?(\\d\\d)/",
                           new SyntaxTermParser() {
 
                               @Override
                               public Object parse(String inputTerm) {
-                                  int hh = Integer.parseInt(inputTerm.substring(0, 2));
-                                  int mm = Integer.parseInt(inputTerm.substring(3));
+          			 			  Matcher m = Pattern.compile("(\\d?\\d):?(\\d\\d)").matcher(inputTerm);
+         			 			  if(!m.matches()) { throw new IllegalArgumentException(); };
+
+         			 			  int hh = parseHourOfDay(m.group(1));
+         			 			  int mm = Integer.parseInt(m.group(2));
                                   
-                                  return new MutableDateTime(0, 0, 0, hh, mm, 00, 00);
+                                  return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
                               }
                           });
         
@@ -466,6 +473,24 @@ public class SyntaxParsers {
     		return Integer.parseInt(matcher.group(1));
     	} else {
     		throw new IllegalArgumentException("Not in appropriate format: " + dayOfMonthStr);
+    	}
+    }
+    
+    
+    
+    /**
+     * e.g. 
+     * 06 -> Likely to be 24 hour time, => 6 am.
+     *  6 -> More likely to refer to 6pm than 6am.
+     * @return Returns a sensible interpretation of String as hour of day.
+     */
+    private static int parseHourOfDay(String hourStr) {
+    	int hour = Integer.parseInt(hourStr);
+    	
+    	if(!hourStr.startsWith("0") && isHourLikelyToBePM(hour)){
+    		return ensureHourIsPM(hour);
+    	} else {
+    		return hour;
     	}
     }
 }
