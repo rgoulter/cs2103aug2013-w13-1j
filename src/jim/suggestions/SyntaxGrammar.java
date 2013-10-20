@@ -31,7 +31,9 @@ public class SyntaxGrammar {
                     "'December' | 'Dec' | 'Dec.'");
         p.addSyntax("<dayofmonth> := /(\\d?\\d)(st|nd|rd|th)?/");
         p.addSyntax("<ddmmyy> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/");
-        p.addSyntax("<date> := <ddmmyy> | <monthname> <dayofmonth> | <dayofmonth> <monthname>");
+        p.addSyntax("<yyyymmdd> := /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/");
+        p.addSyntax("<monthday> := /\\d\\d/\\d\\d/ | <monthname> <dayofmonth> | <dayofmonth> <monthname>");
+        p.addSyntax("<date> := <ddmmyy> | <yyyymmdd> | <monthday>");
         p.addSyntax("<hhmm> := /" + REGEX_TIME_HHMM + "/ | /\\d\\d:\\d\\d/");
         p.addSyntax("<time> := <hhmm>");
         p.addSyntax("<word> := /\\S+/"); // non whitespace

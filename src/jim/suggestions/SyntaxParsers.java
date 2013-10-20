@@ -113,9 +113,48 @@ public class SyntaxParsers {
         registerSyntaxParser(p,
                           "ddmmyy => /\\d\\d-\\d\\d-\\d\\d/",
                           genericDDMMYYParser);
+        
+        registerSyntaxParser(p,
+                "yyyymmdd => /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/",
+				 new SyntaxParser() {
+			 		 @Override
+					 public Object parse(String[] inputTerm) {
+			 			 Matcher m = Pattern.compile("(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)").matcher(inputTerm[0]);
+			 			 if(!m.matches()) { throw new IllegalArgumentException(); };
+
+			 			 int year = Integer.parseInt(m.group(1));
+			 			 int monthOfYear = Integer.parseInt(m.group(2));
+			 			 int dayOfMonth = Integer.parseInt(m.group(3));
+						 return new MutableDateTime(year,
+								 					monthOfYear,
+								 					dayOfMonth,
+								 					0,
+								 					0,
+								 					0,
+								 					0);
+					 }
+				 });
 
         registerSyntaxParser(p,
-                             "date => <monthname> <dayofmonth>",
+                             "monthday => /\\d\\d/\\d\\d/",
+							 new SyntaxParser() {
+						 		 @Override
+								 public Object parse(String[] inputTerm) {
+						 			 String[] parts = inputTerm[0].split("/");
+						 			 int dayOfMonth = Integer.parseInt(parts[0]);
+						 			 int monthOfYear = Integer.parseInt(parts[1]);
+									 return new MutableDateTime(getCurrentYear(),
+											 					monthOfYear,
+											 					dayOfMonth,
+											 					0,
+											 					0,
+											 					0,
+											 					0);
+								 }
+							 });
+
+        registerSyntaxParser(p,
+                             "monthday => <monthname> <dayofmonth>",
 							 new SyntaxParser() {
 						 		 @Override
 								 public Object parse(String[] inputTerm) {
@@ -131,7 +170,7 @@ public class SyntaxParsers {
 								 }
 							 });
         registerSyntaxParser(p,
-			                 "date => <dayofmonth> <monthname>",
+			                 "monthday => <dayofmonth> <monthname>",
 							  new SyntaxParser() {
 						 		  @Override
 								  public Object parse(String[] inputTerm) {

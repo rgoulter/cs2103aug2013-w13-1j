@@ -17,6 +17,10 @@ public class ParserDateTimeTests {
         
         MutableDateTime dateTime;
         
+        dateTime = suggMan.parseDate("311213");
+        assertEquals(31, dateTime.getDayOfMonth());
+        assertEquals(12, dateTime.getMonthOfYear());
+        
         dateTime = suggMan.parseDate("December 31");
         assertEquals(31, dateTime.getDayOfMonth());
         assertEquals(12, dateTime.getMonthOfYear());
@@ -30,6 +34,14 @@ public class ParserDateTimeTests {
         assertEquals(12, dateTime.getMonthOfYear());
         
         dateTime = suggMan.parseDate("Dec. 31");
+        assertEquals(31, dateTime.getDayOfMonth());
+        assertEquals(12, dateTime.getMonthOfYear());
+        
+        dateTime = suggMan.parseDate("31/12");
+        assertEquals(31, dateTime.getDayOfMonth());
+        assertEquals(12, dateTime.getMonthOfYear());
+        
+        dateTime = suggMan.parseDate("2013/12/31");
         assertEquals(31, dateTime.getDayOfMonth());
         assertEquals(12, dateTime.getMonthOfYear());
     }
