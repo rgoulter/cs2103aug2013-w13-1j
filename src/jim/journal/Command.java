@@ -30,7 +30,10 @@ public abstract class Command {
     
     
     
-    public abstract void execute(JournalManager journalManager);
+    public abstract String execute(JournalManager journalManager);
+    
+    public abstract String secondExecute(String secondInput);
+    public abstract String thirdExecute(Task task);
 
     // Abstract reading input from command line (should we need it)
     // so that in UnitTests or in the GUI this can be overridden.

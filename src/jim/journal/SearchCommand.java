@@ -1,5 +1,6 @@
-
 package jim.journal;
+
+
 
 import java.util.ArrayList;
 
@@ -18,7 +19,7 @@ public class SearchCommand extends Command {
 
 
     @Override
-    public void execute(JournalManager journalManager) {
+    public String execute(JournalManager journalManager) {
         String output = "";
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
         SearchTool searchTool = new SearchTool(journalManager);
@@ -31,6 +32,23 @@ public class SearchCommand extends Command {
         } else {
             outputln("Matches for '" + searchTerm + "':\n" + output);
         }
+        return "Success";
+    }
+
+
+
+    @Override
+    public String secondExecute(String secondInput) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+
+    @Override
+    public String thirdExecute(Task task) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

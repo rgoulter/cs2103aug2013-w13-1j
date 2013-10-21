@@ -50,9 +50,8 @@ public class CompleteUnitTests {
 
         String output = completeCmd1.getOutput();
 
-        assertEquals("Give the index of the task you wish to remove.\n" +
-				     "0, CS2103 Lecture\n" +
-				     "Completed Task: CS2103 Lecture\n", output);
+        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','" +
+				     "0, CS2103 Lecture\n", output);
     }
 
 
@@ -77,8 +76,7 @@ public class CompleteUnitTests {
 
         assertEquals("Give the index of the task you wish to remove.\n" +
 				     "0, CS2103 Lecture\n" +
-				     "1, Lecture\n" +
-				     "Completed Task: CS2103 Lecture\nCompleted Task: Lecture\n",
+				     "1, Lecture\n",
                      output);
 
     }
