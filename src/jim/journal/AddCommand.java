@@ -1,5 +1,6 @@
-
 package jim.journal;
+
+
 
 import org.joda.time.MutableDateTime;
 
@@ -39,13 +40,27 @@ public class AddCommand extends Command {
     // e.g. add <description> (for a floating task kindof thing).
 
     @Override
-    public void execute(JournalManager journalManager) {
+    public String execute(JournalManager journalManager) {
         
         journalManager.addTask(taskToAdd);
         journalManager.addCommandHistory("add", taskToAdd);
+        return "Success";
+        
+        
+    }
 
-        
-        
+    @Override
+    public String secondExecute(String secondInput) {
+        // TODO Auto-generated method stub
+        //assert(false);
+        return null;
+    }
+
+    @Override
+    public String thirdExecute(Task task) {
+        // TODO Auto-generated method stub
+        //assert(false);
+        return null;
     }
 
 }

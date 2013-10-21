@@ -1,8 +1,10 @@
-
 package jim.journal;
+
+
 
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
+
 import java.util.List;
 
 
@@ -31,7 +33,7 @@ public class DisplayCommand extends Command {
     
 
     @Override
-    public void execute(JournalManager journalManager) {
+    public String execute(JournalManager journalManager) {
         List<Task> allTasks = journalManager.getAllTasks();
 
         for (Task current : allTasks) {
@@ -51,6 +53,23 @@ public class DisplayCommand extends Command {
             }
 
         }
+        return "Success";
+    }
+
+
+
+    @Override
+    public String secondExecute(String secondInput) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+
+    @Override
+    public String thirdExecute(Task task) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

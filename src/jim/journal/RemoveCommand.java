@@ -1,5 +1,6 @@
-
 package jim.journal;
+
+
 
 import java.util.ArrayList;
 
@@ -8,8 +9,9 @@ import java.util.ArrayList;
 public class RemoveCommand extends Command {
 
     String description;
-
-
+    JournalManager JM;
+    ArrayList<Task> matchingTasks = new ArrayList<Task>();
+    ArrayList<Task> taskToRemove = new ArrayList<Task>();
 
     public RemoveCommand(String des) {
         description = des;
@@ -18,9 +20,9 @@ public class RemoveCommand extends Command {
 
     
     @Override
-    public void execute(JournalManager journalManager) {
-        ArrayList<Task> taskToRemove = new ArrayList<Task>();
-        ArrayList<Task> matchingTasks = new ArrayList<Task>();
+    public String execute(JournalManager journalManager) {
+        JM = journalManager;
+        
         SearchTool searchTool = new SearchTool(journalManager);
         matchingTasks = searchTool.searchByNonStrictDescription(description);
         
@@ -28,38 +30,51 @@ public class RemoveCommand extends Command {
        
             if (matchingTasks.size() == 0){
                 outputln("Description was not matched.");
-                this.changeCommandState("Failure");
+                return "Success";
             }else{
-                outputln("Give the number of which task you wish to remove.");
+                outputln("Type in just the index of tasks you wish to process. Please seperate them by ',''");
                 for (int i = 0; i < matchingTasks.size(); i++){
                     Task task = matchingTasks.get(i);
                     outputln(i + ", " + task.toString());
                 }
-                this.changeCommandState("Pending");
-                String IndexOfTasks = inputLine();
-                String[] Indexes = IndexOfTasks.split(",");
-                
-                for (int i = 0; i < Indexes.length; i++){
-                    int j = Integer.parseInt(Indexes[i]);
-                    assert((j <= matchingTasks.size()) && (j >= 0) );
-                    taskToRemove.add(matchingTasks.get(j));
-                }
-                this.changeCommandState("Success");
+                return "Pending";
                 
             }
-        
-       
-        
-            for (Task t : taskToRemove) {
-                if (journalManager.removeTask(t)) {
-                journalManager.addCommandHistory("remove", t);
-                    outputln("Removed task: " + t.toString());
-                } else {
-                    outputln("Removing task was not successful.");
-                }
-            }
-        
+    }
 
+
+
+    @Override
+    public String secondExecute(String secondInput) {
+        String[] IndexesOfTasks = secondInput.split(",");
+        for (int i = 0; i < IndexesOfTasks.length; i++){
+            try{
+               int j = Integer.parseInt(IndexesOfTasks[i]);
+               taskToRemove.add(matchingTasks.get(j));
+            }catch(NumberFormatException e){
+                return "Pending";
+            }
+        }
+        executeHelper();
+        return "Success";
+    }
+
+
+
+    @Override
+    public String thirdExecute(Task task) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    private void executeHelper(){
+        for (Task t : taskToRemove) {
+            if (JM.removeTask(t)) {
+            JM.addCommandHistory("remove", t);
+                outputln("Removed task: " + t.toString());
+            } else {
+                outputln("Removing task was not successful.");
+            }
+        }
     }
 
 }
