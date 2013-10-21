@@ -303,14 +303,17 @@ public class JimMainPanel extends JPanel {
 
         String input = inputTextField.getText();
         String inputTokens[] = input.split(" ");
+        String feedback = "";
         
         if (lastCommandState.equals("Pending")) {
             lastCommandState = lastCommand.secondExecute(input);
+            feedback = lastCommand.getOutput();
         }
         
         else if (lastCommandState.equals("NeedNewTask")) {
             Task newTask = suggestionManager.parseTask(inputTokens);
             lastCommandState = lastCommand.thirdExecute(newTask);
+            feedback = lastCommand.getOutput();
         }
         
         else {
@@ -320,8 +323,7 @@ public class JimMainPanel extends JPanel {
                 lastCommand = command;
 
                 lastCommandState = command.execute(journalManager);
-                String feedback = command.getOutput();
-                journalView.setFeedbackMessage(feedback);
+                feedback = command.getOutput();
             }
             
             if (lastCommandState.equals("Pending") || lastCommandState.equals("NeedNewTask")) {
@@ -332,6 +334,9 @@ public class JimMainPanel extends JPanel {
         if (lastCommandState.equals("Success") || lastCommandState.equals("Failure")) {
             clearLastCommand();
         }
+        
+        
+        journalView.setFeedbackMessage(feedback);
     }
 
     private void clearLastCommand() {

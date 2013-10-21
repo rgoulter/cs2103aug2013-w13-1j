@@ -11,6 +11,7 @@ import java.util.GregorianCalendar;
 import jim.journal.Command;
 import jim.journal.EditCommand;
 import jim.journal.JournalManager;
+import jim.journal.Task;
 import jim.journal.TemporaryJournalManager;
 import jim.journal.TimedTask;
 import jim.suggestions.SuggestionManager;
@@ -80,12 +81,17 @@ public class EditUnitTests {
         journalManager.addTask(myOldTimedTask);
 
         EditCommand editCmd = new EditCommand("MyOldTask", expectedNewTimedTask);
-        editCmd.execute(journalManager);
+        String commandStatus = editCmd.execute(journalManager);
 
         // This works since, if we have only one Task, then this will be at 0.
         // And if the EditCommand worked, it will replace the task..
-        assertEquals("MyNewTask", journalManager.getAllTasks().get(0)
-                                                .getDescription());
+        assertEquals("The task was not changed correctly in the JournalManager",
+                     "MyNewTask", journalManager.getAllTasks().get(0).getDescription());
+        
+        // Check to see that the correct output is given to the user
+        assertEquals("Output produced does not match expected output",
+                     "The task MyOldTask will be modified.\n",
+                     editCmd.getOutput());
     }
 
 
@@ -93,7 +99,6 @@ public class EditUnitTests {
     @Test
     public void testStrictSyntaxEditCommandWithInputCanExecute () {
         // Edit command, getting input from inputLine()
-
         // e.g. "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
 
         Calendar oldStartTimeCal = new GregorianCalendar(2013, 10, 10, 14, 0);
@@ -105,22 +110,38 @@ public class EditUnitTests {
                                                  "MyOldTask");
 
         JournalManager journalManager = new TemporaryJournalManager(); // Empty; NO
-                                                              // TASKS.
+                                                                       // TASKS.
         journalManager.addTask(myOldTimedTask);
 
-        EditCommand editCmd = new EditCommand("MyOldTask") {
-
-            protected String inputLine () {
-                return "31/12/13 0000 31/12/13 2359 MyNewTask";
-            }
-        };
-        editCmd.execute(journalManager);
-
-        // This works since, if we have only one Task, then this will be at 0.
-        // And if the EditCommand worked, it will replace the task..
-        assertNotNull(journalManager.getAllTasks().get(0));
-        assertEquals("MyNewTask", journalManager.getAllTasks().get(0)
-                                                .getDescription());
+        EditCommand editCmd = new EditCommand("MyOldTask");
+        String executionStatus = editCmd.execute(journalManager);
+        String feedback = editCmd.getOutput();
+        
+        assertEquals("Execution status not correctly updated to NeedNewTask (Phase 1)",
+                     "NeedNewTask", executionStatus);
+        
+        assertEquals("Returned feedback does not match expected feedback (Phase 1)",
+                     "The following Task will be edited.\n" +
+                     "MyOldTask 10/11/2013 14:00 to 15:00\n",
+                     feedback);
+        
+        SuggestionManager sManager = new SuggestionManager();
+        String[] tokens = "MyNewTask 31/12/13 0000 31/12/13 2359".split(" ");
+        Task newTask = sManager.parseTask(tokens);
+        
+        executionStatus = editCmd.thirdExecute(newTask);
+        feedback = editCmd.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Success (Phase 2)",
+                     "Success", executionStatus);
+        
+        assertEquals("Returned feedback does not match expected feedback (Phase 2)",
+                     "The task MyOldTask will be modified.\n",
+                     feedback);
+        
+        assertEquals("The task was not changed correctly in the JournalManager",
+                     "MyNewTask", journalManager.getAllTasks().get(0).getDescription());
+        
     }
 
 }

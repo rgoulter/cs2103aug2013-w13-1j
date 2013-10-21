@@ -32,7 +32,7 @@ public class RemoveCommand extends Command {
                 outputln("Description was not matched.");
                 return "Success";
             }else{
-                outputln("Type in just the index of tasks you wish to process. Please seperate them by ',''");
+                outputln("Type in just the index of tasks you wish to process. Please seperate them by ','");
                 for (int i = 0; i < matchingTasks.size(); i++){
                     Task task = matchingTasks.get(i);
                     outputln(i + ", " + task.toString());
@@ -67,6 +67,8 @@ public class RemoveCommand extends Command {
         return null;
     }
     private void executeHelper(){
+        clearOutput();
+        
         for (Task t : taskToRemove) {
             if (JM.removeTask(t)) {
             JM.addCommandHistory("remove", t);

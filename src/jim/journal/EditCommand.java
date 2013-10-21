@@ -38,8 +38,12 @@ public class EditCommand extends Command {
             matchingTasks = searchTool.searchByNonStrictDescription(description);
             if (matchingTasks.size() == 0){
                 outputln("No Matching Tasks with the description provided.");
+                return "Failure";
+            }else if (matchingTasks.size() == 1 && taskChangedTo != null) {
+                taskToEdit = matchingTasks.get(0);
+                executeHelper();
                 return "Success";
-            }else if (matchingTasks.size() == 1){
+            }else if (matchingTasks.size() == 1 && taskChangedTo == null){
                 outputln("The following Task will be edited.");
                 outputln(matchingTasks.get(0).toString());
                 taskToEdit = matchingTasks.get(0);
@@ -76,13 +80,14 @@ public class EditCommand extends Command {
 
     @Override
     public String thirdExecute(Task task) {
-        // TODO Auto-generated method stub
         taskChangedTo = task;
         executeHelper();
         return "Success";
     }
     
-    private void executeHelper(){
+    private void executeHelper() {
+        clearOutput();
+        outputln("The task " + taskToEdit.getDescription() + " will be modified.");
         JM.editTask(taskToEdit, taskChangedTo);
     }
     

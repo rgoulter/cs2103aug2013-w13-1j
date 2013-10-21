@@ -45,7 +45,7 @@ public class CompleteUnitTests {
 
         String output = completeCmd1.getOutput();
 
-        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','" +
+        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
 				     "0, CS2103 Lecture\n", output);
     }
 
@@ -56,22 +56,17 @@ public class CompleteUnitTests {
         JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
-        AddCommand addCmd2 = new AddCommand("Lecture");
+        AddCommand addCmd2 = new AddCommand("CS2010 Lecture");
         addCmd2.execute(jManager);
 
-        CompleteCommand completeCmd = new CompleteCommand("Lecture") {
-
-            protected String inputLine () {
-                return "0";
-            }
-        };
+        CompleteCommand completeCmd = new CompleteCommand("Lecture");
         completeCmd.execute(jManager);
 
         String output = completeCmd.getOutput();
 
-        assertEquals("Give the index of the task you wish to remove.\n" +
+        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
 				     "0, CS2103 Lecture\n" +
-				     "1, Lecture\n",
+				     "1, CS2010 Lecture\n",
                      output);
 
     }
@@ -93,7 +88,7 @@ public class CompleteUnitTests {
         
         assertEquals("Output generated does not match expected output (Phase 1)",
                      "Type in just the index of tasks you wish to process. " +
-                     "Please seperate them by ',''\n" +
+                     "Please seperate them by ','\n" +
                      "0, CS2103 Lecture\n" +
                      "1, CS2010 Lecture\n",
                      output);

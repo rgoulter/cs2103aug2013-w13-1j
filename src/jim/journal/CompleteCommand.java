@@ -36,7 +36,7 @@ public class CompleteCommand extends Command {
             outputln("Description was not matched.");
             return "Success";
         }else{
-            outputln( "Type in just the index of tasks you wish to process. Please seperate them by ',''");
+            outputln( "Type in just the index of tasks you wish to process. Please seperate them by ','");
             for (int i = 0; i < matchingTasks.size(); i++){
                 Task task = matchingTasks.get(i);
                 outputln(i + ", " + task.toString());
@@ -47,6 +47,8 @@ public class CompleteCommand extends Command {
             
     @Override
     public String secondExecute(String secondInput) {
+        clearOutput();
+        
         String[] IndexesOfTasks = secondInput.split(",");
         for (int i = 0; i < IndexesOfTasks.length; i++){
             try{
@@ -66,11 +68,10 @@ public class CompleteCommand extends Command {
         return null;
     }
     private void executeHelper(){
-        for (Task t : matchingTasks) {
+        for (Task t : taskToComplete) {
             String feedback = JM.completeTask(t);
             JM.addCommandHistory("complete", t);
             outputln(feedback);
-    
         }
     }
     

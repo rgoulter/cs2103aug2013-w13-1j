@@ -55,19 +55,27 @@ public class RemoveUnitTests {
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
-        RemoveCommand removeCmd1 = new RemoveCommand("CS2103 Lecture") {
-
-            protected String inputLine () {
-                return "0";
-            }
-        };
-        removeCmd1.execute(jManager);
-
+        RemoveCommand removeCmd1 = new RemoveCommand("CS2103 Lecture");
+        String executionStatus = removeCmd1.execute(jManager);
         String output = removeCmd1.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Pending (Phase 1)",
+                     "Pending", executionStatus);
 
-        assertEquals("Give the number of which task you wish to remove.\n" +
-				     "0, CS2103 Lecture\n" +
-				     "Removed task: CS2103 Lecture\n", output);
+        assertEquals("Output generated does not match expected output (Phase 1)",
+                     "Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
+				     "0, CS2103 Lecture\n", output);
+        
+        executionStatus = removeCmd1.secondExecute("0");
+        output = removeCmd1.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Success (Phase 2)",
+                     "Success", executionStatus);
+
+        assertEquals("Output generated does not match expected output (Phase 2)",
+                     "Removed task: CS2103 Lecture\n", output);
+        
+        
     }
 
 
@@ -77,24 +85,30 @@ public class RemoveUnitTests {
         JournalManager jManager = new TemporaryJournalManager();
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
-        AddCommand addCmd2 = new AddCommand("Lecture");
+        AddCommand addCmd2 = new AddCommand("CS2010 Lecture");
         addCmd2.execute(jManager);
 
-        RemoveCommand removeCmd2 = new RemoveCommand("Lecture") {
-
-            protected String inputLine () {
-                return "1";
-            }
-        };
-        removeCmd2.execute(jManager);
-
+        RemoveCommand removeCmd2 = new RemoveCommand("Lecture");
+        String executionStatus = removeCmd2.execute(jManager);
         String output = removeCmd2.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Pending (Phase 1)",
+                     "Pending", executionStatus);
 
-        assertEquals("Give the number of which task you wish to remove.\n" +
-        		     "0, CS2103 Lecture\n" +
-        		     "1, Lecture\n" +
-        		     "Removed task: Lecture\n",
-                     output);
+        assertEquals("Output generated does not match expected output (Phase 1)",
+                     "Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
+                     "0, CS2103 Lecture\n" + 
+                     "1, CS2010 Lecture\n", output);
+        
+        executionStatus = removeCmd2.secondExecute("1");
+        output = removeCmd2.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Success (Phase 2)",
+                     "Success", executionStatus);
+
+        assertEquals("Output generated does not match expected output (Phase 2)",
+                     "Removed task: CS2010 Lecture\n", output);
+
 
     }
 

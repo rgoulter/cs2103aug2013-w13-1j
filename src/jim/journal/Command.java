@@ -42,6 +42,10 @@ public abstract class Command {
         outputStringBuilder.append('\n');
     }
 
+    protected void clearOutput() {
+        int stringLength = outputStringBuilder.length();
+        outputStringBuilder.delete(0, stringLength);
+    }
 
 
     public String getOutput() {
