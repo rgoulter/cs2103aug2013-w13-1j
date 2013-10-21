@@ -40,12 +40,7 @@ public class CompleteUnitTests {
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
 
-        CompleteCommand completeCmd1 = new CompleteCommand("Lecture"){
-
-            protected String inputLine () {
-                return "0";
-            }
-        };
+        CompleteCommand completeCmd1 = new CompleteCommand("Lecture");
         completeCmd1.execute(jManager);
 
         String output = completeCmd1.getOutput();
@@ -86,30 +81,35 @@ public class CompleteUnitTests {
     @Test
     public void testStrictSyntaxCompleteCommandHasMultipleMatchesButCompletedCanExecute () {
         JournalManager jManager = new TemporaryJournalManager();
+        
         AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
         addCmd1.execute(jManager);
+        AddCommand addCmd2 = new AddCommand("CS2010 Lecture");
+        addCmd2.execute(jManager);
 
-        CompleteCommand completeCmd1 = new CompleteCommand("Lecture") {
-
-            protected String inputLine () {
-                return "0";
-            }
-        };
-        completeCmd1.execute(jManager);
-        CompleteCommand completeCmd2 = new CompleteCommand("Lecture") {
-
-            protected String inputLine () {
-                return "0";
-            }
-        };
-        completeCmd2.execute(jManager);
-
-        String output = completeCmd2.getOutput();
-
-        assertEquals("Give the index of the task you wish to remove.\n" +
-				     "0, CS2103 Lecture\n" +
-				     "Task CS2103 Lecture has already been marked as completed.\n",
+        CompleteCommand completeCmd1 = new CompleteCommand("Lecture");
+        String executionStatus = completeCmd1.execute(jManager);
+        String output = completeCmd1.getOutput();
+        
+        assertEquals("Output generated does not match expected output (Phase 1)",
+                     "Type in just the index of tasks you wish to process. " +
+                     "Please seperate them by ',''\n" +
+                     "0, CS2103 Lecture\n" +
+                     "1, CS2010 Lecture\n",
                      output);
+        
+        assertEquals("Execution status does not match expected status (Phase 1)",
+                     "Pending", executionStatus);
+        
+        executionStatus = completeCmd1.secondExecute("0");
+        output = completeCmd1.getOutput();
+        
+        assertEquals("Output generated does not match expected output (Phase 2)",
+                     "Completed Task: CS2103 Lecture\n",
+                     output);
+        
+        assertEquals("Execution status does not match expected status (Phase 2)",
+                     "Success", executionStatus);
 
     }
 

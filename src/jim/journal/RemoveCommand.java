@@ -76,5 +76,9 @@ public class RemoveCommand extends Command {
             }
         }
     }
+    
+    public String toString() {
+        return "Remove";
+    }
 
 }

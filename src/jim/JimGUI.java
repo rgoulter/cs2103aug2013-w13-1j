@@ -15,7 +15,8 @@ import javax.swing.JPanel;
 public class JimGUI {
 
     public static void main(String args[]) {
-        JimMainPanel.runWindow();
+        JimMainPanel jimPanel = new JimMainPanel();
+        jimPanel.runWindow();
     }
 
 }

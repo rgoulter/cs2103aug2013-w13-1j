@@ -73,5 +73,9 @@ public class CompleteCommand extends Command {
     
         }
     }
+    
+    public String toString() {
+        return "complete";
+    }
 
 }

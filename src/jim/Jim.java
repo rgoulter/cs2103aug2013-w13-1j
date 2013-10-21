@@ -15,32 +15,17 @@ import jim.suggestions.SuggestionManager;
  * .sh script.
  */
 public class Jim {
-
-    static class CLIInputter extends JimInputter {
-        private static Scanner sc;
-        
-        public CLIInputter() {
-            sc = new Scanner(System.in);
-        }
-        
-        public String getInput() {
-            return sc.nextLine();
-        }
-    }
     
     public static void main(String[] args) {
         
         // Load Journal logic.
         SuggestionManager suggestionManager = new SuggestionManager();
         JournalManager journalManager = new JournalManager();
-        
-        JimInputter inputSource = new CLIInputter();
 
         // Parse the command, try to execute it.
         Command cmd = suggestionManager.parseCommand(args);
         
         if (cmd != null) {
-        	cmd.setInputSource(inputSource);
             cmd.execute(journalManager);
             System.out.print(cmd.getOutput());
         } else {

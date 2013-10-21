@@ -85,5 +85,9 @@ public class EditCommand extends Command {
     private void executeHelper(){
         JM.editTask(taskToEdit, taskChangedTo);
     }
+    
+    public String toString() {
+        return "Edit";
+    }
        
 }

@@ -62,5 +62,10 @@ public class AddCommand extends Command {
         //assert(false);
         return null;
     }
+    
+    @Override
+    public String toString() {
+        return "add";
+    }
 
 }

@@ -50,5 +50,9 @@ public class SearchCommand extends Command {
         // TODO Auto-generated method stub
         return null;
     }
+    
+    public String toString() {
+        return "Search";
+    }
 
 }

@@ -23,5 +23,9 @@ public class UndoCommand extends Command{
         // TODO Auto-generated method stub
         return null;
     }
+    
+    public String toString() {
+        return "Undo";
+    }
 
 }

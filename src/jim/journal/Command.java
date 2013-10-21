@@ -1,14 +1,12 @@
 
 package jim.journal;
 
-import jim.JimInputter;
 
 
 
 public abstract class Command {
 
     private StringBuilder outputStringBuilder;
-    protected JimInputter inputSource;
     String ExecutionState = "Pending";
 
 
@@ -16,9 +14,6 @@ public abstract class Command {
         outputStringBuilder = new StringBuilder();
     }
 
-    public void setInputSource(JimInputter source) {
-        inputSource = source;
-    }
     public String getCommandState(){
         return ExecutionState;
     }
@@ -34,13 +29,6 @@ public abstract class Command {
     
     public abstract String secondExecute(String secondInput);
     public abstract String thirdExecute(Task task);
-
-    // Abstract reading input from command line (should we need it)
-    // so that in UnitTests or in the GUI this can be overridden.
-    protected String inputLine() {
-        return inputSource.getInput();
-    }
-
 
 
     protected void output(String outputStr) {
@@ -58,5 +46,10 @@ public abstract class Command {
 
     public String getOutput() {
         return outputStringBuilder.toString();
+    }
+    
+    @Override
+    public String toString() {
+        return "Generic Command";
     }
 }
