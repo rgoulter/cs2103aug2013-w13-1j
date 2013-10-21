@@ -324,7 +324,7 @@ public class Parser {
         
         addSyntax("<cmd> := " +
                   "<addcmd> | <completecmd> | <removecmd> | " + 
-        		  "<editcmd> | <searchcmd> | <displaycmd>");
+        		  "<editcmd> | <searchcmd> | <displaycmd> | <undocmd>");
         
         initSyntaxParsers();
     }
