@@ -16,7 +16,6 @@ import jim.journal.FloatingTask;
 import jim.journal.SearchCommand;
 import jim.journal.TimedTask;
 import jim.journal.UndoCommand;
-import jim.suggestions.Parser.SyntaxFormat;
 import static jim.util.DateUtils.REGEX_DATE_DDMMYY;
 import static jim.util.DateUtils.REGEX_TIME_HHMM;
 import static jim.util.DateUtils.isHourLikelyToBePM;
