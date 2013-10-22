@@ -67,5 +67,22 @@ public class ParserDateTimeTests {
         dateTime = suggMan.parseTime("06:00");
         assertEquals(6, dateTime.getHourOfDay());
         assertEquals(0, dateTime.getMinuteOfHour());
+        
+        dateTime = suggMan.parseTime("6a");
+        assertEquals(6, dateTime.getHourOfDay());
+        assertEquals(0, dateTime.getMinuteOfHour());
+        
+        dateTime = suggMan.parseTime("6P");
+        assertEquals(18, dateTime.getHourOfDay());
+        assertEquals(0, dateTime.getMinuteOfHour());
+        
+        dateTime = suggMan.parseTime("6:30pm");
+        assertEquals(18, dateTime.getHourOfDay());
+        assertEquals(30, dateTime.getMinuteOfHour());
+        
+        
+        dateTime = suggMan.parseTime("6:30 pm");
+        assertEquals(18, dateTime.getHourOfDay());
+        assertEquals(30, dateTime.getMinuteOfHour());
     }
 }

@@ -35,7 +35,11 @@ public class SyntaxGrammar {
         p.addSyntax("<monthday> := /\\d\\d/\\d\\d/ | <monthname> <dayofmonth> | <dayofmonth> <monthname>");
         p.addSyntax("<date> := <ddmmyy> | <yyyymmdd> | <monthday>");
         p.addSyntax("<hhmm> := /(\\d\\d):?(\\d\\d)[Hh]/ | /(\\d?\\d):?(\\d\\d)/");
-        p.addSyntax("<time> := <hhmm>");
+        p.addSyntax("<ampmtime> := " +
+        			"/(\\d?\\d)([AaPp])[Mm]?/ | " +
+        			"/(\\d?\\d):?(\\d\\d)([AaPp])[Mm]?/ | " +
+        			"/(\\d?\\d):?(\\d\\d)/ /([AaPp])[Mm]?/");
+        p.addSyntax("<time> := <hhmm> | <ampmtime>");
         p.addSyntax("<word> := /\\S+/"); // non whitespace
         p.addSyntax("<phrase> := <word> | <word> <phrase>");
         p.addSyntax("<description> := <phrase>");

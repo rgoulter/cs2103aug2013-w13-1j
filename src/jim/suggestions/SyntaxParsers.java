@@ -204,20 +204,73 @@ public class SyntaxParsers {
                               }
                           });
         registerSyntaxParser(p,
-                          "hhmm => /(\\d?\\d):?(\\d\\d)/",
-                          new SyntaxTermParser() {
+			                 "hhmm => /(\\d?\\d):?(\\d\\d)/",
+			                 new SyntaxTermParser() {
+			                     @Override
+			                     public Object parse(String inputTerm) {
+						 		 	   Matcher m = Pattern.compile("(\\d?\\d):?(\\d\\d)").matcher(inputTerm);
+						 			   if(!m.matches()) { throw new IllegalArgumentException(); };
+			
+						 			   int hh = parseHourOfDay(m.group(1));
+						 			   int mm = Integer.parseInt(m.group(2));
+			                        
+			                           return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
+			                     }
+			                 });
 
-                              @Override
-                              public Object parse(String inputTerm) {
-          			 			  Matcher m = Pattern.compile("(\\d?\\d):?(\\d\\d)").matcher(inputTerm);
-         			 			  if(!m.matches()) { throw new IllegalArgumentException(); };
-
-         			 			  int hh = parseHourOfDay(m.group(1));
-         			 			  int mm = Integer.parseInt(m.group(2));
-                                  
-                                  return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
-                              }
-                          });
+        registerSyntaxParser(p,
+			                 "ampmtime => /(\\d?\\d)([AaPp])[Mm]?/",
+			                 new SyntaxTermParser() {
+			                     @Override
+			                     public Object parse(String inputTerm) {
+									Matcher m = Pattern.compile("(\\d?\\d)([AaPp])[Mm]?").matcher(inputTerm);
+									if(!m.matches()) { throw new IllegalArgumentException(); };
+									
+									int hh = Integer.parseInt(m.group(1));
+									int mm = 0;
+									boolean isAm = m.group(2).toLowerCase().charAt(0) == 'a';
+											  
+									hh = (hh % 12) + (isAm ? 0 : 12);
+											  
+									return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
+			                     }
+			                 });
+        registerSyntaxParser(p,
+			                 "ampmtime => /(\\d?\\d):?(\\d\\d)([AaPp])[Mm]?/",
+			                 new SyntaxTermParser() {
+			                     @Override
+			                     public Object parse(String inputTerm) {
+									 Matcher m = Pattern.compile("(\\d?\\d):?(\\d\\d)([AaPp])[Mm]?").matcher(inputTerm);
+									 if(!m.matches()) { throw new IllegalArgumentException(); };
+										
+									 int hh = Integer.parseInt(m.group(1));
+									 int mm = Integer.parseInt(m.group(2));
+									 boolean isAm = m.group(3).toLowerCase().charAt(0) == 'a';
+											  
+									 hh = (hh % 12) + (isAm ? 0 : 12);
+									   
+									 return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
+			                     }
+			                 });
+        registerSyntaxParser(p,
+							 "ampmtime => /(\\d?\\d):?(\\d\\d)/ /([AaPp])[Mm]?/",
+							 new SyntaxParser() {
+							     @Override
+							     public Object parse(String[] inputTerms) {
+									  Matcher m1 = Pattern.compile("(\\d?\\d):?(\\d\\d)").matcher(inputTerms[0]);
+									  if(!m1.matches()) { throw new IllegalArgumentException(); };
+									  Matcher m2 = Pattern.compile("([AaPp])[Mm]?").matcher(inputTerms[1]);
+									  if(!m2.matches()) { throw new IllegalArgumentException(); };
+										
+									  int hh = Integer.parseInt(m1.group(1));
+									  int mm = Integer.parseInt(m1.group(2));
+									  boolean isAm = m2.group(1).toLowerCase().charAt(0) == 'a';
+											  
+									  hh = (hh % 12) + (isAm ? 0 : 12);
+									   
+									  return new MutableDateTime(0, 1, 1, hh, mm, 00, 00);
+							    }
+							});
         
 
         // Redundant?
