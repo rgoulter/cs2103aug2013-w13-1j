@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -24,8 +25,9 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
 import java.awt.CardLayout;
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.logging.Logger;
+import java.util.GregorianCalendar;
 
 import jim.suggestions.SuggestionManager;
 import jim.suggestions.SuggestionView;
@@ -42,6 +44,9 @@ public class JimMainPanel extends JPanel {
     protected JEditorPane inputTextField;
     protected JPanel viewPanel;
     protected JLabel helperTextLabel;
+    protected JLabel clockLabel;
+    protected JLabel dateLabel;
+    protected JLabel progNameLabel;
 
     protected static String lastCommandState;
     protected Command lastCommand;
@@ -50,11 +55,16 @@ public class JimMainPanel extends JPanel {
     protected SuggestionView suggestionView;
     protected SuggestionManager suggestionManager;
     protected JournalManager journalManager;
+    protected boolean isRunning;
     
-    // Border Objects
-    private static final Color BORDER_DARK_BLUE = new Color(100, 100, 188);
-    private static final Color BORDER_BLUE = new Color(225, 225, 255);
-    private static final Color BORDER_BLACK = new Color(0, 0, 0);
+    // Objects defining style / color / other aesthetics
+    private static final Color COLOR_DARK_BLUE = new Color(100, 100, 188);
+    private static final Color COLOR_BLUE = new Color(225, 225, 255);
+    private static final Color COLOR_BLACK = new Color(0, 0, 0);
+    private static final Color COLOR_TITLE_BLUE = new Color(205, 205, 235);
+    private static final int LARGE_FONT_SIZE = 20;
+    private static final Font FONT_IMPACT = new Font("Impact", Font.PLAIN, LARGE_FONT_SIZE);
+    private static final Font FONT_IMPACT_ITALICS = new Font("Impact", Font.ITALIC, LARGE_FONT_SIZE);
 
     // Arbitrary objects for ActionMap.
     private static final String ACTION_EXIT_WINDOW = "exit window";
@@ -73,6 +83,7 @@ public class JimMainPanel extends JPanel {
     public JimMainPanel() {
         initialiseUIComponents();
         lastCommandState = "Ready";
+        isRunning = true;
 
         // Initialise the logic
         suggestionManager = new SuggestionManager();
@@ -90,14 +101,13 @@ public class JimMainPanel extends JPanel {
     }
 
 
-
     private void initialiseUIComponents() {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
         
         inputTextField = new JEditorPane();
-        Border outerBorder = BorderFactory.createLineBorder(BORDER_BLUE, 4);
-        Border innerBorder = BorderFactory.createLineBorder(BORDER_BLACK, 1);
+        Border outerBorder = BorderFactory.createLineBorder(COLOR_BLUE, 4);
+        Border innerBorder = BorderFactory.createLineBorder(COLOR_BLACK, 1);
         Border inputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
         inputTextField.setBorder(inputFieldBorder);
 
@@ -237,27 +247,43 @@ public class JimMainPanel extends JPanel {
                                               }
                                           });
 
+        // Set up top bar
         JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(COLOR_TITLE_BLUE);
+        
+        dateLabel = new JLabel("  xx-xx-xx");
+        clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
+        progNameLabel = new JLabel("JIM! v0.2    ");
+        
+        dateLabel.setFont(FONT_IMPACT);
+        clockLabel.setFont(FONT_IMPACT);
+        progNameLabel.setFont(FONT_IMPACT_ITALICS);
+        
+        topPanel.add(dateLabel, BorderLayout.WEST);
+        topPanel.add(clockLabel, BorderLayout.CENTER);
+        topPanel.add(progNameLabel, BorderLayout.EAST);
         add(topPanel, BorderLayout.NORTH);
         
-        topPanel.add(inputTextField, BorderLayout.CENTER);
-
+        // Set up input box
+        JPanel inputPanel = new JPanel(new BorderLayout());
+        add(inputPanel, BorderLayout.CENTER);
         helperTextLabel = new JLabel("");
-        topPanel.add(helperTextLabel, BorderLayout.WEST);
+        inputPanel.add(inputTextField, BorderLayout.CENTER);
+        inputPanel.add(helperTextLabel, BorderLayout.WEST);
         
         // The viewPanel here is to contain the "Views" which JIM! may need to
         // display,
         // i.e. show a JournalView, or a SuggestionView (or maybe
         // half-and-half).
         viewPanel = new JPanel();
-        outerBorder = BorderFactory.createLineBorder(BORDER_BLUE, 4);
+        outerBorder = BorderFactory.createLineBorder(COLOR_BLUE, 4);
         innerBorder = BorderFactory.createLoweredSoftBevelBorder();
         Border outputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
         viewPanel.setBorder(outputFieldBorder);
 
         viewPanel.setPreferredSize(new Dimension(VIEW_AREA_WIDTH,
                                                  VIEW_AREA_HEIGHT));
-        add(viewPanel, BorderLayout.CENTER);
+        add(viewPanel, BorderLayout.SOUTH);
         viewPanel.setLayout(new CardLayout(0, 0));
 
     }
@@ -347,16 +373,15 @@ public class JimMainPanel extends JPanel {
 
     // To be lazy, this method is called to run the JIM! GUI
     public void runWindow() {
-
-        
         final JFrame applicationWindow = new JFrame("JIM!");
         applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Beautify Program Window
         applicationWindow.setUndecorated(true);
-        this.setBorder(BorderFactory.createLineBorder(BORDER_DARK_BLUE,
-                                                          3,
-                                                          true));
+        
+        Border border = BorderFactory.createLineBorder(COLOR_DARK_BLUE, 3, true);
+        this.setBorder(border);
+        this.setBackground(COLOR_BLUE);
 
         applicationWindow.getContentPane().add(this);
         applicationWindow.pack();
@@ -380,6 +405,7 @@ public class JimMainPanel extends JPanel {
                                                            }
                                                            else {
                                                                applicationWindow.dispose();
+                                                               isRunning = false;
                                                            }
                                                        }
                                                    });
@@ -393,9 +419,39 @@ public class JimMainPanel extends JPanel {
         applicationWindow.setVisible(true);
 
         this.refreshUI(); // Load current journal on startup
+        runClock();
     }
 
-
+    private void runClock() {
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                while (isRunning) {
+                    
+                    GregorianCalendar calendar = new GregorianCalendar();
+                    String dateString = String.format("  %02d-%02d-%02d",
+                                                      calendar.get(Calendar.DATE),
+                                                      calendar.get(Calendar.MONTH)+1,
+                                                      calendar.get(Calendar.YEAR));
+                    String timeString = String.format("%02d:%02d:%02d",
+                                                      calendar.get(Calendar.HOUR),
+                                                      calendar.get(Calendar.MINUTE),
+                                                      calendar.get(Calendar.SECOND));
+                    
+                    dateLabel.setText(dateString);
+                    clockLabel.setText(timeString);
+                    
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+            
+        }).run();
+    }
 
     public static void main(String args[]) {
         JimMainPanel jimPanel = new JimMainPanel();
