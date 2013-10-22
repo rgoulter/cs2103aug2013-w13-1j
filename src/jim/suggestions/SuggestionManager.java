@@ -122,7 +122,7 @@ public class SuggestionManager {
     		                                                      generatedSuggestionHints.get(i));
     		
     		if (!matchesSubseq) {
-    			LOGGER.info("Filtering out: " + generatedSuggestionHints.get(i).toString());
+    			LOGGER.finer("Filtering out: " + generatedSuggestionHints.get(i).toString());
     			generatedSuggestionHints.remove(i);
     		}
     	}
@@ -139,7 +139,10 @@ public class SuggestionManager {
     	while (i < subseq.length() && lastIndex >= 0) {
     		char charToLookFor = subseq.charAt(i);
     		lastIndex = hintPhrase.indexOf(charToLookFor, lastIndex);
-    		lastIndex += 1;
+    		
+    		if (lastIndex >= 0) {
+    			lastIndex += 1;
+			}
     		i++;
     	}
     	
@@ -160,7 +163,7 @@ public class SuggestionManager {
     			hint = generateRandomSuggestion();
     			
 	    		if (isSubsequenceOfSuggestionHint(filteringSubsequence, hint)) {
-	    			LOGGER.info("Adding Hint to Queue: " + hint);
+	    			LOGGER.finer("Adding Hint to Queue: " + hint);
 	    			generatedSuggestionHints.add(hint);
 	    			added = true;
 	    		}
@@ -178,7 +181,7 @@ public class SuggestionManager {
     	double rnd = Math.random();
     	
     	SuggestionHint hint = syntaxFormats.get(i).generate(null, rnd);
-		LOGGER.info("Generating Hint: " + hint);
+		LOGGER.finer("Generating Hint: " + hint);
     	return hint;
     }
 
