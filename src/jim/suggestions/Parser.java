@@ -26,123 +26,8 @@ public class Parser {
     private final static Logger LOGGER = Logger.getLogger(Parser.class .getName()); 
 
 
-    
-    protected static abstract class SyntaxTerm {
-        public abstract boolean matches(String s);
 
-        public boolean isDisplayable() {
-            return false;
-        }
-
-        public String generate() {
-            throw new UnsupportedOperationException("Not implemented.");
-        }
-
-        public static SyntaxTerm valueOf(String syntaxTerm) {
-        	assert syntaxTerm.length() >= 3 : "Given SyntaxTerm: " + syntaxTerm;
-            String strippedTerm = stripStringPrefixSuffix(syntaxTerm, 1);
-
-            if (isSyntaxLiteral(syntaxTerm)) {
-                return new LiteralSyntaxTerm(strippedTerm);
-            } else if (isSyntaxRegex(syntaxTerm)) {
-                return new RegexSyntaxTerm(strippedTerm);
-            } else if(isSyntaxClass(syntaxTerm)) {
-                return new SyntaxClassSyntaxTerm(strippedTerm);
-            } else {
-                throw new IllegalStateException("An invalid syntax was given: " +
-                                                syntaxTerm);
-            }
-        }
-    }
-
-
-
-    protected static  class LiteralSyntaxTerm extends SyntaxTerm {
-        private String literalValue;
-
-        /**
-         * The "escaped" value. e.g. "'a'" -> LiteralSyntaxTerm("a").
-         */
-        public LiteralSyntaxTerm(String value) {
-            literalValue = value;
-        }
-
-        @Override
-        public boolean matches(String inputTerm) {
-            return literalValue.equals(inputTerm);
-        }
-
-        @Override
-        public boolean isDisplayable() {
-            return true;
-        }
-
-        @Override
-        public String generate() {
-            return literalValue;
-        }
-
-        @Override
-        public String toString() {
-        	return "'" + literalValue + "'";
-        }
-    }
-
-
-
-    protected static class RegexSyntaxTerm extends SyntaxTerm {
-        private Pattern regexPattern;
-
-        public RegexSyntaxTerm(String regexStr) {
-            regexPattern = Pattern.compile(regexStr);
-        }
-
-        @Override
-        public boolean matches(String inputTerm) {
-            Matcher regexMatcher = regexPattern.matcher(inputTerm);
-
-            return regexMatcher.matches();
-        }
-
-        @Override
-        public String toString() {
-        	return "/" + regexPattern.toString() + "/";
-        }
-    }
-
-
-
-    protected static class SyntaxClassSyntaxTerm extends SyntaxTerm {
-		private String syntaxClassName;
-		
-        public SyntaxClassSyntaxTerm(String className) {
-        	syntaxClassName = className;
-        }
-
-        @Override
-        public boolean matches(String inputTerm) {
-            throw new UnsupportedOperationException("Don't match against syntax class.");
-        }
-
-        @Override
-        public boolean isDisplayable() {
-            return "date time description".contains(syntaxClassName);
-        }
-
-        @Override
-        public String generate() {
-            throw new UnsupportedOperationException("Not yet implemented");
-        }
-
-        @Override
-        public String toString() {
-        	return "<" + syntaxClassName + ">";
-        }
-    }
-	
-	
-	
-	/**
+    /**
 	 * Abstraction for sequences of terms.
 	 * e.g. Strings like:
 	 * "'add' <date> <time> <description>"
@@ -291,7 +176,7 @@ public class Parser {
                     List<SyntaxTermSearchNode> postList = syntaxFormat.subList(i + 1, syntaxFormat.size());
 
                     SyntaxClassSyntaxTerm classNode = (SyntaxClassSyntaxTerm) node.syntaxTerm;
-                    String syntaxClassName = classNode.syntaxClassName;
+                    String syntaxClassName = classNode.getSyntaxClassName();
                     List<SyntaxFormat> syntaxClassDefinitionsList = syntaxClassesMap.get(syntaxClassName);
                     
                     if (syntaxClassDefinitionsList == null) {
@@ -437,29 +322,6 @@ public class Parser {
 
 
 
-    /**
-     * Helper method for parsing Syntax.
-     * Returns true if the given String is surrounded by '<' and '>'
-     */
-    private static boolean isSyntaxClass(String s) {
-        // TODO: Eliminate magic values.
-        return isStringSurroundedBy(s, '<', '>') && !s.contains(" ");
-    }
-
-
-
-    private static boolean isSyntaxRegex(String s){
-        return isStringSurroundedBy(s, '/', '/');
-    }
-
-
-
-    private static boolean isSyntaxLiteral(String s){
-        return isStringSurroundedBy(s, '\'', '\'');
-    }
-
-
-
     protected Object doParse(String syntax, String input){
         return doParse(SyntaxFormat.valueOf(syntax), input.split(" "));
     }
@@ -536,7 +398,7 @@ public class Parser {
     		syntaxTerms[i] = childNodes.get(i).syntaxTerm;
         }
         
-        String syntaxClassName = ((SyntaxClassSyntaxTerm) node.syntaxTerm).syntaxClassName;
+        String syntaxClassName = ((SyntaxClassSyntaxTerm) node.syntaxTerm).getSyntaxClassName();
         SyntaxFormat syntaxFormat = new SyntaxFormat(syntaxTerms);
 
         return new SyntaxParserKey(syntaxClassName, syntaxFormat);
