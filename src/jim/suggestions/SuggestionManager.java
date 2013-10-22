@@ -118,35 +118,14 @@ public class SuggestionManager {
     
     private void filterThroughGeneratedSuggestions() {
     	for (int i = generatedSuggestionHints.size() - 1; i >= 0; i--) {
-    		boolean matchesSubseq = isSubsequenceOfSuggestionHint(filteringSubsequence,
-    		                                                      generatedSuggestionHints.get(i));
+    		SuggestionHint hint = generatedSuggestionHints.get(i);
+    		boolean matchesSubseq = hint.matchesSubsequence(filteringSubsequence);
     		
     		if (!matchesSubseq) {
     			LOGGER.finer("Filtering out: " + generatedSuggestionHints.get(i).toString());
     			generatedSuggestionHints.remove(i);
     		}
     	}
-    }
-    
-    
-    
-    private static boolean isSubsequenceOfSuggestionHint(String subseq, SuggestionHint hint) {
-    	int i = 0;
-    	int lastIndex = 0;
-    	
-    	String hintPhrase = hint.toString();
-    	
-    	while (i < subseq.length() && lastIndex >= 0) {
-    		char charToLookFor = subseq.charAt(i);
-    		lastIndex = hintPhrase.indexOf(charToLookFor, lastIndex);
-    		
-    		if (lastIndex >= 0) {
-    			lastIndex += 1;
-			}
-    		i++;
-    	}
-    	
-    	return i == subseq.length();
     }
     
     
@@ -162,7 +141,7 @@ public class SuggestionManager {
     		for (int attempts = 0; !added && attempts < 3; attempts++) { // MAGIC
     			hint = generateRandomSuggestion();
     			
-	    		if (isSubsequenceOfSuggestionHint(filteringSubsequence, hint)) {
+	    		if (hint.matchesSubsequence(filteringSubsequence)) {
 	    			LOGGER.finer("Adding Hint to Queue: " + hint);
 	    			generatedSuggestionHints.add(hint);
 	    			added = true;

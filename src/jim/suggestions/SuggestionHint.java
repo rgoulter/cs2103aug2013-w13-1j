@@ -33,6 +33,25 @@ public class SuggestionHint {
 		return join(words, ' ');
 	}
 	
+	public boolean matchesSubsequence(String subsequence) {
+		int i = 0;
+    	int lastIndex = 0;
+    	
+    	String hintPhrase = toString();
+    	
+    	while (i < subsequence.length() && lastIndex >= 0) {
+    		char charToLookFor = subsequence.charAt(i);
+    		lastIndex = hintPhrase.indexOf(charToLookFor, lastIndex);
+    		
+    		if (lastIndex >= 0) {
+    			lastIndex += 1;
+			}
+    		i++;
+    	}
+    	
+    	return i == subsequence.length();
+	}
+	
 	public static SuggestionHint combine(SuggestionHint hint1, SuggestionHint hint2) {
 		String[] newWords = new String[hint1.words.length + hint2.words.length];
 		String newMatchingSubseq;
