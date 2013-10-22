@@ -47,9 +47,10 @@ public class EditCommand extends Command {
                 outputln("The following Task will be edited.");
                 outputln(matchingTasks.get(0).toString());
                 taskToEdit = matchingTasks.get(0);
+                outputln("Please enter a new task.");
                 return "NeedNewTask";
             }else{
-                outputln("Type in just the index of tasks you wish to process. Please seperate them by ',''");
+                outputln("Type in just the index of tasks you wish to process.");
                 for (int i = 0; i < matchingTasks.size(); i++){
                     Task task = matchingTasks.get(i);
                     outputln(i + ", " + task.toString());
@@ -73,6 +74,10 @@ public class EditCommand extends Command {
             }catch(NumberFormatException e){
                 return "Pending";
             }
+            clearOutput();
+            outputln("The following Task will be edited.");
+            outputln(taskToEdit.toString());
+            outputln("Please enter a new task.");
         return "NeedNewTask";
     }
 
@@ -87,7 +92,10 @@ public class EditCommand extends Command {
     
     private void executeHelper() {
         clearOutput();
-        outputln("The task " + taskToEdit.getDescription() + " will be modified.");
+        outputln("The following task is edited");
+        outputln(taskToEdit.toString());
+        outputln("To");
+        outputln(taskChangedTo.toString());
         JM.editTask(taskToEdit, taskChangedTo);
     }
     
