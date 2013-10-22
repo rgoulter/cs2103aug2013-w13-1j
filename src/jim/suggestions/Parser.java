@@ -471,12 +471,25 @@ public class Parser {
 
         return result.toString();
     }
+    
+    
+    
+    private static SyntaxFormat coerceSearchNodeToSyntaxFormat(SearchNode s) {
+    	List<SyntaxTermSearchNode> fmt = s.syntaxFormat;
+    	SyntaxTerm[] terms = new SyntaxTerm[fmt.size()];
+    	
+    	for (int i = 0; i < terms.length; i++) {
+    		terms[i] = fmt.get(i).syntaxTerm;
+    	}
+    	
+    	return new SyntaxFormat(terms);
+    }
 
 
 
-    public List<SearchNode> getDisplayableSyntaxTreeLeafNodes() {
+    public List<SyntaxFormat> getDisplayableSyntaxTreeLeafNodes() {
 
-        List<SearchNode> result = new ArrayList<SearchNode>();
+        List<SyntaxFormat> result = new ArrayList<SyntaxFormat>();
 
         // Our search-tree is implemented as a STACK,
         // (i.e. a DFS exploration of solution space).
@@ -492,7 +505,7 @@ public class Parser {
 
             if (searchNode.isDisplayable()) {
                 // output
-                result.add(searchNode);
+                result.add(coerceSearchNodeToSyntaxFormat(searchNode));
             } else {
                 List<SearchNode> nextNodes = searchNode.nextNodes();
 
@@ -511,12 +524,22 @@ public class Parser {
     public List<String> getDisplayableSyntaxTreeLeafs() {
         List<String> result = new ArrayList<String>();
 
-        for (SearchNode node : getDisplayableSyntaxTreeLeafNodes()) {
-            // - 3 is a MAGIC hack so that the " <-" from SearchNode doesn't show.
-            result.add(node.toString().substring(0, node.toString().length() - 3));
+        for (SyntaxFormat format : getDisplayableSyntaxTreeLeafNodes()) {
+            result.add(format.toString());
         }
 
         return result;
+    }
+    
+    
+    
+    private void outputRandomSuggestion() {
+    	List<SyntaxFormat> syntaxFormats = getDisplayableSyntaxTreeLeafNodes();
+    	int i = (int) Math.floor(Math.random() * syntaxFormats.size());
+    	double rnd = Math.random();
+    	SuggestionHint suggestionHint = syntaxFormats.get(i).generate(null, rnd);
+    	
+    	System.out.println(suggestionHint);
     }
 
 
@@ -533,6 +556,12 @@ public class Parser {
         System.out.println("Displayable Formats:");
         for (String s : p.getDisplayableSyntaxTreeLeafs()) {
             System.out.println(s);
+        }
+
+        System.out.println("\n\n");
+        System.out.println("Random Suggestions:");
+        for (int i = 0; i < 5; i++) {
+        	p.outputRandomSuggestion();
         }
     }
 }

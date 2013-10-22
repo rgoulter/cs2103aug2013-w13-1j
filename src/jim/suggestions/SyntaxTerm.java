@@ -10,7 +10,7 @@ abstract class SyntaxTerm {
         return false;
     }
 
-    public String generate() {
+    public SuggestionHint generate(GenerationContext context, double t) {
         throw new UnsupportedOperationException("Not implemented.");
     }
 

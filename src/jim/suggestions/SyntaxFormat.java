@@ -19,6 +19,16 @@ class SyntaxFormat {
 	public SyntaxTerm[] getSyntaxTerms() {
 		return syntaxTerms;
 	}
+
+    public SuggestionHint generate(GenerationContext context, double t) {
+		SuggestionHint[] hints = new SuggestionHint[syntaxTerms.length];
+		
+		for (int i = 0; i < hints.length; i++) {
+			hints[i] = syntaxTerms[i].generate(context, t);
+		}
+		
+		return SuggestionHint.combine(hints);
+    }
 	
 	@Override
 	public String toString() {

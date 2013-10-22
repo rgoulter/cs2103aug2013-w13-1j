@@ -22,7 +22,9 @@ class LiteralSyntaxTerm extends SyntaxTerm {
 
     @Override
     public SuggestionHint generate(GenerationContext context, double t) {
-        return new SuggestionHint(new String[]{literalValue});
+        return new SuggestionHint(new String[]{literalValue},
+                                  "",
+                                  new SyntaxTerm[]{this});
     }
 
     @Override
