@@ -21,8 +21,8 @@ class LiteralSyntaxTerm extends SyntaxTerm {
     }
 
     @Override
-    public String generate() {
-        return literalValue;
+    public SuggestionHint generate(GenerationContext context, double t) {
+        return new SuggestionHint(new String[]{literalValue});
     }
 
     @Override
