@@ -261,7 +261,7 @@ public class Parser {
     
     
     public Parser() {
-        initSyntax(this);
+        initSyntax(syntaxClassesMap);
         initSyntaxParsers(this);
     }
 

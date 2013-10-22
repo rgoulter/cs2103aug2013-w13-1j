@@ -2,6 +2,11 @@ package jim.suggestions;
 
 import static jim.util.DateUtils.REGEX_DATE_DDMMYY;
 import static jim.util.DateUtils.REGEX_TIME_HHMM;
+import static jim.util.StringUtils.stripStringPrefixSuffix;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class SyntaxGrammar {
 
@@ -13,56 +18,78 @@ public class SyntaxGrammar {
     
 
 
-    protected static void initSyntax(Parser p) {
+    protected static void initSyntax(Map<String, List<SyntaxFormat>> syntaxClassesMap) {
+    	
         // Initialise our syntax classes dictionary.
         // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
-        p.addSyntax("<monthname> := " +
-                    "'January' | 'Jan' | 'Jan.' | " +
-                    "'February' | 'Feb' | 'Feb.' | " +
-                    "'March' | 'Mar' | 'Mar.' | " +
-                    "'April' | 'Apr' | 'Apr.' | " +
-                    "'May' | " +
-                    "'June' | 'Jun' | 'Jun.' | " +
-                    "'July' | 'Jul' | 'Jul.' | " +
-                    "'August' | 'Aug' | 'Aug.' | " +
-                    "'September' | 'Sep' | 'Sep.' | 'Sept' | 'Sept.' | " +
-                    "'October' | 'Oct' | 'Oct.' | " +
-                    "'November' | 'Nov' | 'Nov.' | " +
-                    "'December' | 'Dec' | 'Dec.'");
-        p.addSyntax("<dayofmonth> := /(\\d?\\d)(st|nd|rd|th)?/");
-        p.addSyntax("<ddmmyy> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/");
-        p.addSyntax("<yyyymmdd> := /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/");
-        p.addSyntax("<monthday> := /\\d\\d/\\d\\d/ | <monthname> <dayofmonth> | <dayofmonth> <monthname>");
-        p.addSyntax("<date> := <ddmmyy> | <yyyymmdd> | <monthday>");
-        p.addSyntax("<hhmm> := /(\\d\\d):?(\\d\\d)[Hh]/ | /(\\d?\\d):?(\\d\\d)/");
-        p.addSyntax("<ampmtime> := " +
-        			"/(\\d?\\d)([AaPp])[Mm]?/ | " +
-        			"/(\\d?\\d):?(\\d\\d)([AaPp])[Mm]?/ | " +
-        			"/(\\d?\\d):?(\\d\\d)/ /([AaPp])[Mm]?/");
-        p.addSyntax("<time> := <hhmm> | <ampmtime>");
-        p.addSyntax("<word> := /\\S+/"); // non whitespace
-        p.addSyntax("<phrase> := <word> | <word> <phrase>");
-        p.addSyntax("<description> := <phrase>");
-
-        p.addSyntax("<timedtask> := " +
-                    "<date> <time> <date> <time> <description> | " +
-                    "<description> <date> <time> <date> <time> | " +
-                    "<date> <time> 'to' <time> <description> | " +
-                    "<date> <time> <time> <description>");
-        p.addSyntax("<deadlinetask> := <date> <description>");
-        p.addSyntax("<floatingtask> := <description>");
-        p.addSyntax("<task> := <timedtask> | <deadlinetask> | <floatingtask>");
+        final String[] syntaxes = new String[]{
+			"<monthname> := " +
+			  "'January' | 'Jan' | 'Jan.' | " +
+			  "'February' | 'Feb' | 'Feb.' | " +
+			  "'March' | 'Mar' | 'Mar.' | " +
+			  "'April' | 'Apr' | 'Apr.' | " +
+			  "'May' | " +
+			  "'June' | 'Jun' | 'Jun.' | " +
+			  "'July' | 'Jul' | 'Jul.' | " +
+			  "'August' | 'Aug' | 'Aug.' | " +
+			  "'September' | 'Sep' | 'Sep.' | 'Sept' | 'Sept.' | " +
+			  "'October' | 'Oct' | 'Oct.' | " +
+			  "'November' | 'Nov' | 'Nov.' | " +
+			  "'December' | 'Dec' | 'Dec.'",
+			"<dayofmonth> := /(\\d?\\d)(st|nd|rd|th)?/",
+			"<ddmmyy> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/",
+			"<yyyymmdd> := /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/",
+			"<monthday> := /\\d\\d/\\d\\d/ | <monthname> <dayofmonth> | <dayofmonth> <monthname>",
+			"<date> := <ddmmyy> | <yyyymmdd> | <monthday>",
+			"<hhmm> := /(\\d\\d):?(\\d\\d)[Hh]/ | /(\\d?\\d):?(\\d\\d)/",
+			"<ampmtime> := " +
+			  "/(\\d?\\d)([AaPp])[Mm]?/ | " +
+			  "/(\\d?\\d):?(\\d\\d)([AaPp])[Mm]?/ | " +
+			  "/(\\d?\\d):?(\\d\\d)/ /([AaPp])[Mm]?/",
+			"<time> := <hhmm> | <ampmtime>",
+			"<word> := /\\S+/",
+			"<phrase> := <word> | <word> <phrase>",
+			"<description> := <phrase>",
+			
+			"<timedtask> := " +
+			  "<date> <time> <date> <time> <description> | " +
+			  "<description> <date> <time> <date> <time> | " +
+			  "<date> <time> 'to' <time> <description> | " +
+			  "<date> <time> <time> <description>",
+			"<deadlinetask> := <date> <description>",
+			"<floatingtask> := <description>",
+			"<task> := <timedtask> | <deadlinetask> | <floatingtask>",
+			
+			"<addcmd> := 'add' <task>",
+			"<completecmd> := 'complete' <description>",
+			"<removecmd> := 'remove' <description>",
+			"<editcmd> := 'edit' <description>",
+			"<searchcmd> := 'search' <description>",
+			"<displaycmd> := 'display' | 'display' <date>",
+			"<undocmd> := 'undo'",
+			
+			"<cmd> := " +
+			  "<addcmd> | <completecmd> | <removecmd> | " + 
+			  "<editcmd> | <searchcmd> | <displaycmd>"
+        };
         
-        p.addSyntax("<addcmd> := 'add' <task>");
-        p.addSyntax("<completecmd> := 'complete' <description>");
-        p.addSyntax("<removecmd> := 'remove' <description>");
-        p.addSyntax("<editcmd> := 'edit' <description>");
-        p.addSyntax("<searchcmd> := 'search' <description>");
-        p.addSyntax("<displaycmd> := 'display' | 'display' <date>");
-        p.addSyntax("<undocmd> := 'undo'");
+        for (String syntaxDefinitionLine : syntaxes) {
+        	addSyntax(syntaxClassesMap, syntaxDefinitionLine);
+        }
+    }
+    
+    protected static void addSyntax(Map<String, List<SyntaxFormat>> syntaxClassesMap, String syntaxLine) {
+        String[] syntaxLineParts = syntaxLine.split(" := ");
+        String syntaxClassName = stripStringPrefixSuffix(syntaxLineParts[0], 1);
+        String[] definedAsSyntaxTerms = syntaxLineParts[1].split(" \\| ");
         
-        p.addSyntax("<cmd> := " +
-                    "<addcmd> | <completecmd> | <removecmd> | " + 
-                    "<editcmd> | <searchcmd> | <displaycmd>");
+        List<SyntaxFormat> definitions = new ArrayList<SyntaxFormat>(definedAsSyntaxTerms.length);
+        
+        for(int i = 0; i < definedAsSyntaxTerms.length; i++) {
+        	definitions.add(SyntaxFormat.valueOf(definedAsSyntaxTerms[i]));
+        }
+        
+        syntaxClassesMap.put(syntaxClassName,
+                             definitions);
     }
 }
