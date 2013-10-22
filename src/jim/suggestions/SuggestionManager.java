@@ -2,10 +2,35 @@
 package jim.suggestions;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import jim.journal.AddCommand;
 import jim.journal.Command;
+import jim.journal.CompleteCommand;
+import jim.journal.DeadlineTask;
+import jim.journal.DisplayCommand;
+import jim.journal.EditCommand;
+import jim.journal.FloatingTask;
+import jim.journal.RemoveCommand;
+import jim.journal.SearchCommand;
+import jim.journal.TimedTask;
+import jim.journal.UndoCommand;
+
+import org.joda.time.MutableDateTime;
+
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static jim.util.StringUtils.isStringSurroundedBy;
+import static jim.util.StringUtils.join;
+import static jim.util.StringUtils.stripStringPrefixSuffix;
 
 
 
@@ -120,6 +145,18 @@ public class SuggestionManager {
                                                               String description) {
     	// As changed in commit 80154c9c7110
         return null;
+    }
+    
+    
+    
+    public MutableDateTime parseDate(String input) {
+    	return (MutableDateTime) inputParser.doParse("<date>", input);
+    }
+    
+    
+    
+    public MutableDateTime parseTime(String input) {
+    	return (MutableDateTime) inputParser.doParse("<time>", input);
     }
 
 
