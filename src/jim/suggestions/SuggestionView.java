@@ -20,7 +20,6 @@ public class SuggestionView extends JimView {
     // Here we want SuggestionView to display a bunch of current suggestions,
     // and give some indication as to which is the user's "current" selection..
 
-    private List<String> displayedSuggestions;
     private JTextPane outputPane;
     private SuggestionManager suggestionManager;
 
@@ -32,8 +31,6 @@ public class SuggestionView extends JimView {
         outputPane = new JTextPane();
         outputPane.setContentType("text/html");
         add(outputPane, BorderLayout.CENTER);
-
-        displayedSuggestions = new ArrayList<String>();
     }
 
 
@@ -49,9 +46,10 @@ public class SuggestionView extends JimView {
     public void updateViewWithContent() {
         assert(suggestionManager != null);
         
-        displayedSuggestions = suggestionManager.getSuggestionsToDisplay();
         SuggestionHints hintSet = suggestionManager.getSuggestionHints();
+        outputPane.invalidate();
         outputPane.setText(hintSet.toString());
+        outputPane.repaint();
     }
 
 }

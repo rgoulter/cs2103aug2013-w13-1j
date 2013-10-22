@@ -26,6 +26,10 @@ class LiteralSyntaxTerm extends SyntaxTerm {
                                   "",
                                   new SyntaxTerm[]{this});
     }
+    
+    public String getLiteralValue() {
+    	return literalValue;
+    }
 
     @Override
     public String toString() {

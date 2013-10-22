@@ -36,7 +36,10 @@ import static jim.util.StringUtils.stripStringPrefixSuffix;
 
 public class SuggestionManager {
     private int highlightedLine = -1;
-    private SuggestionHints hints;
+    private String filteringSubsequence = "";
+    private ArrayList<SuggestionHint> generatedSuggestionHints;
+    private int numberOfSuggestionsToKeep = 8;
+    
     private Parser inputParser;
     
 
@@ -46,34 +49,14 @@ public class SuggestionManager {
 
 
     public SuggestionManager() {
+    	generatedSuggestionHints = new ArrayList<SuggestionHint>();
+    	
     	inputParser = new Parser();
-    }
-
-
-
-    public List<String> getSuggestionsToDisplay() {
-        // TODO: Stop cheating on this, as well =P
-        List<String> displayedSuggestions = new ArrayList<String>();
-        displayedSuggestions.add("Please ignore suggestions for now! ~CC");
-        displayedSuggestions.add("add (name) (date) (time)");
-        displayedSuggestions.add("remove (name)");
-        displayedSuggestions.add("display");
-        displayedSuggestions.add("exit");
-        
-        List<String> hintList = new ArrayList<String>();
-        hintList.add("edit");
-        hintList.add("add");
-        hintList.add("remove");
-        hintList.add("nil");
-        hintList.add("nil");
-        hints = new SuggestionHints(displayedSuggestions, hintList);
-        
-        return displayedSuggestions;
     }
     
     // Pre-Condition: Requires getSuggestionsToDisplay() to be called first
     public SuggestionHints getSuggestionHints() {
-        return hints;
+        return new SuggestionHints(generatedSuggestionHints);
     }
 
 
@@ -81,8 +64,7 @@ public class SuggestionManager {
     public String getCurrentSuggestion() {
         String output = "";
         if (getCurrentSuggestionIndex() != -1) {
-            List<String> allStrings = getSuggestionsToDisplay();
-            output = allStrings.get(getCurrentSuggestionIndex());
+            output = generatedSuggestionHints.get(getCurrentSuggestionIndex()).toString();
         }
 
         return output;
@@ -92,7 +74,6 @@ public class SuggestionManager {
 
     public void setCurrentSuggestionIndex(int i) {
         highlightedLine = i;
-        hints.setSelected(i);
     }
 
 
@@ -105,7 +86,7 @@ public class SuggestionManager {
 
     public void nextSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() + 1) %
-                                  getSuggestionsToDisplay().size());
+        		                  generatedSuggestionHints.size());
     }
 
 
@@ -113,7 +94,7 @@ public class SuggestionManager {
     public void prevSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1));
         if (getCurrentSuggestionIndex() < 0) {
-            setCurrentSuggestionIndex(getSuggestionsToDisplay().size() - 1);
+            setCurrentSuggestionIndex(generatedSuggestionHints.size() - 1);
         }
     }
 
@@ -127,7 +108,78 @@ public class SuggestionManager {
      *            The input currently in the textfield.
      */
     public void updateBuffer(String text) {
-
+    	filteringSubsequence = text;
+    	
+    	filterThroughGeneratedSuggestions();
+    	generateMoreSuggestionsIfNecessary();
+    }
+    
+    
+    
+    private void filterThroughGeneratedSuggestions() {
+    	for (int i = generatedSuggestionHints.size() - 1; i >= 0; i--) {
+    		boolean matchesSubseq = isSubsequenceOfSuggestionHint(filteringSubsequence,
+    		                                                      generatedSuggestionHints.get(i));
+    		
+    		if (!matchesSubseq) {
+    			LOGGER.info("Filtering out: " + generatedSuggestionHints.get(i).toString());
+    			generatedSuggestionHints.remove(i);
+    		}
+    	}
+    }
+    
+    
+    
+    private static boolean isSubsequenceOfSuggestionHint(String subseq, SuggestionHint hint) {
+    	int i = 0;
+    	int lastIndex = 0;
+    	
+    	String hintPhrase = hint.toString();
+    	
+    	while (i < subseq.length() && lastIndex >= 0) {
+    		char charToLookFor = subseq.charAt(i);
+    		lastIndex = hintPhrase.indexOf(charToLookFor, lastIndex);
+    		lastIndex += 1;
+    		i++;
+    	}
+    	
+    	return i == subseq.length();
+    }
+    
+    
+    
+    private void generateMoreSuggestionsIfNecessary() {
+    	// Don't try too hard to generate unique suggestions
+    	// at this stage.
+    	
+    	for (int i = generatedSuggestionHints.size(); i <= numberOfSuggestionsToKeep; i++) {
+    		SuggestionHint hint;
+    		boolean added = false;
+    		
+    		for (int attempts = 0; !added && attempts < 3; attempts++) { // MAGIC
+    			hint = generateRandomSuggestion();
+    			
+	    		if (isSubsequenceOfSuggestionHint(filteringSubsequence, hint)) {
+	    			LOGGER.info("Adding Hint to Queue: " + hint);
+	    			generatedSuggestionHints.add(hint);
+	    			added = true;
+	    		}
+    		}
+    	}
+    }
+    
+    
+    
+    private SuggestionHint generateRandomSuggestion() {
+    	// TODO: Get rid of this dependency on inputParser.
+    	List<SyntaxFormat> syntaxFormats = inputParser.getDisplayableSyntaxTreeLeafNodes();
+    	
+    	int i = (int) Math.floor(Math.random() * syntaxFormats.size());
+    	double rnd = Math.random();
+    	
+    	SuggestionHint hint = syntaxFormats.get(i).generate(null, rnd);
+		LOGGER.info("Generating Hint: " + hint);
+    	return hint;
     }
 
 

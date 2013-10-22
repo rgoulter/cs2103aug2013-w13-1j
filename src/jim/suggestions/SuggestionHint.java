@@ -20,6 +20,14 @@ public class SuggestionHint {
 		this.terms = terms;
 	}
 	
+	protected String[] getWords() {
+		return words;
+	}
+	
+	protected SyntaxTerm[] getSyntaxTerms() {
+		return terms;
+	}
+	
 	@Override
 	public String toString() {
 		return join(words, ' ');
