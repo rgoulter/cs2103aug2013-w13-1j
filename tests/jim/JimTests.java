@@ -23,6 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
                StringUtilsTests.class,
                ParserDateTimeTests.class,
                SuggestionManagerTest.class,
+               UndoUnitTests.class,
                ViewTests.class})
 public class JimTests {
 }

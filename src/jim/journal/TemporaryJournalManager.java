@@ -3,6 +3,9 @@ package jim.journal;
 
 import java.util.List;
 import java.util.ArrayList;
+
+import jim.journal.JournalManager.Command_Task;
+
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
@@ -10,8 +13,8 @@ import org.joda.time.DateTimeComparator;
 public class TemporaryJournalManager extends JournalManager {
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
 
-    
-
+    private List<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
+    private int historyIndex = -1; 
 
     /**
      * Returns a String representation of the current Journal state.
@@ -94,6 +97,7 @@ public class TemporaryJournalManager extends JournalManager {
     public void addTask(Task task) {
 
         storeAllTasks.add(task);
+        addCommandHistory("add", task);
     }
 
 
@@ -116,10 +120,35 @@ public class TemporaryJournalManager extends JournalManager {
     }
 
 
-
     public void editTask(Task old_task, Task new_task) {
         storeAllTasks.remove(old_task);
         storeAllTasks.add(new_task);
+    }
+    
+    public void addCommandHistory(String cmd, Task someTask){
+    	Command_Task command = new Command_Task(cmd, someTask);
+    	historyIndex++;
+    	historyOfCommand.add(historyIndex, command);
+    }
+    public void undoLastCommand(){
+    	// get the last command in historyOfCommand
+    	if (historyIndex == -1) {
+    		// do nothing
+    	} else {
+			Command_Task LastCommand = historyOfCommand.get(historyIndex--);
+		    //add, edit, remove, complete
+		    if (LastCommand.getCommand().equals("add")){
+		    	removeTask(LastCommand.getTask());
+		    } else if (LastCommand.getCommand().equals("edit")){
+		        
+		    } else if (LastCommand.getCommand().equals("remove")){
+		    	addTask(LastCommand.getTask());
+		    } else if (LastCommand.getCommand().equals("complete")){
+		    	incompleteTask(LastCommand.getTask());
+		    } else {
+		        //error
+		    }
+    	}
     }
 
 }
