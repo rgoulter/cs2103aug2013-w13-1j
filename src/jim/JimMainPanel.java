@@ -42,6 +42,7 @@ import jim.journal.Task;
 public class JimMainPanel extends JPanel {
 
     protected JEditorPane inputTextField;
+    protected JFrame applicationWindow;
     protected JPanel viewPanel;
     protected JLabel helperTextLabel;
     protected JLabel clockLabel;
@@ -373,7 +374,7 @@ public class JimMainPanel extends JPanel {
 
     // To be lazy, this method is called to run the JIM! GUI
     public void runWindow() {
-        final JFrame applicationWindow = new JFrame("JIM!");
+        applicationWindow = new JFrame("JIM!");
         applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Beautify Program Window
