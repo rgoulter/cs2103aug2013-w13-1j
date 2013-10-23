@@ -17,7 +17,7 @@ public class ViewTests extends JimMainPanel {
         //   Size of contents of text field >= 1 ==> Show SuggestionView
         
         JimMainPanel mainPanel = new JimMainPanel();
-        mainPanel.isRunning = false; // Prevents window from being stuck open
+		mainPanel.isRunning = false; // Prevents window from being stuck open
         mainPanel.runWindow();
         
         assert(viewPanel instanceof JournalView);
