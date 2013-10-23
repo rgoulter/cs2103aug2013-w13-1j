@@ -33,7 +33,6 @@ public class CompleteUnitTests {
     }
 
 
-
     @Test
     public void testStrictSyntaxCompleteCommandHasMatchesCanExecute () {
         JournalManager jManager = new TemporaryJournalManager();
@@ -48,7 +47,6 @@ public class CompleteUnitTests {
         assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
 				     "0, CS2103 Lecture\n", output);
     }
-
 
 
     @Test
