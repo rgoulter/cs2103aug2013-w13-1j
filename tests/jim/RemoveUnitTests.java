@@ -111,5 +111,59 @@ public class RemoveUnitTests {
 
 
     }
+    @Test
+    public void testStrictSyntaxRemoveCommandHasMultipleMatchesSecondInputNotMatchCanExecute () {
+        JournalManager jManager = new TemporaryJournalManager();
+        AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
+        addCmd1.execute(jManager);
+        AddCommand addCmd2 = new AddCommand("CS2010 Lecture");
+        addCmd2.execute(jManager);
+
+        RemoveCommand removeCmd2 = new RemoveCommand("Lecture");
+        String executionStatus = removeCmd2.execute(jManager);
+        String output = removeCmd2.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Pending (Phase 1)",
+                     "Pending", executionStatus);
+
+        assertEquals("Output generated does not match expected output (Phase 1)",
+                     "Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
+                     "0, CS2103 Lecture\n" + 
+                     "1, CS2010 Lecture\n", output);
+        
+        executionStatus = removeCmd2.secondExecute("2");
+        output = removeCmd2.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Success (Phase 2)",
+                     "Pending", executionStatus);
+
+    }
+    @Test
+    public void testStrictSyntaxRemoveCommandHasMultipleMatchesSecondInputNottMatchCanExecute () {
+        JournalManager jManager = new TemporaryJournalManager();
+        AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
+        addCmd1.execute(jManager);
+        AddCommand addCmd2 = new AddCommand("CS2010 Lecture");
+        addCmd2.execute(jManager);
+
+        RemoveCommand removeCmd2 = new RemoveCommand("Lecture");
+        String executionStatus = removeCmd2.execute(jManager);
+        String output = removeCmd2.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Pending (Phase 1)",
+                     "Pending", executionStatus);
+
+        assertEquals("Output generated does not match expected output (Phase 1)",
+                     "Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
+                     "0, CS2103 Lecture\n" + 
+                     "1, CS2010 Lecture\n", output);
+        
+        executionStatus = removeCmd2.secondExecute("ajsdlfj");
+        output = removeCmd2.getOutput();
+        
+        assertEquals("Execution status not correctly updated to Success (Phase 2)",
+                     "Pending", executionStatus);
+
+    }
 
 }

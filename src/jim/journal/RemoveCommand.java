@@ -50,9 +50,12 @@ public class RemoveCommand extends Command {
         for (int i = 0; i < IndexesOfTasks.length; i++){
             try{
                int j = Integer.parseInt(IndexesOfTasks[i]);
+               //if ((0<j)||(j>matchingTasks.size())){
+                 //  return "Fail";
+               //}
                taskToRemove.add(matchingTasks.get(j));
-            }catch(NumberFormatException e){
-                return "Pending";
+            }catch(Exception e){
+               return "Pending";
             }
         }
         executeHelper();
