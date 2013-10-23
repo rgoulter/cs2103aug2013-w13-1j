@@ -124,6 +124,8 @@ public class SuggestionManager {
     		if (!matchesSubseq) {
     			LOGGER.finer("Filtering out: " + generatedSuggestionHints.get(i).toString());
     			generatedSuggestionHints.remove(i);
+    		} else {
+    			hint.setMatchingSubsequence(filteringSubsequence);
     		}
     	}
     }
@@ -158,8 +160,9 @@ public class SuggestionManager {
     	
     	int i = (int) Math.floor(Math.random() * syntaxFormats.size());
     	double rnd = Math.random();
-    	
-    	SuggestionHint hint = syntaxFormats.get(i).generate(null, rnd);
+
+    	GenerationContext genCtx = new GenerationContext(null, filteringSubsequence);
+    	SuggestionHint hint = syntaxFormats.get(i).generate(genCtx, rnd);
 		LOGGER.finer("Generating Hint: " + hint);
     	return hint;
     }

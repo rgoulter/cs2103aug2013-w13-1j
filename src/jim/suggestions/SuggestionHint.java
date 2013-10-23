@@ -2,6 +2,10 @@ package jim.suggestions;
 
 import static jim.util.StringUtils.join;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * A Suggestion Hint, which describes a suggested input's words, syntax,
  *  and where the current input matches. (This is for the driver/GUI to then
@@ -11,12 +15,14 @@ import static jim.util.StringUtils.join;
  */
 public class SuggestionHint {
 	private String[] words;
+	private boolean[][] matchingMask;
 	private String matchingSubseq;
 	private SyntaxTerm[] terms;
 
 	public SuggestionHint(String[] words, String matchingSubsequence, SyntaxTerm[] terms) {
 		this.words = words;
 		this.matchingSubseq = matchingSubsequence;
+		matchingMask = getMatchMaskForWords(matchingSubseq, words);
 		this.terms = terms;
 	}
 	
@@ -28,16 +34,71 @@ public class SuggestionHint {
 		return terms;
 	}
 	
+	protected void setMatchingSubsequence(String subseq) {
+		this.matchingSubseq = subseq;
+		matchingMask = getMatchMaskForWords(matchingSubseq, words);
+	}
+	
 	@Override
 	public String toString() {
 		return join(words, ' ');
+	}
+	
+	protected boolean[][] getMatchingMask() {
+		return matchingMask;
+	}
+	
+	private static boolean[][] getMatchMaskForWords(String subseq, String[] words) {
+		int i = 0;
+    	int lastIndex = 0;
+    	
+    	String hintPhrase = join(words, ' ');
+    	List<Integer> matchingIndices = new ArrayList<Integer>(subseq.length());
+    	
+    	while (i < subseq.length() && lastIndex >= 0) {
+    		char charToLookFor = subseq.charAt(i);
+    		lastIndex = hintPhrase.indexOf(charToLookFor, lastIndex);
+    		
+    		if (lastIndex >= 0) {
+    			matchingIndices.add(lastIndex);
+    			lastIndex += 1;
+			}
+    		i++;
+    	}
+    	
+    	boolean matches = (i == subseq.length());
+    	boolean[][] matchingMask = new boolean[words.length][];
+    	
+    	for (i = 0; i < words.length; i++) {
+    		matchingMask[i] = new boolean[words[i].length()];
+    		Arrays.fill(matchingMask[i], false);
+    	}
+    	
+    	if (!matches) {
+    		return matchingMask;
+    	}
+    	
+    	int currentWord = 0;
+    	int skip = 0; // accumulated length of the words already matched..
+    	for (Integer index : matchingIndices) {
+    		while(index - skip >= words[currentWord].length()) {
+    			skip += 1 + words[currentWord].length();
+    			currentWord += 1;
+    		}
+    		
+    		if(index - skip < 0){ continue; }
+    		
+    		matchingMask[currentWord][index - skip] = true;
+    	}
+    	
+		return matchingMask;
 	}
 	
 	public boolean matchesSubsequence(String subsequence) {
 		int i = 0;
     	int lastIndex = 0;
     	
-    	String hintPhrase = toString();
+    	String hintPhrase = join(words, ' ');
     	
     	while (i < subsequence.length() && lastIndex >= 0) {
     		char charToLookFor = subsequence.charAt(i);
@@ -49,7 +110,7 @@ public class SuggestionHint {
     		i++;
     	}
     	
-    	return i == subsequence.length();
+		return i == subsequence.length();
 	}
 	
 	public static SuggestionHint combine(SuggestionHint hint1, SuggestionHint hint2) {
@@ -60,7 +121,10 @@ public class SuggestionHint {
 		System.arraycopy(hint1.words, 0, newWords, 0, hint1.words.length);
 		System.arraycopy(hint2.words, 0, newWords, hint1.words.length, hint2.words.length);
 		
-		newMatchingSubseq = hint1.matchingSubseq + hint2.matchingSubseq;
+		// See: generating in SyntaxFormat.generate(..),
+		// Since we do not split up the subseq there, we shouldn't
+		// join it here.
+		newMatchingSubseq = hint1.matchingSubseq; // + hint2.matchingSubseq;
 		
 		System.arraycopy(hint1.terms, 0, newTerms, 0, hint1.terms.length);
 		System.arraycopy(hint2.terms, 0, newTerms, hint1.terms.length, hint2.terms.length);

@@ -26,6 +26,8 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 
     @Override
     public SuggestionHint generate(GenerationContext context, double t) {
+    	assert context != null;
+    	
     	if ("description".equals(syntaxClassName)) {
     		return generateDescriptionSuggestionHint(context, t);
     	} else if ("date".equals(syntaxClassName)) {
@@ -42,7 +44,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     	String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
     	
     	return new SuggestionHint(new String[]{suggestedWord},
-                                  "",
+    			                  context.getInputSubsequence(),
                                   new SyntaxTerm[]{this});
     }
     
@@ -51,7 +53,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     	String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
     	
     	return new SuggestionHint(new String[]{suggestedWord},
-                                  "",
+    			                  context.getInputSubsequence(),
                                   new SyntaxTerm[]{this});
     }
     
@@ -60,7 +62,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     	String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
     	
     	return new SuggestionHint(new String[]{suggestedWord},
-                                  "",
+    			                  context.getInputSubsequence(),
                                   new SyntaxTerm[]{this});
     }
     

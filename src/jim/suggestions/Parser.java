@@ -534,10 +534,11 @@ public class Parser {
     
     
     private void outputRandomSuggestion() {
+    	GenerationContext genCtx = new GenerationContext(null, "");
     	List<SyntaxFormat> syntaxFormats = getDisplayableSyntaxTreeLeafNodes();
     	int i = (int) Math.floor(Math.random() * syntaxFormats.size());
     	double rnd = Math.random();
-    	SuggestionHint suggestionHint = syntaxFormats.get(i).generate(null, rnd);
+    	SuggestionHint suggestionHint = syntaxFormats.get(i).generate(genCtx, rnd);
     	
     	System.out.println(suggestionHint);
     }

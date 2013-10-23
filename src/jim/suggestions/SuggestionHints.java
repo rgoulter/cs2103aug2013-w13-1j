@@ -63,19 +63,20 @@ public class SuggestionHints {
         StringBuilder result = new StringBuilder();
         
         String[] words = suggestion.getWords();
+        boolean[][] masks = suggestion.getMatchingMask();
         SyntaxTerm[] terms = suggestion.getSyntaxTerms();
         
-        result.append(renderWord(words[0], terms[0]));
+        result.append(renderWord(words[0], masks[0], terms[0]));
         
         for (int i = 1; i < words.length; i++) {
         	result.append(' ');
-        	result.append(renderWord(words[i], terms[i]));
+        	result.append(renderWord(words[i], masks[i], terms[i]));
         }
         
         return result.toString();
     }
     
-    private static String renderWord(String word, SyntaxTerm type) {
+    private static String renderWord(String word, boolean[] matchMask, SyntaxTerm type) {
     	if (type instanceof LiteralSyntaxTerm) {
     		String htmlColor = BLACK_COLOR;
     		String synTermValue = ((LiteralSyntaxTerm) type).getLiteralValue();
@@ -90,13 +91,29 @@ public class SuggestionHints {
     			htmlColor = GREEN_COLOR;
     		}
     		
-    		return renderTextWithColor(word, htmlColor);
+    		return renderTextWithColor(word, matchMask, htmlColor);
     	} else {
-    		return word;
+    		return renderTextWithColor(word, matchMask, BLACK_COLOR);
     	}
     }
     
-    private static String renderTextWithColor(String text, String htmlColor) {
-    	return "<font color='" + htmlColor + "'>" + text + "</font>";
+    private static String renderTextWithColor(String text, boolean[] matchMask, String htmlColor) {
+    	StringBuilder result = new StringBuilder();
+    	result.append("<font color='");
+    	result.append(htmlColor);
+    	result.append("'>");
+
+    	for (int i = 0; i < text.length(); i++) {
+    		if (matchMask[i]){
+    			result.append("<u>");
+    			result.append(text.charAt(i));
+    			result.append("</u>");
+    		} else {
+    			result.append(text.charAt(i));
+    		}
+    	}
+
+    	result.append("</font>");
+    	return result.toString();
     }
 }
