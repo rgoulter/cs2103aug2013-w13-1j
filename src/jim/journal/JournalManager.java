@@ -138,16 +138,20 @@ public class JournalManager {
         }
     }
     
-    public String incompleteTask(Task task) {
-        if (!task.isCompleted()) {
-            return "Task " +
-                   task.toString() +
-                   " is currently incomplete.";
-        } else {
-            task.markAsIncompleted();
-            saveToStorage();
-            return "Incompleted Task: " + task.toString();
-        }
+    public void incompleteTask(Task task) {
+    	for (Task current: storeAllTasks) {
+    		if (task.equals(current)){
+		        if (!task.isCompleted()) {
+		            System.out.println( "Task " +
+		                   task.toString() +
+		                   " is currently incomplete.");
+		        } else {
+		            task.markAsIncompleted();
+		            saveToStorage();
+		            System.out.println(  "Incompleted Task: " + task.toString());
+		        }
+	    	}
+    	}
     }
 
     public void editTask(Task old_task, Task new_task) {
