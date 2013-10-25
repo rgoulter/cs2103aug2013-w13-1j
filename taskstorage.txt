@@ -63,3 +63,18 @@ S:
 E:
 D:CS2103 Lecture
 C:Not Completed
+T:TimedTask
+S:2013-10-24T23:50:00.000+08:00
+E:2013-10-24T23:59:00.000+08:00
+D:do stuff
+C:Not Completed
+T:FloatingTask
+S:
+E:
+D:XYZ
+C:Not Completed
+T:FloatingTask
+S:
+E:
+D:YVW
+C:Not Completed

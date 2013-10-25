@@ -59,13 +59,19 @@ public class SyntaxGrammar {
 			"<deadlinetask> := <date> <description>",
 			"<floatingtask> := <description>",
 			"<task> := <timedtask> | <deadlinetask> | <floatingtask>",
-			
-			"<addcmd> := 'add' <task>",
-			"<completecmd> := 'complete' <description>",
-			"<removecmd> := 'remove' <description>",
-			"<editcmd> := 'edit' <description>",
-			"<searchcmd> := 'search' <description>",
-			"<displaycmd> := 'display' | 'display' <date>",
+
+			"<addword> := 'add' | 'create'",
+			"<addcmd> := <addword> <task>",
+			"<completeword> := 'complete'",
+			"<completecmd> := <completeword> <description>",
+			"<removeword> := 'remove'",
+			"<removecmd> := <removeword> <description>",
+			"<editword> := 'edit'",
+			"<editcmd> := <editword> <description>",
+			"<searchword> := 'search'",
+			"<searchcmd> := <searchword> <description>",
+			"<displayword> := 'display'",
+			"<displaycmd> := <displayword> | <displayword> <date>",
 			"<undocmd> := 'undo'",
 			
 			"<cmd> := " +

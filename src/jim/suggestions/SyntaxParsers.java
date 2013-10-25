@@ -14,8 +14,10 @@ import jim.journal.DeadlineTask;
 import jim.journal.EditCommand;
 import jim.journal.FloatingTask;
 import jim.journal.SearchCommand;
+import jim.journal.Task;
 import jim.journal.TimedTask;
 import jim.journal.UndoCommand;
+import jim.suggestions.Parser.SyntaxTermSearchNode;
 import static jim.util.DateUtils.REGEX_DATE_DDMMYY;
 import static jim.util.DateUtils.REGEX_TIME_HHMM;
 import static jim.util.DateUtils.isHourLikelyToBePM;
@@ -27,13 +29,26 @@ public class SyntaxParsers {
 
 
 
-    protected interface SyntaxParser {
-        public Object parse(String[] input);
+    protected static abstract class SyntaxParser {
+        public abstract Object parse(SyntaxTermSearchNode[] input);
+    }
+    
+    protected static abstract class SimpleSyntaxParser extends SyntaxParser {
+        public Object parse(SyntaxTermSearchNode[] input) {
+        	String[] strInput = new String[input.length];
+        	
+        	for(int i = 0; i < input.length; i++) { strInput[i] = input[i].getMatchedInput(); }
+        	
+        	return parse(strInput);
+        }
+        
+        public abstract Object parse(String[] input);
     }
 
-    protected static abstract class SyntaxTermParser implements SyntaxParser {
+    protected static abstract class SyntaxTermParser extends SimpleSyntaxParser {
         public abstract Object parse(String inputTerm);
         
+        @Override
         public Object parse(String[] input){
             if (input.length != 1) {
                 // To keep in line with the assumption of SyntaxTermParser
@@ -117,7 +132,7 @@ public class SyntaxParsers {
         
         registerSyntaxParser(p,
                 "yyyymmdd => /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/",
-				 new SyntaxParser() {
+				 new SimpleSyntaxParser() {
 			 		 @Override
 					 public Object parse(String[] inputTerm) {
 			 			 Matcher m = Pattern.compile("(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)").matcher(inputTerm[0]);
@@ -138,7 +153,7 @@ public class SyntaxParsers {
 
         registerSyntaxParser(p,
                              "monthday => /\\d\\d/\\d\\d/",
-							 new SyntaxParser() {
+							 new SimpleSyntaxParser() {
 						 		 @Override
 								 public Object parse(String[] inputTerm) {
 						 			 String[] parts = inputTerm[0].split("/");
@@ -156,7 +171,7 @@ public class SyntaxParsers {
 
         registerSyntaxParser(p,
                              "monthday => <monthname> <dayofmonth>",
-							 new SyntaxParser() {
+							 new SimpleSyntaxParser() {
 						 		 @Override
 								 public Object parse(String[] inputTerm) {
 						 			 String monthName = inputTerm[0];
@@ -172,7 +187,7 @@ public class SyntaxParsers {
 							 });
         registerSyntaxParser(p,
 			                 "monthday => <dayofmonth> <monthname>",
-							  new SyntaxParser() {
+							  new SimpleSyntaxParser() {
 						 		  @Override
 								  public Object parse(String[] inputTerm) {
 						 			  String monthName = inputTerm[1];
@@ -253,7 +268,7 @@ public class SyntaxParsers {
 			                 });
         registerSyntaxParser(p,
 							 "ampmtime => /(\\d?\\d):?(\\d\\d)/ /([AaPp])[Mm]?/",
-							 new SyntaxParser() {
+							 new SimpleSyntaxParser() {
 							     @Override
 							     public Object parse(String[] inputTerms) {
 									  Matcher m1 = Pattern.compile("(\\d?\\d):?(\\d\\d)").matcher(inputTerms[0]);
@@ -310,16 +325,16 @@ public class SyntaxParsers {
                           "timedtask => <date> <time> <date> <time> <description>",
                           new SyntaxParser() {
                               @Override
-                              public Object parse(String[] input) {
+                              public Object parse(SyntaxTermSearchNode[] input) {
                                   MutableDateTime startDate =
-                                          (MutableDateTime) p.doParse("<date>", input[0]);
+                                          (MutableDateTime) p.doParse(input[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) p.doParse("<time>", input[1]);
+                                          (MutableDateTime) p.doParse(input[1]);
                                   MutableDateTime endDate =
-                                          (MutableDateTime) p.doParse("<date>", input[2]);
+                                          (MutableDateTime) p.doParse(input[2]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) p.doParse("<time>", input[3]);
-                                  String description = input[4];
+                                          (MutableDateTime) p.doParse(input[3]);
+                                  String description = input[4].getMatchedInput();
                                   return new TimedTask(datetime(startDate, startTime),
                                                        datetime(endDate, endTime), description);
                               }
@@ -328,16 +343,16 @@ public class SyntaxParsers {
                 "timedtask => <description> <date> <time> <date> <time>",
                 new SyntaxParser() {
                     @Override
-                    public Object parse(String[] input) {
-                        String description = input[0];
+                    public Object parse(SyntaxTermSearchNode[] input) {
+                        String description = input[0].getMatchedInput();
                         MutableDateTime startDate =
-                                (MutableDateTime) p.doParse("<date>", input[1]);
+                                (MutableDateTime) p.doParse(input[1]);
                         MutableDateTime startTime =
-                                (MutableDateTime) p.doParse("<time>", input[2]);
+                                (MutableDateTime) p.doParse(input[2]);
                         MutableDateTime endDate =
-                                (MutableDateTime) p.doParse("<date>", input[3]);
+                                (MutableDateTime) p.doParse(input[3]);
                         MutableDateTime endTime =
-                                (MutableDateTime) p.doParse("<time>", input[4]);
+                                (MutableDateTime) p.doParse(input[4]);
                         return new TimedTask(datetime(startDate, startTime),
                                              datetime(endDate, endTime), description);
                     }
@@ -346,14 +361,14 @@ public class SyntaxParsers {
                           "timedtask => <date> <time> 'to' <time> <description>",
                           new SyntaxParser() {
                               @Override
-                              public Object parse(String[] input) {
+                              public Object parse(SyntaxTermSearchNode[] input) {
                                   MutableDateTime date =
-                                          (MutableDateTime) p.doParse("<date>", input[0]);
+                                          (MutableDateTime) p.doParse(input[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) p.doParse("<time>", input[1]);
+                                          (MutableDateTime) p.doParse(input[1]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) p.doParse("<time>", input[3]);
-                                  String description = input[4];
+                                          (MutableDateTime) p.doParse(input[3]);
+                                  String description = input[4].getMatchedInput();
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
                                                        description);
@@ -363,14 +378,14 @@ public class SyntaxParsers {
                           "timedtask => <date> <time> <time> <description>",
                           new SyntaxParser() {
                               @Override
-                              public Object parse(String[] input) {
+                              public Object parse(SyntaxTermSearchNode[] input) {
                                   MutableDateTime date =
-                                          (MutableDateTime) p.doParse("<date>", input[0]);
+                                          (MutableDateTime) p.doParse(input[0]);
                                   MutableDateTime startTime =
-                                          (MutableDateTime) p.doParse("<time>", input[1]);
+                                          (MutableDateTime) p.doParse(input[1]);
                                   MutableDateTime endTime =
-                                          (MutableDateTime) p.doParse("<time>", input[2]);
-                                  String description = input[3];
+                                          (MutableDateTime) p.doParse(input[2]);
+                                  String description = input[3].getMatchedInput();
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
                                                        description);
@@ -380,10 +395,10 @@ public class SyntaxParsers {
                           "deadlinetask => <date> <description>",
                           new SyntaxParser() {
                               @Override
-                              public Object parse(String[] input) {
+                              public Object parse(SyntaxTermSearchNode[] input) {
                                   MutableDateTime date =
-                                          (MutableDateTime) p.doParse("<date>", input[0]);
-                                  String description = input[1];
+                                          (MutableDateTime) p.doParse(input[0]);
+                                  String description = input[1].getMatchedInput();
                                   return new DeadlineTask(date, description);
                               }
                           });
@@ -400,19 +415,20 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "addcmd => 'add' <task>",
+                          "addcmd => <addword> <task>",
                           new SyntaxParser() {
                               @Override
-                              public Object parse(String[] input) {
-                                  jim.journal.Task taskToAdd = p.parseTask(input[1].split(" "));
+                              public Object parse(SyntaxTermSearchNode[] input) {
+                                  Task taskToAdd =
+                                		  (Task) p.doParse(input[1]);
                                   return new AddCommand(taskToAdd);
                               }
                           });
         
         
         registerSyntaxParser(p,
-                          "completecmd => 'complete' <description>",
-                          new SyntaxParser() {
+                          "completecmd => <completeword> <description>",
+                          new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   return new jim.journal.CompleteCommand(input[1]);
@@ -421,8 +437,8 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "removecmd => 'remove' <description>",
-                          new SyntaxParser() {
+                          "removecmd => <removeword> <description>",
+                          new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   return new jim.journal.RemoveCommand(input[1]);
@@ -431,8 +447,8 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "editcmd => 'edit' <description>",
-                          new SyntaxParser() {
+                          "editcmd => <editword> <description>",
+                          new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   String description = input[1];
@@ -444,8 +460,8 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "searchcmd => 'search' <description>",
-                          new SyntaxParser() {
+                          "searchcmd => <searchword> <description>",
+                          new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   return new SearchCommand(input[1]);
@@ -454,8 +470,8 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-		                  "displaycmd => 'display'",
-                          new SyntaxParser() {
+		                  "displaycmd => <displayword>",
+                          new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   return new jim.journal.DisplayCommand();
@@ -464,8 +480,8 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-		                  "displaycmd => 'display' <date>",
-                          new SyntaxParser() {
+		                  "displaycmd => <displayword> <date>",
+                          new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   MutableDateTime date =
@@ -478,7 +494,7 @@ public class SyntaxParsers {
         
         registerSyntaxParser(p,
         		          "undocmd => 'undo'",
-                          new SyntaxParser() {
+                          new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   return new UndoCommand();
