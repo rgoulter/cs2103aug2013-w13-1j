@@ -181,13 +181,13 @@ public class Parser {
 
 
 
-    private class SyntaxTermSearchNode {
+    protected static class SyntaxTermSearchNode {
         SyntaxTermSearchNode parent;
         private boolean hasBeenAddedToParent = false;
         
         private List<SyntaxTermSearchNode> childrenNodes = new ArrayList<SyntaxTermSearchNode>();
-        SyntaxTerm syntaxTerm; // e.g. <date>, "add", /abc/, ...
-        String inputTerm = null;
+        private SyntaxTerm syntaxTerm; // e.g. <date>, "add", /abc/, ...
+        private String inputTerm = null;
 
         public SyntaxTermSearchNode(SyntaxTerm syntax) {
             syntaxTerm = syntax;
@@ -289,7 +289,15 @@ public class Parser {
     protected Object doParse(SyntaxFormat syntaxFormat, String[] input){
         LOGGER.log(Level.INFO, "doParse: " + syntaxFormat + " " + join(input, ' '));
         
-        // Our search-tree is implemented as a STACK,
+        SearchNode matchedSearchNode = doSyntaxTreeSearch(syntaxFormat, input);
+        SyntaxTermSearchNode rootNode = getRootSyntaxTermSearchNodeOfMatchedSearchNode(matchedSearchNode);
+        return doParse(rootNode);
+    }
+    
+    
+    
+    private SearchNode doSyntaxTreeSearch(SyntaxFormat syntaxFormat, String[] input){
+    	// Our search-tree is implemented as a STACK,
         // (i.e. a DFS exploration of solution space).
         // A PriorityQueue may make more sense?
         Stack<SearchNode> searchNodes = new Stack<SearchNode>();
@@ -314,7 +322,7 @@ public class Parser {
 
                 case YES:
                     LOGGER.log(Level.INFO, "Matched SearchNode: " + searchNode.toString());
-                    return doParseWithMatchedSearchNode(searchNode);
+                    return searchNode;
 
                 case MAYBE:
                     List<SearchNode> nextNodes = searchNode.nextNodes();
@@ -355,30 +363,35 @@ public class Parser {
 
         return new SyntaxParserKey(syntaxClassName, syntaxFormat);
     }
-
-
-
-    private Object doParseWithMatchedSearchNode(SearchNode searchNode){
+    
+    
+    
+    private SyntaxTermSearchNode getRootSyntaxTermSearchNodeOfMatchedSearchNode(SearchNode searchNode) {
         assert searchNode.getMatchedState() == SearchMatchState.YES;
 
-        // TODO: SLAP This away.
         // Get root SyntaxNode from search.
         SyntaxTermSearchNode root = searchNode.syntaxFormat.get(0);
         while (root.parent != null) {
             root = root.parent;
         }
 
-        SyntaxTermSearchNode node = root;
-        LOGGER.log(Level.INFO, "Parsing, matching search node, root node: " + root.syntaxTerm);
-        
+        LOGGER.finer("Parsing, matching search node, root node: " + root.syntaxTerm);
+        return root;
+    }
+
+
+
+    protected Object doParse(SyntaxTermSearchNode node){
         while (true) {
-            LOGGER.log(Level.INFO, "Parsing, looking for parser: " + getSyntaxParserKeyForSyntaxNode(node));
+            LOGGER.finer("Parsing, looking for parser: " + getSyntaxParserKeyForSyntaxNode(node));
             SyntaxParser parser = syntaxParsers.get(getSyntaxParserKeyForSyntaxNode(node));
             
             if (parser != null) {
                 // Match terms of children, pass to parser.
-                String[] input = node.getMatchedInputOfChildren();
-                return parser.parse(input);
+                SyntaxTermSearchNode[] matchedInput = node
+                		                              .getChildren()
+                		                              .toArray(new SyntaxTermSearchNode[]{});
+                return parser.parse(matchedInput);
             } else if(node.getChildren().size() == 1) {
                 node = node.getChildren().get(0);
             } else {
