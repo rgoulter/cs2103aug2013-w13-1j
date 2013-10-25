@@ -415,7 +415,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "addcmd => 'add' <task>",
+                          "addcmd => <addwords> <task>",
                           new SyntaxParser() {
                               @Override
                               public Object parse(SyntaxTermSearchNode[] input) {

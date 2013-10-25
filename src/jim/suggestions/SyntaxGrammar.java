@@ -59,8 +59,9 @@ public class SyntaxGrammar {
 			"<deadlinetask> := <date> <description>",
 			"<floatingtask> := <description>",
 			"<task> := <timedtask> | <deadlinetask> | <floatingtask>",
-			
-			"<addcmd> := 'add' <task>",
+
+			"<addwords> := 'add' | 'create'",
+			"<addcmd> := <addwords> <task>",
 			"<completecmd> := 'complete' <description>",
 			"<removecmd> := 'remove' <description>",
 			"<editcmd> := 'edit' <description>",
