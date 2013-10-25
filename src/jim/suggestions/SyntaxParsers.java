@@ -415,7 +415,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "addcmd => <addwords> <task>",
+                          "addcmd => <addword> <task>",
                           new SyntaxParser() {
                               @Override
                               public Object parse(SyntaxTermSearchNode[] input) {
@@ -427,7 +427,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "completecmd => 'complete' <description>",
+                          "completecmd => <completeword> <description>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
@@ -437,7 +437,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "removecmd => 'remove' <description>",
+                          "removecmd => <removeword> <description>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
@@ -447,7 +447,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "editcmd => 'edit' <description>",
+                          "editcmd => <editword> <description>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
@@ -460,7 +460,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "searchcmd => 'search' <description>",
+                          "searchcmd => <searchword> <description>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
@@ -470,7 +470,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-		                  "displaycmd => 'display'",
+		                  "displaycmd => <displayword>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
@@ -480,7 +480,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-		                  "displaycmd => 'display' <date>",
+		                  "displaycmd => <displayword> <date>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
