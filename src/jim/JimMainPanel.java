@@ -254,7 +254,7 @@ public class JimMainPanel extends JPanel {
         
         dateLabel = new JLabel("  xx-xx-xx");
         clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
-        progNameLabel = new JLabel("JIM! v0.2    ");
+        progNameLabel = new JLabel("JIM! v0.3 Internal    ");
         
         dateLabel.setFont(FONT_IMPACT);
         clockLabel.setFont(FONT_IMPACT);
@@ -308,7 +308,7 @@ public class JimMainPanel extends JPanel {
         CardLayout cardLayout = (CardLayout) viewPanel.getLayout();
 
         // TODO: 0 is a magic number here, oddly enough.
-        if (inputTextField.getText().length() > 0) {
+        if (inputTextField.getText().length() > 0 && !lastCommandState.equals("Pending")) {
             // Show the Suggestion view
             cardLayout.show(viewPanel, CARDLAYOUT_SUGGESTION_VIEW);
         } else {
@@ -332,6 +332,7 @@ public class JimMainPanel extends JPanel {
         String inputTokens[] = input.split(" ");
         String feedback = "";
         
+        // Check before execution
         if (lastCommandState.equals("Pending")) {
             lastCommandState = lastCommand.secondExecute(input);
             feedback = lastCommand.getOutput();
@@ -358,8 +359,13 @@ public class JimMainPanel extends JPanel {
             }
         }
 
+        // Check after execution
         if (lastCommandState.equals("Success") || lastCommandState.equals("Failure")) {
             clearLastCommand();
+            journalView.unholdFeedback();
+        }
+        else if (lastCommandState.equals("Pending")) {
+            journalView.holdFeedback();
         }
         
         

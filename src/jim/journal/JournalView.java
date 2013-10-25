@@ -15,6 +15,7 @@ public class JournalView extends JimView {
     private JTextPane outputTextArea;
     private JournalManager journalManager;
     private String lastFeedback = "";
+    private boolean holdingFeedback = false;
 
 
 
@@ -50,12 +51,15 @@ public class JournalView extends JimView {
         assert(journalManager != null);
         
         // Load up and display feedback, if any, from previous command
-        // We also clear the feedback to prevent double-display of feedback
+        // We also clear the feedback (unless explicitly told not to) to prevent double-display of feedback
         String journalText = "";
         if (!lastFeedback.equals("")) {
             journalText = lastFeedback + "<p />";
+        }
+        if (!holdingFeedback) {
             lastFeedback = "";
         }
+        
 
         // Build text from current journal content.
         String outputText = journalManager.getDisplayString();
@@ -68,5 +72,8 @@ public class JournalView extends JimView {
         // Output to the Text Area
         outputTextArea.setText(journalText);
     }
+    
+    public void holdFeedback()   { holdingFeedback = true; }
+    public void unholdFeedback() { holdingFeedback = false; }
 
 }

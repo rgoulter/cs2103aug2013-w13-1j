@@ -95,7 +95,7 @@ public class SearchTool {
     //return all the tasks that contains the key word.
     public ArrayList<Task> searchByNonStrictDescription(String KeyWord){
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
-        for (Task task : AllTasks) {
+        for (Task task : AllTasks) {  
             if (task.getDescription().contains(KeyWord)) {
                 matchingTasks.add(task);
             }
