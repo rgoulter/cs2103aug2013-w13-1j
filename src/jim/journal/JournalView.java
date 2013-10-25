@@ -4,7 +4,11 @@ package jim.journal;
 import jim.JimView;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
 
+import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
@@ -13,6 +17,7 @@ import javax.swing.JTextPane;
 public class JournalView extends JimView {
 
     private JTextPane outputTextArea;
+    private JScrollPane scrollingPane;
     private JournalManager journalManager;
     private String lastFeedback = "";
     private boolean holdingFeedback = false;
@@ -20,15 +25,16 @@ public class JournalView extends JimView {
 
 
     public JournalView() {
+        journalManager = null;
         setLayout(new BorderLayout(0, 0));
 
         outputTextArea = new JTextPane();
         outputTextArea.setContentType("text/html");
         outputTextArea.setText("Current:");
         outputTextArea.setEditable(false);
-        add(outputTextArea, BorderLayout.CENTER);
-
-        journalManager = new JournalManager();
+        
+        scrollingPane = new JScrollPane(outputTextArea);
+        add(scrollingPane, BorderLayout.CENTER);
     }
 
 
@@ -71,6 +77,7 @@ public class JournalView extends JimView {
 
         // Output to the Text Area
         outputTextArea.setText(journalText);
+        outputTextArea.select(0,0);
     }
     
     public void holdFeedback()   { holdingFeedback = true; }
