@@ -2,6 +2,8 @@
 package jim.journal;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -46,8 +48,8 @@ public class JournalManager {
     	} else return false;
     }
     
-    public String getDisplayString() {
-        //List<Task> upcomingTasks = storeAllTasks;
+    /*public String getDisplayString() {
+
         List<Task> upcomingTasks = this.getAllTasks();
         String timedTasks = "", floatingTasks = "", deadlineTasks = "";
         String output = "Upcoming Events:\n";
@@ -61,7 +63,11 @@ public class JournalManager {
      				   timedTasks = timedTasks + current.toString() + "\n";
      			   }
             } else if (current instanceof FloatingTask) {
-                floatingTasks = floatingTasks + current.toString() + "\n";
+                if (current.isCompleted()){
+                    floatingTasks = floatingTasks + "[DONE] "+ current.toString() +"\n";
+                }else{
+                    floatingTasks = floatingTasks + current.toString() + "\n";
+                }
             } else if (current instanceof DeadlineTask) {
             	MutableDateTime taskTime = ((DeadlineTask) current).getEndDate();    
                 if (compareDate(taskTime, today)) {
@@ -73,8 +79,54 @@ public class JournalManager {
 
         output = output + deadlineTasks + timedTasks + "\n\nTodo:\n" + floatingTasks;
         return output;
-    }
+    }*/
+    public String getDisplayString() {
 
+        ArrayList<Task> upcomingTasks = this.getAllTasks();
+        ArrayList<TimedTask> upcomingTimedTask = new ArrayList<TimedTask>();
+        ArrayList<DeadlineTask> upcomingDeadlineTask = new ArrayList<DeadlineTask>();
+        ArrayList<FloatingTask> upcomingFloatingTask = new ArrayList<FloatingTask>();
+        
+        String timedTasks = "", floatingTasks = "", deadlineTasks = "";
+        String output = "Upcoming Events:\n";
+
+        MutableDateTime today = new MutableDateTime();
+
+        for (Task current : upcomingTasks) {
+            if (current instanceof TimedTask) {
+                MutableDateTime taskTime = ((TimedTask) current).getStartTime();    
+                if (compareDate(taskTime, today)) {
+                       upcomingTimedTask.add((TimedTask)current);
+                   }
+            } else if (current instanceof FloatingTask) {
+                upcomingFloatingTask.add((FloatingTask)current);
+            } else if (current instanceof DeadlineTask) {
+                MutableDateTime taskTime = ((DeadlineTask) current).getEndDate();    
+                if (compareDate(taskTime, today)) {
+                    upcomingDeadlineTask.add((DeadlineTask)current);
+                   }
+            }
+
+        }
+        sortTimedTask(upcomingTimedTask);
+        sortDeadlineTask(upcomingDeadlineTask);
+        sortFloatingTask(upcomingFloatingTask);
+        for (TimedTask task : upcomingTimedTask){
+            timedTasks = timedTasks + task.toString() + "\n";
+        }
+        for (DeadlineTask task : upcomingDeadlineTask){
+            deadlineTasks = deadlineTasks + task.toString() + "\n";
+        }
+        for (FloatingTask task : upcomingFloatingTask){
+            if (task.isCompleted()){
+                floatingTasks = floatingTasks + "[DONE] "+ task.toString() +"\n";
+            }else{
+                floatingTasks = task.toString() + "\n" + floatingTasks;
+            }
+        }
+        output = output + deadlineTasks + timedTasks + "\n\nTodo:\n" + floatingTasks;
+        return output;
+    }
 
     public void saveToStorage(){
         Logger.log(Level.INFO, "going to save to storage");
@@ -126,13 +178,15 @@ public class JournalManager {
 
 
     public String completeTask(Task task) {
+        
         if (task.isCompleted()) {
             return "Task " +
                    task.toString() +
                    " has already been marked as completed.";
         } else {
-            
+            storeAllTasks.remove(task);
             task.markAsCompleted();
+            storeAllTasks.add(task);
             saveToStorage();
             return "Completed Task: " + task.toString();
         }
@@ -146,7 +200,9 @@ public class JournalManager {
 		                   task.toString() +
 		                   " is currently incomplete.");
 		        } else {
+		            storeAllTasks.remove(task);
 		            task.markAsIncompleted();
+		            storeAllTasks.add(task);
 		            saveToStorage();
 		            System.out.println(  "Incompleted Task: " + task.toString());
 		        }
@@ -204,7 +260,14 @@ public class JournalManager {
 		String getCommand() { return cmd; }
 		Task getTask() { return someTask; }
 	}
-
-
+    public void sortTimedTask(ArrayList<TimedTask> timedTasks){
+        Collections.sort(timedTasks);
+    }
+    public void sortDeadlineTask(ArrayList<DeadlineTask> deadlineTasks){
+        Collections.sort(deadlineTasks);
+    }
+    public void sortFloatingTask(ArrayList<FloatingTask> floatingTasks){
+        
+    }
 
 }

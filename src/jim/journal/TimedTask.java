@@ -1,9 +1,10 @@
 
 package jim.journal;
+import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 
 
-public class TimedTask extends Task {
+public class TimedTask extends Task implements Comparable<TimedTask>{
 
     private MutableDateTime startTime;
     private MutableDateTime endTime;
@@ -103,4 +104,12 @@ public class TimedTask extends Task {
                13 +
                description.hashCode();
     }
+
+    @Override
+    public int compareTo(TimedTask arg0) {
+        // TODO Auto-generated method stub
+        return DateTimeComparator.getInstance().compare(this.getStartTime(), arg0.getStartTime());
+    }
+    
+    
 }

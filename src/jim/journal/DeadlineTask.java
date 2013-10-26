@@ -1,8 +1,9 @@
 package jim.journal;
+import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 
 
-public class DeadlineTask extends Task {
+public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
 
     private MutableDateTime endDate;
 
@@ -55,5 +56,9 @@ public class DeadlineTask extends Task {
     public int hashCode() {
         return endDate.hashCode() *
                31 + description.hashCode();
+    }
+    @Override
+    public int compareTo(DeadlineTask arg0) {
+        return DateTimeComparator.getInstance().compare(this.getEndDate(), arg0.getEndDate());
     }
 }
