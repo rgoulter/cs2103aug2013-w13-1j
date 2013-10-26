@@ -61,16 +61,18 @@ public class TimedTask extends Task {
 
 
     public String toString() {
-    	String taskName = "%s %d/%d/%d %02d:%02d to %02d:%02d";
-    	String taskNameNoStartTime = "%s %d/%d/%d %02d:%02d";
+    	String taskName = "[%d/%d/%d] [%02d:%02d - %02d:%02d] %s";
+    	String taskNameNoStartTime = "[%d/%d/%d] [%02d:%02d] %s";
+    	//TODO: Do we still need to check startTime != null?? Isn't it DeadlineTask?
     	if (this.startTime == null) {
-        	return String.format(taskNameNoStartTime, getDescription(), 
+        	return String.format(taskNameNoStartTime, 
         						 endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
-        						 endTime.getHourOfDay(), endTime.getMinuteOfHour());
+        						 endTime.getHourOfDay(), endTime.getMinuteOfHour(), getDescription());
     	} else {
-        	return String.format(taskName, getDescription(), endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
+        	return String.format(taskName, endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
 					startTime.getHourOfDay(), startTime.getMinuteOfHour(),
-					endTime.getHourOfDay(), endTime.getMinuteOfHour());
+					endTime.getHourOfDay(), endTime.getMinuteOfHour(),
+					getDescription());
     	}
 
     	//return getDescription() +"  "+ startTime.toString() +" to " + endTime.toString();

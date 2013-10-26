@@ -30,10 +30,9 @@ public class DeadlineTask extends Task {
     }
 
     public String toString() {
-    	
-    	String taskNameDeadline = "%s %d/%d/%d";
-    	
-    	return String.format(taskNameDeadline, getDescription(), endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear());
+       
+        String taskNameDeadline = "[%d/%d/%d] [xx:xx - %02d:%02d] %s";
+    	return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear(),endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
     }
 
 

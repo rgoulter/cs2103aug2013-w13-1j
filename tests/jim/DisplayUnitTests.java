@@ -79,7 +79,7 @@ public class DisplayUnitTests {
     	String output = dispCmd.getOutput();
     	
         assertEquals("Display of Timed Task failed",
-                     "Birthday Party 8/11/2013 00:00 to 00:00\n",
+                     "[8/11/2013] [00:00 - 00:00] Birthday Party\n",
                      output);
     }
 
@@ -97,7 +97,7 @@ public class DisplayUnitTests {
         dispCmd.execute(jManager);
 
         String output = dispCmd.getOutput();
-        assertEquals("CS2103 Lecture 10/10/2013 00:00 to 00:00\n", output);
+        assertEquals("[10/10/2013] [00:00 - 00:00] CS2103 Lecture\n", output);
     }
     
     @Test
@@ -121,7 +121,7 @@ public class DisplayUnitTests {
         
         String output = dispCmd.getOutput();
         assertEquals("Display command test on multiple items failed",
-                     "CS2103 Lecture 10/10/2013 00:00 to 00:00\n",
+                     "[10/10/2013] [00:00 - 00:00] CS2103 Lecture\n",
                      output);
     }
 

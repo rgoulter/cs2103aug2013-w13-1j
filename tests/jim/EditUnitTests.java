@@ -91,9 +91,9 @@ public class EditUnitTests {
         // Check to see that the correct output is given to the user
         assertEquals("Output produced does not match expected output",
                      "The following task is edited\n"+
-                     "MyOldTask 10/11/2013 14:00 to 15:00\n"+
+                     "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
                      "To\n"+
-                     "MyNewTask 31/12/2013 14:00 to 15:00\n",
+                     "[31/12/2013] [14:00 - 15:00] MyNewTask\n",
                      editCmd.getOutput());
     }
 
@@ -125,7 +125,7 @@ public class EditUnitTests {
         
         assertEquals("Returned feedback does not match expected feedback (Phase 1)",
                      "The following Task will be edited.\n" +
-                     "MyOldTask 10/11/2013 14:00 to 15:00\n"+
+                     "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
                      "Please enter a new task.\n",
                      feedback);
         
@@ -141,9 +141,9 @@ public class EditUnitTests {
         
         assertEquals("Returned feedback does not match expected feedback (Phase 2)",
                      "The following task is edited\n"+
-                     "MyOldTask 10/11/2013 14:00 to 15:00\n"+
+                     "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
                      "To\n"+
-                     "MyNewTask 31/12/2013 00:00 to 23:59\n",
+                     "[31/12/2013] [00:00 - 23:59] MyNewTask\n",
                      feedback);
         
         assertEquals("The task was not changed correctly in the JournalManager",
