@@ -26,8 +26,8 @@ public class TimedTask extends Task {
                System.out.println("timed task must have time! error exists in storage.");
             
         }
-        this.startTime = new MutableDateTime(startTime);
-        this.endTime = new MutableDateTime(endTime);
+        this.startTime = MutableDateTime.parse(startTime);
+        this.endTime = MutableDateTime.parse(endTime);
         description = desc;
         
     }

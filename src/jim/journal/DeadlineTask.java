@@ -6,19 +6,19 @@ public class DeadlineTask extends Task {
 
     private MutableDateTime endDate;
 
-    // private String description;
 
     public DeadlineTask(MutableDateTime endDate, String desc) {
         // Tasks with both start and end date and time.
         this.endDate = endDate;
-        description = desc;
+        this.description = desc;
     }
     public DeadlineTask(String endDate, String desc){
         if (endDate.isEmpty()){
             System.out.println("deadline task must have time! error exists in storage.");
         } else{
-            this.endDate = new MutableDateTime(endDate);
+            this.endDate = MutableDateTime.parse(endDate);
         }
+        this.description = desc;
     }
     
     public MutableDateTime getEndDate() {
@@ -26,7 +26,7 @@ public class DeadlineTask extends Task {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public String toString() {

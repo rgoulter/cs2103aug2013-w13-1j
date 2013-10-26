@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
                SuggestionManagerTest.class,
                ViewTests.class,
                UndoUnitTests.class,
+               TaskStorageUnitTests.class,
                IntegrationTests.class})
 public class JimTests {
 }
