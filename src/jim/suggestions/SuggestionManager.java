@@ -38,6 +38,7 @@ public class SuggestionManager {
     private int highlightedLine = -1;
     private String filteringSubsequence = "";
     private ArrayList<SuggestionHint> generatedSuggestionHints;
+    private SuggestionHints hintSet;
     private int numberOfSuggestionsToKeep = 8;
     
     private Parser inputParser;
@@ -56,7 +57,8 @@ public class SuggestionManager {
     
     // Pre-Condition: Requires getSuggestionsToDisplay() to be called first
     public SuggestionHints getSuggestionHints() {
-        return new SuggestionHints(generatedSuggestionHints);
+        hintSet = new SuggestionHints(generatedSuggestionHints);
+        return hintSet;
     }
 
 
@@ -74,6 +76,7 @@ public class SuggestionManager {
 
     public void setCurrentSuggestionIndex(int i) {
         highlightedLine = i;
+        hintSet.setSelectedHint(i);
     }
 
 

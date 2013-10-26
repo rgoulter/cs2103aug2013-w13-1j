@@ -131,13 +131,15 @@ public class JimMainPanel extends JPanel {
             @Override
             public void keyReleased(KeyEvent arg0) {
                 int keyCode = arg0.getKeyCode();
-                int keyModifiers = arg0.getModifiers();
                 
                 switch (keyCode) {
                 case KeyEvent.VK_SHIFT:
                 case KeyEvent.VK_CONTROL:
                 case KeyEvent.VK_ALT:
                 case KeyEvent.VK_META:
+                    break;
+                case KeyEvent.VK_TAB:
+                    refreshUI();
                     break;
                 default:
                     suggestionManager.updateBuffer(inputTextField.getText());

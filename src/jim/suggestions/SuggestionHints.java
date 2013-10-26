@@ -36,7 +36,7 @@ public class SuggestionHints {
     	// an HTML rendering..
         StringBuilder result = new StringBuilder(HTML_START_DOCUMENT);
         
-        for (int i = 0; i < suggestions.size(); i++) {
+        for (int i = 0; i < suggestions.size(); i++) {            
             if (i == selectedHint) {
                 result.append(renderHighlighted(renderSuggestion(suggestions.get(i))));
             }
@@ -115,5 +115,10 @@ public class SuggestionHints {
 
     	result.append("</font>");
     	return result.toString();
+    }
+    
+    // Mutators
+    public void setSelectedHint(int selection) {
+        selectedHint = selection;
     }
 }
