@@ -64,8 +64,8 @@ public class JimMainPanel extends JPanel {
     private static final Color COLOR_BLACK = new Color(0, 0, 0);
     private static final Color COLOR_TITLE_BLUE = new Color(205, 205, 235);
     private static final int LARGE_FONT_SIZE = 20;
-    private static final Font FONT_IMPACT = new Font("Impact", Font.PLAIN, LARGE_FONT_SIZE);
-    private static final Font FONT_IMPACT_ITALICS = new Font("Impact", Font.ITALIC, LARGE_FONT_SIZE);
+    private static final Font FONT_MAIN = new Font("Arial Black", Font.PLAIN, LARGE_FONT_SIZE);
+    private static final Font FONT_TITLE = new Font("Impact", Font.ITALIC, LARGE_FONT_SIZE);
 
     // Arbitrary objects for ActionMap.
     private static final String ACTION_EXIT_WINDOW = "exit window";
@@ -256,9 +256,9 @@ public class JimMainPanel extends JPanel {
         clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
         progNameLabel = new JLabel("JIM! v0.3 Internal    ");
         
-        dateLabel.setFont(FONT_IMPACT);
-        clockLabel.setFont(FONT_IMPACT);
-        progNameLabel.setFont(FONT_IMPACT_ITALICS);
+        dateLabel.setFont(FONT_MAIN);
+        clockLabel.setFont(FONT_MAIN);
+        progNameLabel.setFont(FONT_TITLE);
         
         topPanel.add(dateLabel, BorderLayout.WEST);
         topPanel.add(clockLabel, BorderLayout.CENTER);
@@ -437,12 +437,12 @@ public class JimMainPanel extends JPanel {
                 while (isRunning) {
                     
                     GregorianCalendar calendar = new GregorianCalendar();
-                    String dateString = String.format("  %02d-%02d-%02d",
+                    String dateString = String.format(" %02d-%02d-%02d",
                                                       calendar.get(Calendar.DATE),
                                                       calendar.get(Calendar.MONTH)+1,
                                                       calendar.get(Calendar.YEAR));
                     String timeString = String.format("%02d:%02d:%02d",
-                                                      calendar.get(Calendar.HOUR),
+                                                      calendar.get(Calendar.HOUR_OF_DAY),
                                                       calendar.get(Calendar.MINUTE),
                                                       calendar.get(Calendar.SECOND));
                     
