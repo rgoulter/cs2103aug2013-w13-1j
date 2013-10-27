@@ -6,6 +6,7 @@ import jim.journal.AddCommand;
 import jim.journal.CompleteCommand;
 import jim.journal.JournalManager;
 import jim.journal.TemporaryJournalManager;
+import jim.journal.TimedTask;
 
 import org.junit.Test;
 
@@ -103,6 +104,26 @@ public class CompleteUnitTests {
         
         assertEquals("Execution status does not match expected status (Phase 2)",
                      "Success", executionStatus);
+
+    }
+    @Test
+    public void testDateCompleteCommandHasOneMatchesCanExecute () {
+        JournalManager jManager = new TemporaryJournalManager();
+        String startTime = "2013-10-12T12:00:00.000+08:00";
+        String endTime = "2013-10-12T13:00:00.000+08:00";
+        String description = "do a TimedTask";
+        TimedTask testTask = new TimedTask(startTime,endTime,description);
+        AddCommand addCmd1 = new AddCommand(testTask);
+        addCmd1.execute(jManager);
+        
+        CompleteCommand completeCmd = new CompleteCommand(testTask.getStartTime());
+        completeCmd.execute(jManager);
+
+        String output = completeCmd.getOutput();
+
+        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
+                     "0, [12/10/2013] [12:00 - 13:00] do a TimedTask\n",
+                     output);
 
     }
 

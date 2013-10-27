@@ -5,10 +5,13 @@ package jim.journal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.MutableDateTime;
+
 public class EditCommand extends Command {
 
     String description;
     JournalManager JM;
+    MutableDateTime date;
 
     List<Task> tasksToEdit = null;
     Task taskToEdit = null;
@@ -27,7 +30,9 @@ public class EditCommand extends Command {
         description = des;
         taskChangedTo = newTask;
     }
-
+    public EditCommand(MutableDateTime d){
+        date = d;
+    }
 
 
     @Override
@@ -35,7 +40,11 @@ public class EditCommand extends Command {
         JM = journalManager;
         if (tasksToEdit == null) {
             SearchTool searchTool = new SearchTool(JM);
-            matchingTasks = searchTool.searchByNonStrictDescription(description);
+            if (description != null){
+                matchingTasks = searchTool.searchByNonStrictDescription(description);
+            }else if (date != null){
+                matchingTasks = searchTool.searchByDate(date);
+            }
             if (matchingTasks.size() == 0){
                 outputln("No Matching Tasks with the description provided.");
                 return "Failure";
@@ -61,11 +70,7 @@ public class EditCommand extends Command {
         return "NeedNewTask";
         
     }
-
     
-
-
-
     @Override
     public String secondExecute(String secondInput){
             try{

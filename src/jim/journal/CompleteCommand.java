@@ -30,6 +30,8 @@ public class CompleteCommand extends Command {
         
         if (description != null){
             matchingTasks = searchTool.searchByNonStrictDescription(description);
+        }else if (EndDate !=null){
+            matchingTasks = searchTool.searchByDate(EndDate);
         }
           
         if (matchingTasks.size() == 0){

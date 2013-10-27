@@ -4,16 +4,21 @@ package jim.journal;
 
 import java.util.ArrayList;
 
+import org.joda.time.MutableDateTime;
+
 
 
 public class SearchCommand extends Command {
 
-    private String searchTerm;
-
+    private String description;
+    private MutableDateTime date;
 
 
     public SearchCommand(String operand) {
-        searchTerm = operand;
+        description = operand;
+    }
+    public SearchCommand(MutableDateTime d){
+        date = d;
     }
 
 
@@ -21,16 +26,24 @@ public class SearchCommand extends Command {
     @Override
     public String execute(JournalManager journalManager) {
         String output = "";
+        String searchTerm = "";
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
         SearchTool searchTool = new SearchTool(journalManager);
-        matchingTasks = searchTool.searchByNonStrictDescription(searchTerm);
+        if (description != null){
+            searchTerm = description;
+            matchingTasks = searchTool.searchByNonStrictDescription(description);
+        }else if (date != null){
+            
+
+            matchingTasks = searchTool.searchByDate(date);
+        }
         for (Task task : matchingTasks){
             output = output + task.toString() + "\n";
         }
         if (output.equals("")) {
-            outputln("Search term '" + searchTerm + "' was not found.");
+            outputln("Search term '" + description + "' was not found.");
         } else {
-            outputln("Matches for '" + searchTerm + "':\n" + output);
+            outputln("Matches for '" + description + "':\n" + output);
         }
         return "Success";
     }

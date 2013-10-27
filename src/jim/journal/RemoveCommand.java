@@ -4,19 +4,24 @@ package jim.journal;
 
 import java.util.ArrayList;
 
+import org.joda.time.MutableDateTime;
+
 
 
 public class RemoveCommand extends Command {
 
     String description;
     JournalManager JM;
+    MutableDateTime date;
     ArrayList<Task> matchingTasks = new ArrayList<Task>();
     ArrayList<Task> taskToRemove = new ArrayList<Task>();
 
     public RemoveCommand(String des) {
         description = des;
     }
-
+    public RemoveCommand(MutableDateTime d){
+        date = d;
+    }
 
     
     @Override
@@ -24,8 +29,11 @@ public class RemoveCommand extends Command {
         JM = journalManager;
         
         SearchTool searchTool = new SearchTool(journalManager);
-        matchingTasks = searchTool.searchByNonStrictDescription(description);
-        
+        if (description != null){
+            matchingTasks = searchTool.searchByNonStrictDescription(description);
+        }else if (date != null){
+            matchingTasks = searchTool.searchByDate(date);
+        }
        
        
             if (matchingTasks.size() == 0){

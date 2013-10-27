@@ -143,7 +143,7 @@ public class SearchTool {
     private ArrayList<DeadlineTask> getAllDeadlineTasks(){
         ArrayList<DeadlineTask> AllDeadlineTask = new ArrayList<DeadlineTask>();
         for (Task task : AllTasks){
-            if (task instanceof TimedTask){
+            if (task instanceof DeadlineTask){
                 AllDeadlineTask.add((DeadlineTask)task);
             }
         }

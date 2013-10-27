@@ -7,6 +7,7 @@ import jim.journal.Command;
 import jim.journal.JournalManager;
 import jim.journal.SearchCommand;
 import jim.journal.TemporaryJournalManager;
+import jim.journal.TimedTask;
 import jim.suggestions.SuggestionManager;
 
 import org.junit.Test;
@@ -87,6 +88,26 @@ public class SearchUnitTests {
 
         output = searchCmd3.getOutput();
         assertEquals("Matches for 'Lecture':\nCS2103 Lecture\nCS2101 Lecture\n\n", output);
+
+    }
+    @Test
+    public void testDateSearchCommandHasOneMatchesCanExecute () {
+        JournalManager jManager = new TemporaryJournalManager();
+        String startTime = "2013-10-12T12:00:00.000+08:00";
+        String endTime = "2013-10-12T13:00:00.000+08:00";
+        String description = "do a TimedTask";
+        TimedTask testTask = new TimedTask(startTime,endTime,description);
+        AddCommand addCmd1 = new AddCommand(testTask);
+        addCmd1.execute(jManager);
+        
+        SearchCommand searchCmd = new SearchCommand(testTask.getStartTime());
+        searchCmd.execute(jManager);
+
+        String output = searchCmd.getOutput();
+
+        assertEquals("Matches for 'null':\n" +
+                     "[12/10/2013] [12:00 - 13:00] do a TimedTask\n" + "\n",
+                     output);
 
     }
 

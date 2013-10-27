@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import jim.journal.AddCommand;
 import jim.journal.Command;
 import jim.journal.EditCommand;
 import jim.journal.FloatingTask;
@@ -198,6 +199,27 @@ public class EditUnitTests {
         assertEquals("The task was not changed correctly in the JournalManager",
                      "Testing Edit", jManager.getAllTasks().get(1).getDescription());
         
+    }
+    @Test
+    public void testDateEditCommandHasOneMatchesCanExecute () {
+        JournalManager jManager = new TemporaryJournalManager();
+        String startTime = "2013-10-12T12:00:00.000+08:00";
+        String endTime = "2013-10-12T13:00:00.000+08:00";
+        String description = "do a TimedTask";
+        TimedTask testTask = new TimedTask(startTime,endTime,description);
+        AddCommand addCmd1 = new AddCommand(testTask);
+        addCmd1.execute(jManager);
+        
+        EditCommand editCmd = new EditCommand(testTask.getStartTime());
+        editCmd.execute(jManager);
+
+        String output = editCmd.getOutput();
+
+        assertEquals("The following Task will be edited.\n" + 
+                        "[12/10/2013] [12:00 - 13:00] do a TimedTask\n" + 
+                            "Please enter a new task.\n",
+                     output);
+
     }
     
 }
