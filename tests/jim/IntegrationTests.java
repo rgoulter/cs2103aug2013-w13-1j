@@ -2,6 +2,11 @@ package jim;
 
 import static org.junit.Assert.*;
 import jim.journal.AddCommand;
+import jim.journal.CompleteCommand;
+import jim.journal.DisplayCommand;
+import jim.journal.EditCommand;
+import jim.journal.FloatingTask;
+import jim.journal.RemoveCommand;
 import jim.journal.TemporaryJournalManager;
 import jim.suggestions.SuggestionManager;
 
@@ -55,5 +60,35 @@ public class IntegrationTests {
     }
     
     
+    // Runs ALL five major commands, but only tests the final output
+    @Test
+    public void basicAllEncompassingTest() {
+        SuggestionManager sManager = new SuggestionManager();
+        TemporaryJournalManager jManager = new TemporaryJournalManager();
+        
+        AddCommand addCmd1 = new AddCommand(new FloatingTask("Item the First!"));
+        AddCommand addCmd2 = new AddCommand(new FloatingTask("Item the Second!"));
+        addCmd1.execute(jManager);
+        addCmd2.execute(jManager);
+        
+        EditCommand editCmd = new EditCommand("Item");
+        editCmd.execute(jManager);
+        editCmd.secondExecute("1");
+        editCmd.thirdExecute(new FloatingTask("The Second!"));
+        
+        RemoveCommand remCmd = new RemoveCommand("First!");
+        remCmd.execute(jManager);
+        remCmd.secondExecute("0");
+        
+        CompleteCommand completeCmd = new CompleteCommand("The");
+        completeCmd.execute(jManager);
+        completeCmd.secondExecute("0");
+        
+        DisplayCommand dispCmd = new DisplayCommand();
+        dispCmd.execute(jManager);
+        
+        String displayOutput = dispCmd.getOutput();
+        assertEquals(displayOutput, "[DONE] The Second!\n");
+    }
 
 }

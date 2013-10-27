@@ -38,7 +38,12 @@ public class DisplayCommand extends Command {
 
         for (Task current : allTasks) {
             if (dateLimit == null) {
-                outputln(current.toString());
+                
+                if (current.isCompleted()) {
+                    outputln("[DONE] " + current.toString());
+                } else {
+                    outputln(current.toString());
+                }
             } else {
                 if (current instanceof TimedTask) {
                 	MutableDateTime taskTime =((TimedTask) current).getStartTime();

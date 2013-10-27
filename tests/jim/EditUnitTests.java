@@ -10,6 +10,7 @@ import java.util.GregorianCalendar;
 
 import jim.journal.Command;
 import jim.journal.EditCommand;
+import jim.journal.FloatingTask;
 import jim.journal.JournalManager;
 import jim.journal.Task;
 import jim.journal.TemporaryJournalManager;
@@ -20,12 +21,19 @@ import org.joda.time.MutableDateTime;
 import org.junit.Test;
 
 
+/* GLOSSARY
+ * Editing happens in up to three phases: 1) Search Phase, 2) Select Phase, 3) Edit Phase
+ * In Phase 1, the user enters the name of a task, and a search is performed
+ * In Phase 2, if the input is ambiguous, allow the user to make a selection
+ * In Phase 3, the user enters new text to replace that of the selected task
+ */
 
 
 
 
 public class EditUnitTests {
 
+    // Tests Parsing
     @Test
     public void testStrictSyntaxEditCommandCanParse () {
         // Strict syntax for "edit" command:
@@ -37,9 +45,6 @@ public class EditUnitTests {
         Calendar endTimeCal = new GregorianCalendar(2013, 10, 10, 15, 0);
         MutableDateTime startTime = new MutableDateTime(startTimeCal);
         MutableDateTime endTime = new MutableDateTime(endTimeCal);
-        TimedTask myOldTimedTask = new TimedTask(startTime,
-                                                 endTime,
-                                                 "MyOldTask");
 
         String testCommand = "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
         String[] testCommandWords = testCommand.split(" ");
@@ -52,9 +57,9 @@ public class EditUnitTests {
     }
 
 
-
+    // Tests Only Phase 3
     @Test
-    public void testStrictSyntaxEditCommandCanExecute () {
+    public void testStrictSyntaxEditCommandOnePartCanExecute () {
         // Edit Command with the given change-to-task.
 
         // e.g. "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
@@ -98,9 +103,9 @@ public class EditUnitTests {
     }
 
 
-
+    // Tests Only Phase 1 and Phase 3
     @Test
-    public void testStrictSyntaxEditCommandWithInputCanExecute () {
+    public void testStrictSyntaxEditCommandTwoPartsCanExecute () {
         // Edit command, getting input from inputLine()
         // e.g. "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
 
@@ -120,10 +125,10 @@ public class EditUnitTests {
         String executionStatus = editCmd.execute(journalManager);
         String feedback = editCmd.getOutput();
         
-        assertEquals("Execution status not correctly updated to NeedNewTask (Phase 1)",
+        assertEquals("Execution status not correctly updated to NeedNewTask (Part 1)",
                      "NeedNewTask", executionStatus);
         
-        assertEquals("Returned feedback does not match expected feedback (Phase 1)",
+        assertEquals("Returned feedback does not match expected feedback (Part 1)",
                      "The following Task will be edited.\n" +
                      "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
                      "Please enter a new task.\n",
@@ -136,10 +141,10 @@ public class EditUnitTests {
         executionStatus = editCmd.thirdExecute(newTask);
         feedback = editCmd.getOutput();
         
-        assertEquals("Execution status not correctly updated to Success (Phase 2)",
+        assertEquals("Execution status not correctly updated to Success (Part 2)",
                      "Success", executionStatus);
         
-        assertEquals("Returned feedback does not match expected feedback (Phase 2)",
+        assertEquals("Returned feedback does not match expected feedback (Part 2)",
                      "The following task is edited\n"+
                      "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
                      "To\n"+
@@ -151,4 +156,48 @@ public class EditUnitTests {
         
     }
 
+    
+    // Tests Phases 1, 2 and 3
+    @Test
+    public void testStrictSyntaxEditCommandThreePartsCanExecute() {
+        JournalManager jManager = new TemporaryJournalManager();
+        jManager.addTask(new FloatingTask("Testing Item"));
+        jManager.addTask(new FloatingTask("Placeholder Item"));
+        
+        EditCommand editCmd = new EditCommand("Item");
+        String executionStatus = editCmd.execute(jManager);
+        String commandOutput = editCmd.getOutput();
+        
+        assertEquals("Execution Status not set to 'Pending'",
+                     executionStatus, "Pending");
+        assertEquals("Edit Command did not return expected output",
+                     "Type in just the index of tasks you wish to process.\n" +
+                     "0, Testing Item\n" + 
+                     "1, Placeholder Item\n",
+                     commandOutput);
+        
+        executionStatus = editCmd.secondExecute("0");
+        commandOutput = editCmd.getOutput();
+        
+        assertEquals("Execution Status not set to 'NeedNewTask'",
+                     executionStatus, "NeedNewTask");
+        assertEquals("Edit Command did not return expected output",
+                     "The following Task will be edited.\n" +
+                     "Testing Item\n" +
+                     "Please enter a new task.\n",
+                     commandOutput);
+
+        executionStatus = editCmd.thirdExecute(new FloatingTask("Testing Edit"));
+        commandOutput = editCmd.getOutput();
+        
+        assertEquals("Execution Status not set to 'Success'",
+                     executionStatus, "Success");
+        assertEquals("Edit Command did not return expected output",
+                     "The following task is edited\n" + 
+                     "Testing Item\nTo\nTesting Edit\n", commandOutput);
+        assertEquals("The task was not changed correctly in the JournalManager",
+                     "Testing Edit", jManager.getAllTasks().get(1).getDescription());
+        
+    }
+    
 }
