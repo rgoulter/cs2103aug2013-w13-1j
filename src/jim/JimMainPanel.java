@@ -32,6 +32,7 @@ import java.util.GregorianCalendar;
 import jim.suggestions.SuggestionManager;
 import jim.suggestions.SuggestionView;
 import jim.journal.Command;
+import jim.journal.EditCommand;
 import jim.journal.JournalManager;
 import jim.journal.JournalView;
 import jim.journal.Task;
@@ -133,14 +134,21 @@ public class JimMainPanel extends JPanel {
                 int keyCode = arg0.getKeyCode();
                 
                 switch (keyCode) {
+                
+                // No action for key modifiers
                 case KeyEvent.VK_SHIFT:
                 case KeyEvent.VK_CONTROL:
                 case KeyEvent.VK_ALT:
                 case KeyEvent.VK_META:
                     break;
+                
+                // Only refresh view for esc and tab
+                case KeyEvent.VK_ESCAPE:
                 case KeyEvent.VK_TAB:
                     refreshUI();
                     break;
+                
+                // Send text to suggestionmanager
                 default:
                     suggestionManager.updateBuffer(inputTextField.getText());
                     refreshUI();
@@ -181,7 +189,6 @@ public class JimMainPanel extends JPanel {
                                               @Override
                                               public void actionPerformed(ActionEvent e) {
                                                   executeInput();
-                                                  inputTextField.setText("");
                                               }
                                           });
 
@@ -256,7 +263,7 @@ public class JimMainPanel extends JPanel {
         
         dateLabel = new JLabel("  xx-xx-xx");
         clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
-        progNameLabel = new JLabel("JIM! v0.3 Internal    ");
+        progNameLabel = new JLabel("JIM! v0.3    ");
         
         dateLabel.setFont(FONT_MAIN);
         clockLabel.setFont(FONT_MAIN);
@@ -310,7 +317,8 @@ public class JimMainPanel extends JPanel {
         CardLayout cardLayout = (CardLayout) viewPanel.getLayout();
 
         // TODO: 0 is a magic number here, oddly enough.
-        if (inputTextField.getText().length() > 0 && !lastCommandState.equals("Pending")) {
+        if (inputTextField.getText().length() > 0 &&
+           (!lastCommandState.equals("Pending") && !lastCommandState.equals("NeedNewTask"))) {
             // Show the Suggestion view
             cardLayout.show(viewPanel, CARDLAYOUT_SUGGESTION_VIEW);
         } else {
@@ -365,9 +373,14 @@ public class JimMainPanel extends JPanel {
         if (lastCommandState.equals("Success") || lastCommandState.equals("Failure")) {
             clearLastCommand();
             journalView.unholdFeedback();
+            inputTextField.setText("");
         }
         else if (lastCommandState.equals("Pending")) {
             journalView.holdFeedback();
+            inputTextField.setText("");
+        }
+        else if (lastCommandState.equals("NeedNewTask")) {
+            inputTextField.setText( ((EditCommand) lastCommand).getSelectedTaskDescription() );
         }
         
         
@@ -411,6 +424,9 @@ public class JimMainPanel extends JPanel {
                                                            if (lastCommandState.equals("Pending") ||
                                                                lastCommandState.equals("NeedNewTask")) {
                                                                clearLastCommand();
+                                                               journalView.unholdFeedback();
+                                                               refreshUI();
+                                                               inputTextField.setText("");
                                                            }
                                                            else {
                                                                applicationWindow.dispose();
@@ -443,7 +459,7 @@ public class JimMainPanel extends JPanel {
                                                       calendar.get(Calendar.DATE),
                                                       calendar.get(Calendar.MONTH)+1,
                                                       calendar.get(Calendar.YEAR));
-                    String timeString = String.format("%02d:%02d:%02d",
+                    String timeString = String.format("%02d:%02d:%02d     ",
                                                       calendar.get(Calendar.HOUR_OF_DAY),
                                                       calendar.get(Calendar.MINUTE),
                                                       calendar.get(Calendar.SECOND));
