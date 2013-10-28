@@ -41,12 +41,9 @@ public class AddCommand extends Command {
 
     @Override
     public String execute(JournalManager journalManager) {
-        
         journalManager.addTask(taskToAdd);
         journalManager.addCommandHistory("add", taskToAdd);
-        return "Success";
-        
-        
+        return "Success";     
     }
 
     @Override

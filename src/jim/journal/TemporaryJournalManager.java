@@ -130,12 +130,10 @@ public class TemporaryJournalManager extends JournalManager {
     	historyIndex++;
     	historyOfCommand.add(historyIndex, command);
     }
-    public void undoLastCommand(){
+    public boolean undoLastCommand(){
     	// get the last command in historyOfCommand
-    	if (historyIndex == -1) {
-    		// do nothing
-    	} else {
-			Command_Task LastCommand = historyOfCommand.get(historyIndex--);
+    	if (historyIndex > -1) {
+    		Command_Task LastCommand = historyOfCommand.get(historyIndex--);
 		    //add, edit, remove, complete
 		    if (LastCommand.getCommand().equals("add")){
 		    	removeTask(LastCommand.getTask());
@@ -148,6 +146,9 @@ public class TemporaryJournalManager extends JournalManager {
 		    } else {
 		        //error
 		    }
+    		return true;
+    	} else {
+			return false;
     	}
     }
 

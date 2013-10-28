@@ -2,21 +2,20 @@ package jim.journal;
 
 
 
-public class UndoCommand extends Command{
+public class RedoCommand extends Command{
 	
-    public UndoCommand() {
+    public RedoCommand() {
     }
     @Override
     public String execute(JournalManager journalManager) {
         // TODO Auto-generated method stub
-        if (journalManager.undoLastCommand()) {
-    	  outputln("Undo Successful");
-          return "Success";
+        if (journalManager.redoUndoCommand()){
+        	outputln("Redo Successful");
+        	return "Success";
         } else {
-     	  outputln("Undo Unsuccessful");
-          return "Failure";
+        	outputln("Redo Unsuccessful");
+        	return "Failure";
         }
-      
     }
     @Override
     public String secondExecute(String secondInput) {
@@ -30,7 +29,7 @@ public class UndoCommand extends Command{
     }
     
     public String toString() {
-        return "Undo";
+        return "Redo";
     }
 
 }

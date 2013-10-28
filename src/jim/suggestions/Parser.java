@@ -473,6 +473,7 @@ public class Parser {
                                                     "searchcmd",
                                                     "displaycmd",
                                                     "undocmd",
+                                                    "redocmd",
                                                     "cmd"};
         
         StringBuilder result = new StringBuilder();

@@ -73,10 +73,11 @@ public class SyntaxGrammar {
 			"<displayword> := 'display'",
 			"<displaycmd> := <displayword> | <displayword> <date>",
 			"<undocmd> := 'undo'",
+			"<redocmd> := 'redo'",
 			
 			"<cmd> := " +
 			  "<addcmd> | <completecmd> | <removecmd> | " + 
-			  "<editcmd> | <searchcmd> | <displaycmd> | <undocmd>"
+			  "<editcmd> | <searchcmd> | <displaycmd> | <undocmd> | <redocmd>"
         };
         
         for (String syntaxDefinitionLine : syntaxes) {

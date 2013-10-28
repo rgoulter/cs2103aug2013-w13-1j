@@ -13,6 +13,7 @@ import jim.journal.AddCommand;
 import jim.journal.DeadlineTask;
 import jim.journal.EditCommand;
 import jim.journal.FloatingTask;
+import jim.journal.RedoCommand;
 import jim.journal.SearchCommand;
 import jim.journal.Task;
 import jim.journal.TimedTask;
@@ -500,8 +501,14 @@ public class SyntaxParsers {
                                   return new UndoCommand();
                               }
                           });
-        
-
+        registerSyntaxParser(p,
+				          "redocmd => 'redo'",
+		                new SimpleSyntaxParser() {
+		                    @Override
+		                    public Object parse(String[] input) {
+		                        return new RedoCommand();
+		                    }
+		                });
     }
 
 

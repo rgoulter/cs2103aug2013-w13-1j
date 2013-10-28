@@ -20,7 +20,9 @@ public class JournalManager {
     TaskStorage taskStorage = new TaskStorage("taskstorage.txt");
     private int historyIndex = NO_COMMAND_EXECUTED_YET; 
     
-    private List<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
+    private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
+    private boolean newTrueCommand = true;
+    
     private static Logger Logger = java.util.logging.Logger.getLogger("JournalManager");
      
     /**
@@ -154,7 +156,7 @@ public class JournalManager {
      * completedTasks.
      */
     public void addTask(Task task) {
-
+    	clearPastCmds();
         storeAllTasks.add(task);
         try {
             taskStorage.recordNewTask(task);
@@ -162,23 +164,25 @@ public class JournalManager {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+     //   System.out.println("history Index = " + historyIndex);
     }
 
     public boolean removeTask(Task task) {
+    	clearPastCmds();
         boolean result = false;
         getAllTasks();
         if (storeAllTasks.remove(task)){
             result = true;
             saveToStorage();
         }
+  //      System.out.println("history Index = " + historyIndex);
         return result;
     }
 
 
 
     public String completeTask(Task task) {
-        
+    	clearPastCmds();
         if (task.isCompleted()) {
             return "Task " +
                    task.toString() +
@@ -226,13 +230,14 @@ public class JournalManager {
     	Command_Task command = new Command_Task(cmd, someTask);
     	historyIndex++;
     	historyOfCommand.add(historyIndex, command);
+    //	System.out.println("history Index = " + historyIndex);
     }
-    public void undoLastCommand(){
+
+    public boolean undoLastCommand(){
     	// get the last command in historyOfCommand
-    	if (historyIndex == NO_COMMAND_EXECUTED_YET) {
-    		// do nothing
-    	} else {
-			Command_Task LastCommand = historyOfCommand.get(historyIndex--);
+    	if (historyIndex > NO_COMMAND_EXECUTED_YET) {
+        	newTrueCommand = false;
+    		Command_Task LastCommand = historyOfCommand.get(historyIndex--);
 		    //add, edit, remove, complete
 		    if (LastCommand.getCommand().equals("add")){
 		    	removeTask(LastCommand.getTask());
@@ -245,7 +250,48 @@ public class JournalManager {
 		    } else {
 		        //error
 		    }
+	//	    System.out.println("history Index = " + historyIndex);
+		    return true;
+    	} else {
+   // 		System.out.println("history Index = " + historyIndex);
+    		return false;
     	}
+    }
+    
+    public boolean redoUndoCommand(){
+    	if (historyOfCommand.size() >= 0 && historyIndex < historyOfCommand.size() - 1) {
+    		newTrueCommand = false;
+    		Command_Task LastCommand = historyOfCommand.get(++historyIndex);
+		    //add, edit, remove, complete
+		    if (LastCommand.getCommand().equals("add")){
+		    	addTask(LastCommand.getTask());
+		    } else if (LastCommand.getCommand().equals("edit")){
+		        
+		    } else if (LastCommand.getCommand().equals("remove")){
+		    	removeTask(LastCommand.getTask());
+		    } else if (LastCommand.getCommand().equals("complete")){
+		    	completeTask(LastCommand.getTask());
+		    } else {
+		        //error
+		    }
+	//	    System.out.println("history Index = " + historyIndex);
+		    return true;
+    	} else {
+    //		System.out.println("history Index = " + historyIndex);
+    		return false;
+    	}
+    	
+    }
+    
+    private void clearPastCmds(){
+    	// if true, it means addTask() is not called from undoLastCommand()
+    	if (historyOfCommand.size() > 0) {
+    		if (newTrueCommand) {
+	        	historyOfCommand.subList(historyIndex+1, historyOfCommand.size()-1).clear();
+	    	} else {
+	    		newTrueCommand = true;
+	    	}
+    	}  	
     }
     
 	class Command_Task {
@@ -269,5 +315,4 @@ public class JournalManager {
     public void sortFloatingTask(ArrayList<FloatingTask> floatingTasks){
         
     }
-
 }
