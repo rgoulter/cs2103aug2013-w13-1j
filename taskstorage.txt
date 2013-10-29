@@ -1,80 +1,100 @@
-T:TimedTask
-S:2013-10-12T12:00:00.000+08:00
-E:2013-10-12T13:00:00.000+08:00
-D:lunch
+T:FloatingTask
+S:
+E:
+D:Book Driving Test
+C:Not Completed
+T:DeadlineTask
+S:
+E:2013-10-29T00:00:00.000+08:00
+D:Finish Stats Homework
 C:Not Completed
 T:FloatingTask
 S:
 E:
-D:code for JIM!
-C:Not Completed
-T:FloatingTask
-S:
-E:
-D:try JIM!
-C:Not Completed
-T:FloatingTask
-S:
-E:
-D:CS2101 Sectional
+D:Restock Kitchen Cabinet
 C:Not Completed
 T:TimedTask
-S:2013-11-07T00:00:00.000+08:00
-E:2013-11-08T00:00:00.000+08:00
-D:Birthday Party
+S:2013-10-29T14:00:00.000+08:00
+E:2013-10-29T15:00:00.000+08:00
+D:Skype Call with Team
+C:Not Completed
+T:DeadlineTask
+S:
+E:2013-10-30T00:00:00.000+08:00
+D:Bring Thumbdrive to School
+C:Not Completed
+T:FloatingTask
+S:
+E:
+D:Charge Batteries for Saturday Roadtrip
 C:Not Completed
 T:TimedTask
-S:2013-10-14T00:00:00.000+08:00
-E:2013-10-14T00:00:00.000+08:00
-D:CS2101 Lesson
+S:2013-10-30T19:00:00.000+08:00
+E:2013-10-30T20:00:00.000+08:00
+D:Collect Phone from Repair Shop
+C:Not Completed
+T:FloatingTask
+S:
+E:
+D:Implement new features in pet project
+C:Not Completed
+T:FloatingTask
+S:
+E:
+D:Backup laptop hard disk!
 C:Not Completed
 T:TimedTask
-S:2013-12-31T00:00:00.000+08:00
-E:2013-12-31T00:00:00.000+08:00
-D:MyNewTask
+S:2013-10-31T12:00:00.000+08:00
+E:2013-10-31T14:00:00.000+08:00
+D:Consultation for Stats Homework
 C:Not Completed
 T:TimedTask
-S:2013-12-31T14:00:00.000+08:00
-E:2013-12-31T15:00:00.000+08:00
-D:MyNewTask
-C:Not Completed
-T:FloatingTask
-S:
-E:
-D:CS2103 Lecture
-C:Not Completed
-T:FloatingTask
-S:
-E:
-D:CS2101 Sectional
-C:Not Completed
-T:FloatingTask
-S:
-E:
-D:CS2103 Lecture
-C:Not Completed
-T:FloatingTask
-S:
-E:
-D:CS2101 Sectional
-C:Not Completed
-T:FloatingTask
-S:
-E:
-D:CS2103 Lecture
+S:2013-10-31T11:00:00.000+08:00
+E:2013-10-31T12:00:00.000+08:00
+D:Presentation Dry Run
 C:Not Completed
 T:TimedTask
-S:2013-10-24T23:50:00.000+08:00
-E:2013-10-24T23:59:00.000+08:00
-D:do stuff
+S:2013-10-29T18:00:00.000+08:00
+E:2013-10-29T21:00:00.000+08:00
+D:Training Session
+C:Not Completed
+T:DeadlineTask
+S:
+E:2013-10-30T00:00:00.000+08:00
+D:Prepare to begin recording JIM Demo Video
+C:Not Completed
+T:DeadlineTask
+S:
+E:2013-10-30T00:00:00.000+08:00
+D:Stress Test on JIM!
+C:Not Completed
+T:DeadlineTask
+S:
+E:2013-10-31T00:00:00.000+08:00
+D:Start work on CS2010
+C:Not Completed
+T:TimedTask
+S:2013-10-30T13:00:00.000+08:00
+E:2013-10-30T14:00:00.000+08:00
+D:JIM v0.3 Demo
 C:Not Completed
 T:FloatingTask
 S:
 E:
-D:XYZ
+D:Prepare helpsheet for Stats
 C:Not Completed
 T:FloatingTask
 S:
 E:
-D:YVW
+D:Prepare helpsheet for CS2010
+C:Not Completed
+T:TimedTask
+S:2013-10-30T20:00:00.000+08:00
+E:2013-10-30T21:00:00.000+08:00
+D:Finalize CS2101 Presentation Draft 1
+C:Not Completed
+T:FloatingTask
+S:
+E:
+D:1-11-13 Group Meeting
 C:Not Completed
