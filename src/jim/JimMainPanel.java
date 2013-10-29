@@ -252,8 +252,9 @@ public class JimMainPanel extends JPanel {
 
                                               @Override
                                               public void actionPerformed(ActionEvent e) {
-                                                  JOptionPane.showMessageDialog(null, "Redo!", "Work In Progress", 1);
-                                                  refreshUI();
+                                                  inputTextField.setText("redo");
+                                                  executeInput();
+                                                  inputTextField.setText("");
                                               }
                                           });
 
