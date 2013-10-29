@@ -79,7 +79,22 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
     	//return getDescription() +"  "+ startTime.toString() +" to " + endTime.toString();
     }
 
+    public String toStringForEditCommand(){
+        String taskName = "%d/%d/%d %02d:%02d to %02d:%02d %s";
+        String taskNameNoStartTime = "%d/%d/%d %02d:%02d %s";
+        //TODO: Do we still need to check startTime != null?? Isn't it DeadlineTask?
+        if (this.startTime == null) {
+            return String.format(taskNameNoStartTime, 
+                                 endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear()-2000,
+                                 endTime.getHourOfDay(), endTime.getMinuteOfHour(), getDescription());
+        } else {
+            return String.format(taskName, endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear()-2000,
+                    startTime.getHourOfDay(), startTime.getMinuteOfHour(),
+                    endTime.getHourOfDay(), endTime.getMinuteOfHour(),
+                    getDescription());
+        }
 
+    }
 
     @Override
     public boolean equals(Object o) {
