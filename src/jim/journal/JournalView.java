@@ -22,6 +22,7 @@ public class JournalView extends JimView {
     private String lastFeedback = "";
     private boolean holdingFeedback = false;
 
+    private int selectionPosition = 0;
 
 
     public JournalView() {
@@ -78,6 +79,27 @@ public class JournalView extends JimView {
         // Output to the Text Area
         outputTextArea.setText(journalText);
         outputTextArea.select(0,0);
+    }
+    
+    public void scrollPageDown() {
+        selectionPosition += 300;
+        int maxPosition = scrollingPane.getVerticalScrollBar().getMaximum() - 383;
+        
+        if (selectionPosition > maxPosition) {
+            selectionPosition = maxPosition;
+        }
+
+        scrollingPane.getVerticalScrollBar().setValue(selectionPosition);
+    }
+    
+    public void scrollPageUp() {
+        selectionPosition -= 300;
+        
+        if (selectionPosition < 0) {
+            selectionPosition = 0;
+        }
+
+        scrollingPane.getVerticalScrollBar().setValue(selectionPosition);
     }
     
     public void holdFeedback()   { holdingFeedback = true; }

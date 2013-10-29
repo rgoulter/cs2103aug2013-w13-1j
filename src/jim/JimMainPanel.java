@@ -75,6 +75,8 @@ public class JimMainPanel extends JPanel {
     private static final String ACTION_SUGGESTIONS_BACKWARD = "suggestions backward";
     private static final String ACTION_JOURNAL_UNDO = "undo";
     private static final String ACTION_JOURNAL_REDO = "redo";
+    private static final String ACTION_JOURNAL_SCROLLUP = "scroll up";
+    private static final String ACTION_JOURNAL_SCROLLDOWN = "scroll down";
 
     private static final String CARDLAYOUT_JOURNAL_VIEW = "journal view";
     private static final String CARDLAYOUT_SUGGESTION_VIEW = "suggestion view";
@@ -135,11 +137,13 @@ public class JimMainPanel extends JPanel {
                 
                 switch (keyCode) {
                 
-                // No action for key modifiers
+                // No action for key modifiers; PageUp/PageDown
                 case KeyEvent.VK_SHIFT:
                 case KeyEvent.VK_CONTROL:
                 case KeyEvent.VK_ALT:
                 case KeyEvent.VK_META:
+                case KeyEvent.VK_PAGE_UP:
+                case KeyEvent.VK_PAGE_DOWN:
                     break;
                 
                 // Only refresh view for esc and tab
@@ -195,7 +199,7 @@ public class JimMainPanel extends JPanel {
         // Bind TAB to nextSuggestion
         inputTextField.getInputMap()
                       .put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0),
-                           ACTION_SUGGESTIONS_FORWARD);
+                                          ACTION_SUGGESTIONS_FORWARD);
         inputTextField.getActionMap().put(ACTION_SUGGESTIONS_FORWARD,
                                           new AbstractAction() {
 
@@ -212,7 +216,7 @@ public class JimMainPanel extends JPanel {
         inputTextField.getInputMap()
                       .put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
                                                   java.awt.event.InputEvent.SHIFT_DOWN_MASK),
-                           ACTION_SUGGESTIONS_BACKWARD);
+                                                  ACTION_SUGGESTIONS_BACKWARD);
         inputTextField.getActionMap().put(ACTION_SUGGESTIONS_BACKWARD,
                                           new AbstractAction() {
 
@@ -225,7 +229,7 @@ public class JimMainPanel extends JPanel {
                                               }
                                           });
         
-     // Bind CTRL+Z to undo (Work in progress; Waiting for Undo to be implemented)
+     // Bind CTRL+Z to undo
         inputTextField.getInputMap()
                       .put(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
                                                   java.awt.event.InputEvent.CTRL_DOWN_MASK),
@@ -242,7 +246,7 @@ public class JimMainPanel extends JPanel {
                                               }
                                           });
         
-        // Bind CTRL+Y to undo (Work in progress; Waiting for Redo to be implemented)
+        // Bind CTRL+Y to undo
         inputTextField.getInputMap()
                       .put(KeyStroke.getKeyStroke(KeyEvent.VK_Y,
                                                   java.awt.event.InputEvent.CTRL_DOWN_MASK),
@@ -255,6 +259,31 @@ public class JimMainPanel extends JPanel {
                                                   inputTextField.setText("redo");
                                                   executeInput();
                                                   inputTextField.setText("");
+                                              }
+                                          });
+        // Bind PAGEUP to scroll up for JournalView
+        inputTextField.getInputMap()
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0),
+                                    ACTION_JOURNAL_SCROLLUP);
+        inputTextField.getActionMap().put(ACTION_JOURNAL_SCROLLUP,
+                                          new AbstractAction() {
+
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  journalView.scrollPageUp();
+                                              }
+                                          });
+        
+        // Bind PAGEDOWN to scroll down for JournalView
+        inputTextField.getInputMap()
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0),
+                                    ACTION_JOURNAL_SCROLLDOWN);
+        inputTextField.getActionMap().put(ACTION_JOURNAL_SCROLLDOWN,
+                                          new AbstractAction() {
+
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  journalView.scrollPageDown();
                                               }
                                           });
 
