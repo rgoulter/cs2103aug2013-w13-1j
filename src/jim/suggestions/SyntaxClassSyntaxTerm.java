@@ -87,9 +87,9 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     	
     	// LIMITATION: We must assume that the input subsequence has spaces between things matched.
     	String[] subseqParts = context.getInputSubsequence().split(" ");
-    	String subseqForGenWord = (numWordsSoFar < subseqParts.length) ? subseqParts[numWordsSoFar] : "";
     	Set<String> wordsFromCurrentTasks = context.getAllWordsFromCurrentTasks();
-    	
+
+    	String subseqForGenWord = (numWordsSoFar < subseqParts.length) ? subseqParts[numWordsSoFar] : "";
     	String suggestedWord = generateSuggestionWord(wordsFromCurrentTasks, subseqForGenWord, t);
     	SuggestionHint generatedHint =  new SuggestionHint(new String[]{suggestedWord},
     	                                                   context.getInputSubsequence(),
@@ -97,11 +97,14 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     	int numWordsGenerated = 1;
     	
     	while (numWordsSoFar + numWordsGenerated < subseqParts.length) {
-    		suggestedWord = generateSuggestionWord(wordsFromCurrentTasks, subseqForGenWord, t);
+    		numWordsGenerated++;
+    		int subseqPartIdx = numWordsSoFar + numWordsGenerated;
+    		double tt = Math.pow(1 + t, subseqPartIdx) % 1; // need to redistribute t
+    		subseqForGenWord = (subseqPartIdx < subseqParts.length) ? subseqParts[subseqPartIdx] : "";
+    		suggestedWord = generateSuggestionWord(wordsFromCurrentTasks, subseqForGenWord, tt);
     		SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{suggestedWord},
                                                                context.getInputSubsequence(),
                                                                new SyntaxTerm[]{this});
-    		numWordsGenerated++;
     		generatedHint = SuggestionHint.combine(generatedHint, nextGeneratedHint);
     	}
     	
