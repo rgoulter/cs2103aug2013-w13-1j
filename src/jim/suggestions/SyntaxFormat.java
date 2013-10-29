@@ -20,14 +20,16 @@ class SyntaxFormat {
 		return syntaxTerms;
 	}
 
-    public SuggestionHint generate(GenerationContext context, double t) {
-		SuggestionHint[] hints = new SuggestionHint[syntaxTerms.length];
+    public SuggestionHint generate(GenerationContext context, double t) {		
+		SuggestionHint generatedHint = syntaxTerms[0].generate(context, t);
 		
-		for (int i = 0; i < hints.length; i++) {
-			hints[i] = syntaxTerms[i].generate(context, t);
+		for (int i = 1; i < syntaxTerms.length; i++) {
+			context.setCurrentGeneratedHint(generatedHint);
+			SuggestionHint tmpHint = syntaxTerms[i].generate(context, t);
+			generatedHint = SuggestionHint.combine(generatedHint, tmpHint);
 		}
 		
-		return SuggestionHint.combine(hints);
+		return generatedHint;
     }
 	
 	@Override

@@ -1,11 +1,18 @@
 package jim.suggestions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import static jim.util.StringUtils.filterMatchBySubseq;
 
 class SyntaxClassSyntaxTerm extends SyntaxTerm {
+    private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName()); 
+    
 	private static Map<String, List<SyntaxFormat>> syntaxClassesMap = null;
 	
 	private String syntaxClassName;
@@ -58,12 +65,53 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     }
     
     private SuggestionHint generateDescriptionSuggestionHint(GenerationContext context, double t) {
+    	// Delegate to other methods, if we can.
+    	if (isSearchCmd(context, t)) {
+    		return generateSearchDescriptionSuggestionHint(context, t);
+    	}
+    	
     	List<String> wordList = Arrays.asList(new String[]{"monkey", "banana"}); // Temporary MAGIC
     	String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
     	
     	return new SuggestionHint(new String[]{suggestedWord},
     			                  context.getInputSubsequence(),
                                   new SyntaxTerm[]{this});
+    }
+    
+    private SuggestionHint generateSearchDescriptionSuggestionHint(GenerationContext context, double t) {
+    	// Here we generate as little or as much of a description as we need to.
+    	// This may be one word, or it may be many.
+    	
+    	SuggestionHint currentHint = context.getCurrentGeneratedHint();
+    	int numWordsSoFar = currentHint.getWords().length;
+    	
+    	// LIMITATION: We must assume that the input subsequence has spaces between things matched.
+    	String[] subseqParts = context.getInputSubsequence().split(" ");
+    	String subseqForGenWord = (numWordsSoFar < subseqParts.length) ? subseqParts[numWordsSoFar] : "";
+    	
+    	Set<String> wordsFromCurrentTasks = context.getAllWordsFromCurrentTasks();
+    	Set<String> matchingWordSet = filterMatchBySubseq(wordsFromCurrentTasks,
+    	                                                  subseqForGenWord);
+    	List<String> wordList = new ArrayList<String>(matchingWordSet);
+    	
+    	LOGGER.info("# words: " + wordsFromCurrentTasks.size() + ", # matched: " + matchingWordSet.size());
+    	
+    	
+    	String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
+    	
+    	return new SuggestionHint(new String[]{suggestedWord},
+    			                  context.getInputSubsequence(),
+                                  new SyntaxTerm[]{this});
+    }
+    
+    private boolean isSearchCmd(GenerationContext context, double t) {
+    	if (context.getCurrentGeneratedHint() == null) {
+    		return false;
+    	}
+    	
+    	String firstWord = context.getCurrentGeneratedHint().getWords()[0];
+    	
+    	return "search".contains(firstWord); // MAGIC
     }
     
     private SuggestionHint generateSuggesionHintFromRandomFormat(GenerationContext context,

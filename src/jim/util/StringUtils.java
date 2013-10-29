@@ -1,5 +1,8 @@
 package jim.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class StringUtils {
 
 
@@ -96,5 +99,35 @@ public class StringUtils {
             }
         }
         return dates;
+    }
+    
+    
+    
+    public static Set<String> filterMatchBySubseq(Set<String> setOfStrings, String subseq) {
+    	Set<String> matchingStrings = new HashSet<String>();
+    	
+    	for (String s : setOfStrings) {
+    		if (isSubsequenceMatch(s, subseq)) {
+    			matchingStrings.add(s);
+    		}
+    	}
+    	
+    	return matchingStrings;
+    }
+    
+    
+    
+    public static boolean isSubsequenceMatch(String str, String subseq) {
+    	char[] strChars = str.toCharArray();
+    	char[] subseqChars = subseq.toCharArray();
+    	int charIdx = 0;
+    	
+    	for (int i = 0; i < strChars.length && charIdx < subseqChars.length; i++) {
+    		if (strChars[i] == subseqChars[charIdx]) {
+    			charIdx++;
+    		}
+    	}
+    	
+    	return charIdx == subseqChars.length;
     }
 }
