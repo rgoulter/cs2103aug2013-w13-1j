@@ -126,6 +126,13 @@ public class SuggestionManager {
     public void updateBuffer(String text) {
     	filteringSubsequence = text;
     	
+    	// This is very clunky at the moment, since,
+    	//  as we add more input to the buffer, we "delete" the earlier,
+    	//  "good" suggestions...
+    	// To be more natural, we could perhaps try "deriving" suggestions
+    	//  from current suggestions. (GenerationContext would allow this?).
+    	// or other alternatives; but the above may be alright..
+    	
     	filterThroughGeneratedSuggestions();
     	generateMoreSuggestionsIfNecessary();
     }
