@@ -93,8 +93,8 @@ S:2013-10-30T20:00:00.000+08:00
 E:2013-10-30T21:00:00.000+08:00
 D:Finalize CS2101 Presentation Draft 1
 C:Not Completed
-T:FloatingTask
-S:
-E:
-D:1-11-13 Group Meeting
+T:TimedTask
+S:2013-11-01T16:00:00.000+08:00
+E:2013-11-01T17:00:00.000+08:00
+D:Group Meeting
 C:Not Completed
