@@ -24,8 +24,6 @@ public class EditCommand extends Command {
         description = des;
     }
 
-
-
     public EditCommand(String des, Task newTask) {
         description = des;
         taskChangedTo = newTask;
@@ -42,23 +40,23 @@ public class EditCommand extends Command {
             SearchTool searchTool = new SearchTool(JM);
             if (description != null){
                 matchingTasks = searchTool.searchByNonStrictDescription(description);
-            }else if (date != null){
+            } else if (date != null){
                 matchingTasks = searchTool.searchByDate(date);
             }
             if (matchingTasks.size() == 0){
                 outputln("No Matching Tasks with the description provided.");
                 return "Failure";
-            }else if (matchingTasks.size() == 1 && taskChangedTo != null) {
+            } else if (matchingTasks.size() == 1 && taskChangedTo != null) {
                 taskToEdit = matchingTasks.get(0);
                 executeHelper();
                 return "Success";
-            }else if (matchingTasks.size() == 1 && taskChangedTo == null){
+            } else if (matchingTasks.size() == 1 && taskChangedTo == null){
                 outputln("The following Task will be edited.");
                 outputln(matchingTasks.get(0).toString());
                 taskToEdit = matchingTasks.get(0);
                 outputln("Please enter a new task.");
                 return "NeedNewTask";
-            }else{
+            } else {
                 outputln("Type in just the index of tasks you wish to process.");
                 for (int i = 0; i < matchingTasks.size(); i++){
                     Task task = matchingTasks.get(i);
@@ -105,6 +103,7 @@ public class EditCommand extends Command {
         outputln("To");
         outputln(taskChangedTo.toString());
         JM.editTask(taskToEdit, taskChangedTo);
+        JM.addCommandHistory("edit", taskChangedTo, taskToEdit);
     }
     
     public String toString() {

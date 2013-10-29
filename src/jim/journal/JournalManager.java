@@ -197,6 +197,7 @@ public class JournalManager {
     }
     
     public void incompleteTask(Task task) {
+    	clearPastCmds();
     	for (Task current: storeAllTasks) {
     		if (task.equals(current)){
 		        if (!task.isCompleted()) {
@@ -215,6 +216,7 @@ public class JournalManager {
     }
 
     public void editTask(Task old_task, Task new_task) {
+    	clearPastCmds();
         getAllTasks();
         storeAllTasks.remove(old_task);
         storeAllTasks.add(new_task);
@@ -226,11 +228,15 @@ public class JournalManager {
     }
     //only certain command need to push.
     //add, edit, complete, remove.
-    public void addCommandHistory(String cmd, Task someTask){
-    	Command_Task command = new Command_Task(cmd, someTask);
+    public void addCommandHistory(String cmd, Task someTask, Task editTask){
+    	Command_Task command = new Command_Task(cmd, someTask, editTask);
     	historyIndex++;
     	historyOfCommand.add(historyIndex, command);
     //	System.out.println("history Index = " + historyIndex);
+    }
+    
+    public void addCommandHistory(String cmd, Task someTask){
+    	addCommandHistory(cmd, someTask, null);
     }
 
     public boolean undoLastCommand(){
@@ -240,13 +246,13 @@ public class JournalManager {
     		Command_Task LastCommand = historyOfCommand.get(historyIndex--);
 		    //add, edit, remove, complete
 		    if (LastCommand.getCommand().equals("add")){
-		    	removeTask(LastCommand.getTask());
+		    	removeTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("edit")){
-		        
+		    	editTask(LastCommand.getSomeTask(), LastCommand.getEditTask());
 		    } else if (LastCommand.getCommand().equals("remove")){
-		    	addTask(LastCommand.getTask());
+		    	addTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("complete")){
-		    	incompleteTask(LastCommand.getTask());
+		    	incompleteTask(LastCommand.getSomeTask());
 		    } else {
 		        //error
 		    }
@@ -264,13 +270,13 @@ public class JournalManager {
     		Command_Task LastCommand = historyOfCommand.get(++historyIndex);
 		    //add, edit, remove, complete
 		    if (LastCommand.getCommand().equals("add")){
-		    	addTask(LastCommand.getTask());
+		    	addTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("edit")){
-		        
+		    	editTask(LastCommand.getEditTask(), LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("remove")){
-		    	removeTask(LastCommand.getTask());
+		    	removeTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("complete")){
-		    	completeTask(LastCommand.getTask());
+		    	completeTask(LastCommand.getSomeTask());
 		    } else {
 		        //error
 		    }
@@ -284,27 +290,35 @@ public class JournalManager {
     }
     
     private void clearPastCmds(){
-    	// if true, it means addTask() is not called from undoLastCommand()
-    	if (historyOfCommand.size() > 0) {
+    	// if true, it means addTask() (or remove, edit, complete) is not called from undoLastCommand()
+    	if (historyOfCommand.size() > 0 && historyIndex != historyOfCommand.size()-1) {
     		if (newTrueCommand) {
-	        	historyOfCommand.subList(historyIndex+1, historyOfCommand.size()-1).clear();
-	    	} else {
+   				historyOfCommand.subList(historyIndex+1, historyOfCommand.size()-1).clear();
+    		} else {
 	    		newTrueCommand = true;
 	    	}
-    	}  	
+    	} else {
+    		newTrueCommand = true;
+    	}
     }
     
 	class Command_Task {
 		String cmd;
-		Task someTask;
-	
-		public Command_Task(String cmd, Task temp) {
+		Task someTask, editTask;
+		
+		public Command_Task(String cmd, Task someTask, Task editTask) {
 			this.cmd = cmd;
-			someTask = temp;
+			this.someTask = someTask;
+			this.editTask = editTask;
+		}
+	
+		public Command_Task(String cmd, Task someTask) {
+			this(cmd, someTask, null);
 		}
 	
 		String getCommand() { return cmd; }
-		Task getTask() { return someTask; }
+		Task getSomeTask() { return someTask; }
+		Task getEditTask() { return editTask; }
 	}
     public void sortTimedTask(ArrayList<TimedTask> timedTasks){
         Collections.sort(timedTasks);

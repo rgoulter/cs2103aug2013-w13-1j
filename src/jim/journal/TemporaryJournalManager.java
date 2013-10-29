@@ -136,13 +136,13 @@ public class TemporaryJournalManager extends JournalManager {
     		Command_Task LastCommand = historyOfCommand.get(historyIndex--);
 		    //add, edit, remove, complete
 		    if (LastCommand.getCommand().equals("add")){
-		    	removeTask(LastCommand.getTask());
+		    	removeTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("edit")){
-		        
+		        editTask(LastCommand.getSomeTask(), LastCommand.getEditTask());
 		    } else if (LastCommand.getCommand().equals("remove")){
-		    	addTask(LastCommand.getTask());
+		    	addTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("complete")){
-		    	incompleteTask(LastCommand.getTask());
+		    	incompleteTask(LastCommand.getSomeTask());
 		    } else {
 		        //error
 		    }
