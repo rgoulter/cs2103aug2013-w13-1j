@@ -92,6 +92,10 @@ public class JimMainPanel extends JPanel {
         // Initialise the logic
         suggestionManager = new SuggestionManager();
         journalManager = new JournalManager();
+        
+        // Give JournalManager to SuggestionManager.
+        // (Dependency for generating Suggestions).
+        suggestionManager.setJournalManager(journalManager);
 
         // Setup the View parts for the Jim-specific stuff.
         suggestionView = new SuggestionView();

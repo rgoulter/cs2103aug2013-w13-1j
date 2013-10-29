@@ -18,6 +18,7 @@ import jim.journal.DeadlineTask;
 import jim.journal.DisplayCommand;
 import jim.journal.EditCommand;
 import jim.journal.FloatingTask;
+import jim.journal.JournalManager;
 import jim.journal.RemoveCommand;
 import jim.journal.SearchCommand;
 import jim.journal.TimedTask;
@@ -43,6 +44,8 @@ public class SuggestionManager {
     
     private Parser inputParser;
     
+    private JournalManager currentJournalManager;
+    
 
     //assumes the current class is called logger
     private final static Logger LOGGER = Logger.getLogger(SuggestionManager.class .getName()); 
@@ -54,6 +57,11 @@ public class SuggestionManager {
     	
     	inputParser = new Parser();
     }
+	
+	public void setJournalManager(JournalManager jm) {
+		// We need this dependency for GenerationContext, unfortunately.
+		currentJournalManager = jm;
+	}
     
     // Pre-Condition: Requires getSuggestionsToDisplay() to be called first
     public SuggestionHints getSuggestionHints() {
@@ -164,10 +172,22 @@ public class SuggestionManager {
     	int i = (int) Math.floor(Math.random() * syntaxFormats.size());
     	double rnd = Math.random();
 
-    	GenerationContext genCtx = new GenerationContext(null, filteringSubsequence);
+    	GenerationContext genCtx = getGenerationContext();
     	SuggestionHint hint = syntaxFormats.get(i).generate(genCtx, rnd);
 		LOGGER.finer("Generating Hint: " + hint);
     	return hint;
+    }
+    
+    
+    
+    private GenerationContext getGenerationContext() {
+    	// Generating suggestions, we need a Journal Manager.
+    	assert currentJournalManager != null;
+
+    	GenerationContext genCtx = new GenerationContext(null, filteringSubsequence);
+    	genCtx.setJournalManager(currentJournalManager);
+    	
+    	return genCtx;
     }
 
 
