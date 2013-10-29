@@ -2,10 +2,13 @@
 package jim.suggestions;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -38,7 +41,8 @@ import static jim.util.StringUtils.stripStringPrefixSuffix;
 public class SuggestionManager {
     private int highlightedLine = -1;
     private String filteringSubsequence = "";
-    private ArrayList<SuggestionHint> generatedSuggestionHints;
+    private ArrayList<SuggestionHint> generatedSuggestionHintsList;
+    private Set<SuggestionHint> generatedSuggestionHintsSet;
     private SuggestionHints hintSet;
     private int numberOfSuggestionsToKeep = 8;
     
@@ -53,7 +57,8 @@ public class SuggestionManager {
 
 
     public SuggestionManager() {
-    	generatedSuggestionHints = new ArrayList<SuggestionHint>();
+    	generatedSuggestionHintsList = new ArrayList<SuggestionHint>();
+    	generatedSuggestionHintsSet = new HashSet<SuggestionHint>();
     	
     	inputParser = new Parser();
     }
@@ -65,7 +70,7 @@ public class SuggestionManager {
     
     // Pre-Condition: Requires getSuggestionsToDisplay() to be called first
     public SuggestionHints getSuggestionHints() {
-        hintSet = new SuggestionHints(generatedSuggestionHints);
+        hintSet = new SuggestionHints(generatedSuggestionHintsList);
         return hintSet;
     }
 
@@ -74,7 +79,7 @@ public class SuggestionManager {
     public String getCurrentSuggestion() {
         String output = "";
         if (getCurrentSuggestionIndex() != -1) {
-            output = generatedSuggestionHints.get(getCurrentSuggestionIndex()).toString();
+            output = generatedSuggestionHintsList.get(getCurrentSuggestionIndex()).toString();
         }
 
         return output;
@@ -97,7 +102,7 @@ public class SuggestionManager {
 
     public void nextSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() + 1) %
-        		                  generatedSuggestionHints.size());
+        		                  generatedSuggestionHintsList.size());
     }
 
 
@@ -105,7 +110,7 @@ public class SuggestionManager {
     public void prevSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1));
         if (getCurrentSuggestionIndex() < 0) {
-            setCurrentSuggestionIndex(generatedSuggestionHints.size() - 1);
+            setCurrentSuggestionIndex(generatedSuggestionHintsList.size() - 1);
         }
     }
 
@@ -128,13 +133,17 @@ public class SuggestionManager {
     
     
     private void filterThroughGeneratedSuggestions() {
-    	for (int i = generatedSuggestionHints.size() - 1; i >= 0; i--) {
-    		SuggestionHint hint = generatedSuggestionHints.get(i);
+    	for (int i = generatedSuggestionHintsList.size() - 1; i >= 0; i--) {
+    		SuggestionHint hint = generatedSuggestionHintsList.get(i);
     		boolean matchesSubseq = hint.matchesSubsequence(filteringSubsequence);
     		
     		if (!matchesSubseq) {
-    			LOGGER.finer("Filtering out: " + generatedSuggestionHints.get(i).toString());
-    			generatedSuggestionHints.remove(i);
+    			LOGGER.finer("Filtering out: " + generatedSuggestionHintsList.get(i).toString());
+    			SuggestionHint hintToRemove = generatedSuggestionHintsList.get(i);
+    			generatedSuggestionHintsList.remove(hintToRemove);
+    			generatedSuggestionHintsSet.remove(hintToRemove);
+    			
+    			//TODO: Preserve selected index here...
     		} else {
     			hint.setMatchingSubsequence(filteringSubsequence);
     		}
@@ -147,20 +156,26 @@ public class SuggestionManager {
     	// Don't try too hard to generate unique suggestions
     	// at this stage.
     	
-    	for (int i = generatedSuggestionHints.size(); i <= numberOfSuggestionsToKeep; i++) {
+    	//TODO: Preserve selected index here...
+    	
+    	for (int i = generatedSuggestionHintsList.size(); i <= numberOfSuggestionsToKeep; i++) {
     		SuggestionHint hint;
     		boolean added = false;
     		
-    		for (int attempts = 0; !added && attempts < 3; attempts++) { // MAGIC
+    		for (int attempts = 0; !added && attempts < 6; attempts++) { // MAGIC
     			hint = generateRandomSuggestion();
     			
-	    		if (hint.matchesSubsequence(filteringSubsequence)) {
+	    		if (hint.matchesSubsequence(filteringSubsequence) &&
+	    			!generatedSuggestionHintsSet.contains(hint)) {
 	    			LOGGER.finer("Adding Hint to Queue: " + hint);
-	    			generatedSuggestionHints.add(hint);
+	    			generatedSuggestionHintsList.add(hint);
+	    			generatedSuggestionHintsSet.add(hint);
 	    			added = true;
 	    		}
     		}
     	}
+    	
+    	Collections.sort(generatedSuggestionHintsList);
     }
     
     

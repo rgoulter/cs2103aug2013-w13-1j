@@ -96,8 +96,10 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     	
     	LOGGER.info("# words: " + wordsFromCurrentTasks.size() + ", # matched: " + matchingWordSet.size());
     	
-    	
-    	String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
+    	// If no words matched, we'll just use the subsequence.
+    	String suggestedWord = !wordList.isEmpty() ? 
+    	                       wordList.get((int) Math.floor(t * wordList.size())) :
+    	                       context.getInputSubsequence();
     	
     	return new SuggestionHint(new String[]{suggestedWord},
     			                  context.getInputSubsequence(),
