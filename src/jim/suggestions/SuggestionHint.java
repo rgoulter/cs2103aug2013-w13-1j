@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * API VOLATILE as the suggestion system hasn't been implemented yet.
  */
-public class SuggestionHint {
+public class SuggestionHint implements Comparable<SuggestionHint> {
 	private String[] words;
 	private boolean[][] matchingMask;
 	private String matchingSubseq;
@@ -144,5 +144,35 @@ public class SuggestionHint {
 		}
 		
 		return result;
+	}
+	
+	public int hashCode() {
+		return Arrays.asList(words).hashCode();
+	}
+	
+	public boolean equals(Object o) {
+		if (o instanceof SuggestionHint) {
+			SuggestionHint other = (SuggestionHint) o;
+			
+			return Arrays.equals(words, other.words);
+		}
+		
+		return false;
+	}
+
+	@Override
+	public int compareTo(SuggestionHint otherHint) {
+		// Show first the suggestions which...?
+		
+		// ...has fewer words.
+		// n.b. INCONSISTENT WITH EQUALS
+		int lenDiff = words.length - otherHint.words.length;
+		
+		if (lenDiff != 0) {
+			return lenDiff;
+		} else {
+			// If the same length, sort by the strings..
+			return join(words, ' ').compareTo(join(otherHint.words, ' '));
+		}
 	}
 }
