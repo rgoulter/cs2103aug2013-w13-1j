@@ -85,8 +85,11 @@ public class EditCommand extends Command {
     }
 
     // Pre-Cond: Command must be in third phase of execution ("NeedNewTask")
-    public String getSelectedTaskDescription() {
+    /*public String getSelectedTaskDescription() {
         return taskToEdit.getDescription();
+    }*/
+    public String getSelectedTaskDescription(){
+        return taskToEdit.toStringForEditCommand();
     }
 
     @Override

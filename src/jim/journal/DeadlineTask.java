@@ -36,6 +36,11 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
     	return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear(),endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
     }
 
+    public String toStringForEditCommand() {
+        
+        String taskNameDeadline = "%d/%d/%d %s";
+        return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear()-2000,getDescription());
+    }
 
 
     @Override

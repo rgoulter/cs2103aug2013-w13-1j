@@ -21,4 +21,7 @@ public abstract class Task {
     public String toString() {
         return description;
     }
+    public String toStringForEditCommand(){
+        return description;
+    }
 }
