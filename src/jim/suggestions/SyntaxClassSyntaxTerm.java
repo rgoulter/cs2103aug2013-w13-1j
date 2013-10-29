@@ -88,22 +88,37 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     	// LIMITATION: We must assume that the input subsequence has spaces between things matched.
     	String[] subseqParts = context.getInputSubsequence().split(" ");
     	String subseqForGenWord = (numWordsSoFar < subseqParts.length) ? subseqParts[numWordsSoFar] : "";
-    	
     	Set<String> wordsFromCurrentTasks = context.getAllWordsFromCurrentTasks();
-    	Set<String> matchingWordSet = filterMatchBySubseq(wordsFromCurrentTasks,
-    	                                                  subseqForGenWord);
-    	List<String> wordList = new ArrayList<String>(matchingWordSet);
     	
-    	LOGGER.info("# words: " + wordsFromCurrentTasks.size() + ", # matched: " + matchingWordSet.size());
+    	String suggestedWord = generateSuggestionWord(wordsFromCurrentTasks, subseqForGenWord, t);
+    	SuggestionHint generatedHint =  new SuggestionHint(new String[]{suggestedWord},
+    	                                                   context.getInputSubsequence(),
+    	                                                   new SyntaxTerm[]{this});
+    	int numWordsGenerated = 1;
     	
-    	// If no words matched, we'll just use the subsequence.
-    	String suggestedWord = !wordList.isEmpty() ? 
-    	                       wordList.get((int) Math.floor(t * wordList.size())) :
-    	                       context.getInputSubsequence();
+    	while (numWordsSoFar + numWordsGenerated < subseqParts.length) {
+    		suggestedWord = generateSuggestionWord(wordsFromCurrentTasks, subseqForGenWord, t);
+    		SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{suggestedWord},
+                                                               context.getInputSubsequence(),
+                                                               new SyntaxTerm[]{this});
+    		numWordsGenerated++;
+    		generatedHint = SuggestionHint.combine(generatedHint, nextGeneratedHint);
+    	}
     	
-    	return new SuggestionHint(new String[]{suggestedWord},
-    			                  context.getInputSubsequence(),
-                                  new SyntaxTerm[]{this});
+    	// Generate enough words for the given subsequence hint.
+    	return generatedHint;
+    }
+    
+    private String generateSuggestionWord(Set<String> words, String subseqForGenWord, double t) {
+    	Set<String> matchingWordSet = filterMatchBySubseq(words,
+                                                          subseqForGenWord);
+		List<String> wordList = new ArrayList<String>(matchingWordSet);
+		
+		// If no words matched, we'll just use the subsequence.
+		String suggestedWord = !wordList.isEmpty() ? 
+		                       wordList.get((int) Math.floor(t * wordList.size())) :
+		                       subseqForGenWord;
+    	return suggestedWord;
     }
     
     private boolean isSearchCmd(GenerationContext context, double t) {
