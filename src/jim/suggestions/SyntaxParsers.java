@@ -438,11 +438,35 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
+                          "completecmd => <completeword> <date>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(SyntaxTermSearchNode[] input) {
+                                  MutableDateTime date =
+                                          (MutableDateTime) p.doParse(input[1]);
+                                  return new jim.journal.CompleteCommand(date);
+                              }
+                          });
+        
+        
+        registerSyntaxParser(p,
                           "removecmd => <removeword> <description>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   return new jim.journal.RemoveCommand(input[1]);
+                              }
+                          });
+        
+        
+        registerSyntaxParser(p,
+                          "removecmd => <removeword> <date>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(SyntaxTermSearchNode[] input) {
+                                  MutableDateTime date =
+                                          (MutableDateTime) p.doParse(input[1]);
+                                  return new jim.journal.RemoveCommand(date);
                               }
                           });
         
@@ -461,11 +485,35 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
+                          "editcmd => <editword> <date>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(SyntaxTermSearchNode[] input) {
+                                  MutableDateTime date =
+                                          (MutableDateTime) p.doParse(input[1]);
+                                  return new jim.journal.EditCommand(date);
+                              }
+                          });
+        
+        
+        registerSyntaxParser(p,
                           "searchcmd => <searchword> <description>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
                                   return new SearchCommand(input[1]);
+                              }
+                          });
+        
+        
+        registerSyntaxParser(p,
+                          "searchcmd => <searchword> <date>",
+                          new SyntaxParser() {
+                              @Override
+                              public Object parse(SyntaxTermSearchNode[] input) {
+                                  MutableDateTime date =
+                                          (MutableDateTime) p.doParse(input[1]);
+                                  return new jim.journal.SearchCommand(date);
                               }
                           });
         
