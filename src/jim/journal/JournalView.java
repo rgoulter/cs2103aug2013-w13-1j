@@ -23,6 +23,7 @@ public class JournalView extends JimView {
     private boolean holdingFeedback = false;
 
     private int selectionPosition = 0;
+    private String lastFeedbackSource = "";
 
 
     public JournalView() {
@@ -45,14 +46,10 @@ public class JournalView extends JimView {
         assert(journal != null);
         assert(journal instanceof JournalManager);
     }
-
-
-
+    
     public void setFeedbackMessage(String feedback) {
         lastFeedback = feedback;
     }
-
-
 
     public void updateViewWithContent() {
         assert(journalManager != null);
@@ -69,9 +66,14 @@ public class JournalView extends JimView {
         
 
         // Build text from current journal content.
-        String outputText = journalManager.getDisplayString();
-        journalText = journalText + outputText;
+        if (!lastFeedbackSource.equals("Display") && !lastFeedbackSource.equals("Search")) {
+            String outputText = journalManager.getDisplayString();
+            journalText = journalText + outputText;
+        } else {
+            lastFeedbackSource = "";
+        }
         
+            
         journalText = journalText.replace("\n", "<br>");
         journalText = journalText.replace("Upcoming Events:", "<b><u>Upcoming Events:</u></b>");
         journalText = journalText.replace("Todo:", "<b><u>Todo:</u></b>");
@@ -105,4 +107,7 @@ public class JournalView extends JimView {
     public void holdFeedback()   { holdingFeedback = true; }
     public void unholdFeedback() { holdingFeedback = false; }
 
+    public void setFeedbackSource(String source) {
+        lastFeedbackSource = source;
+    }
 }

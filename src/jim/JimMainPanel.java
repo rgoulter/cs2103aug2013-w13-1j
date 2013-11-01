@@ -412,6 +412,9 @@ public class JimMainPanel extends JPanel {
             clearLastCommand();
             journalView.unholdFeedback();
             inputTextField.setText("");
+            
+            lastCommandState = "Ready";
+            journalView.setFeedbackSource(lastCommand.toString());
         }
         else if (lastCommandState.equals("Pending")) {
             journalView.holdFeedback();
@@ -420,7 +423,6 @@ public class JimMainPanel extends JPanel {
         else if (lastCommandState.equals("NeedNewTask")) {
             inputTextField.setText( ((EditCommand) lastCommand).getSelectedTaskDescription() );
         }
-        
         
         journalView.setFeedbackMessage(feedback);
     }
