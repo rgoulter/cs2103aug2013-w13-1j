@@ -61,7 +61,7 @@ public class JournalView extends JimView {
         // We also clear the feedback (unless explicitly told not to) to prevent double-display of feedback
         String journalText = "";
         if (!lastFeedback.equals("")) {
-            journalText = lastFeedback + "<p />";
+            journalText = lastFeedback + "<br><br>";
         }
         if (!holdingFeedback) {
             lastFeedback = "";
