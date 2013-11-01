@@ -1,5 +1,7 @@
 
 package jim.journal;
+import jim.Configuration;
+
 import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 
@@ -8,6 +10,10 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
 
     private MutableDateTime startTime;
     private MutableDateTime endTime;
+    
+    private static Configuration configManager = Configuration.getConfiguration();
+    private static final String DATE_SEPARATOR = configManager.getDateSeparator();
+    private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
 
 
 
@@ -62,8 +68,11 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
 
 
     public String toString() {
-    	String taskName = "[%d/%d/%d] [%02d:%02d - %02d:%02d] %s";
-    	String taskNameNoStartTime = "[%d/%d/%d] [%02d:%02d] %s";
+    	String taskName = "[%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d]" +
+    	                  " [%02d" + TIME_SEPARATOR + "%02d - %02d" + TIME_SEPARATOR + "%02d] %s";
+    	String taskNameNoStartTime = "[%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d]" +
+                                     " [%02d" + TIME_SEPARATOR + "%02d] %s";
+    	
     	//TODO: Do we still need to check startTime != null?? Isn't it DeadlineTask?
     	if (this.startTime == null) {
         	return String.format(taskNameNoStartTime, 

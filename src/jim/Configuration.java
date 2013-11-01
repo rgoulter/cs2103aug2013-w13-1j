@@ -18,9 +18,9 @@ public class Configuration {
     private static final String FILE_DEFAULT_CONTENT = "outputFileName=taskStorage.txt\n" +
                                                        "dateSeparator=/\n" +
                                                        "timeSeparator=:\n";
-    private static final int LINE_1_START_POS = 14;
-    private static final int LINE_2_START_POS = 13;
-    private static final int LINE_3_START_POS = 13;
+    private static final int LINE_1_START_POS = 15;
+    private static final int LINE_2_START_POS = 14;
+    private static final int LINE_3_START_POS = 14;
     
     // This class uses a singleton pattern!
     private static Configuration configItem;

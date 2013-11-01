@@ -9,15 +9,18 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jim.Configuration;
+
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
 
 public class JournalManager {
 	private static final int NO_COMMAND_EXECUTED_YET = -1;
+	private static Configuration configManager = Configuration.getConfiguration();
 	
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
-    TaskStorage taskStorage = new TaskStorage("taskstorage.txt");
+    TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
     private int historyIndex = NO_COMMAND_EXECUTED_YET; 
     
     private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();

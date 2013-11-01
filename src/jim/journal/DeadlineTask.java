@@ -1,4 +1,6 @@
 package jim.journal;
+import jim.Configuration;
+
 import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 
@@ -7,6 +9,9 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
 
     private MutableDateTime endDate;
 
+    private static Configuration configManager = Configuration.getConfiguration();
+    private static final String DATE_SEPARATOR = configManager.getDateSeparator();
+    private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
 
     public DeadlineTask(MutableDateTime endDate, String desc) {
         // Tasks with both start and end date and time.
@@ -32,13 +37,14 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
 
     public String toString() {
        
-        String taskNameDeadline = "[%d/%d/%d] [xx:xx - %02d:%02d] %s";
+        String taskNameDeadline = "[%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d] " + 
+                                  "[%02d" + TIME_SEPARATOR + "%02d] %s";
     	return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear(),endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
     }
 
     public String toStringForEditCommand() {
         
-        String taskNameDeadline = "%d/%d/%d %s";
+        String taskNameDeadline = "%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d %s";
         return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear()-2000,getDescription());
     }
 
