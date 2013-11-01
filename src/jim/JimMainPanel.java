@@ -59,6 +59,10 @@ public class JimMainPanel extends JPanel {
     protected JournalManager journalManager;
     protected boolean isRunning;
     
+    private static Configuration configManager = Configuration.getConfiguration();
+    private static final String DATE_SEPARATOR = configManager.getDateSeparator();
+    private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
+    
     // Objects defining style / color / other aesthetics
     private static final Color COLOR_DARK_BLUE = new Color(100, 100, 188);
     private static final Color COLOR_BLUE = new Color(225, 225, 255);
@@ -489,11 +493,11 @@ public class JimMainPanel extends JPanel {
                 while (isRunning) {
                     
                     GregorianCalendar calendar = new GregorianCalendar();
-                    String dateString = String.format(" %02d-%02d-%02d",
+                    String dateString = String.format(" %02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d",
                                                       calendar.get(Calendar.DATE),
                                                       calendar.get(Calendar.MONTH)+1,
                                                       calendar.get(Calendar.YEAR));
-                    String timeString = String.format("%02d:%02d:%02d     ",
+                    String timeString = String.format("%02d" + TIME_SEPARATOR + "%02d" + TIME_SEPARATOR + "%02d     ",
                                                       calendar.get(Calendar.HOUR_OF_DAY),
                                                       calendar.get(Calendar.MINUTE),
                                                       calendar.get(Calendar.SECOND));
