@@ -72,12 +72,14 @@ public class SyntaxGrammar {
 			"<searchcmd> := <searchword> <description> | <searchword> <date>",
 			"<displayword> := 'display'",
 			"<displaycmd> := <displayword> | <displayword> <date>",
+			"<configword> := 'config' | 'configuration' | 'configure'",
+			"<configcmd> := <configword> | <configword> <description> <description> | <configword> <description>",
 			"<undocmd> := 'undo'",
 			"<redocmd> := 'redo'",
 			
 			"<cmd> := " +
-			  "<addcmd> | <completecmd> | <removecmd> | " + 
-			  "<editcmd> | <searchcmd> | <displaycmd> | <undocmd> | <redocmd>"
+			  "<addcmd> | <completecmd> | <removecmd> | <editcmd> | " + 
+			  "<searchcmd> | <displaycmd> | <undocmd> | <redocmd> | <configcmd>"
         };
         
         for (String syntaxDefinitionLine : syntaxes) {

@@ -557,6 +557,33 @@ public class SyntaxParsers {
 		                        return new RedoCommand();
 		                    }
 		                });
+        
+        registerSyntaxParser(p,
+                             "configcmd => <configword>",
+                             new SimpleSyntaxParser() {
+                                 @Override
+                                 public Object parse(String[] input) {
+                                     return new jim.ConfigCommand();
+                                 }
+                             });
+        
+        registerSyntaxParser(p,
+                             "configcmd => <configword> <description> <description>",
+                             new SimpleSyntaxParser() {
+                                 @Override
+                                 public Object parse(String[] input) {
+                                     return new jim.ConfigCommand(input[1], input[2]);
+                                 }
+                             });
+        
+        registerSyntaxParser(p,
+                             "configcmd => <configword> <description>",
+                             new SimpleSyntaxParser() {
+                                 @Override
+                                 public Object parse(String[] input) {
+                                     return new jim.ConfigCommand(input[1]);
+                                 }
+                             });
     }
 
 

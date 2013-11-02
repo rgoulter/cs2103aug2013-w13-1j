@@ -15,9 +15,12 @@ import java.util.Scanner;
 public class Configuration {
     private static final String CONFIG_FILE_NAME = "config.ini";
     private static final String FILE_READWRITE_MODE = "rw";
-    private static final String FILE_DEFAULT_CONTENT = "outputFileName=taskStorage.txt\n" +
-                                                       "dateSeparator=/\n" +
-                                                       "timeSeparator=:\n";
+    public static final String DEFAULT_FILENAME = "taskStorage.txt";
+    public static final String DEFAULT_DATE_SEPARATOR = "/";
+    public static final String DEFAULT_TIME_SEPARATOR = ":";
+    private static final String TEMPLATE_STRING = "outputFileName=%s\n" +
+                                                  "dateSeparator=%s\n" +
+                                                  "timeSeparator=%s\n";
     private static final int LINE_1_START_POS = 15;
     private static final int LINE_2_START_POS = 14;
     private static final int LINE_3_START_POS = 14;
@@ -30,11 +33,13 @@ public class Configuration {
     
     private Scanner initializeFile() {
         try {
-            RandomAccessFile initFile = new RandomAccessFile(CONFIG_FILE_NAME, FILE_READWRITE_MODE);
-            initFile.writeBytes(FILE_DEFAULT_CONTENT);
-            initFile.close();
+            setOutputFileName(DEFAULT_FILENAME);
+            setDateSeparator(DEFAULT_DATE_SEPARATOR);
+            setTimeSeparator(DEFAULT_TIME_SEPARATOR);
             
+            writeSettings();
             return new Scanner(new File(CONFIG_FILE_NAME));
+            
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -69,9 +74,33 @@ public class Configuration {
         return configItem;
     }
 
+    public String toString() {
+        return String.format(TEMPLATE_STRING, getOutputFileName(),
+                                              getDateSeparator(),
+                                              getTimeSeparator());
+    }
     
     // Accessors
     public String getOutputFileName() { return outputFileName; }
     public String getDateSeparator() { return dateSeparator; }
     public String getTimeSeparator() { return timeSeparator; }
+    
+    // Mutator
+    public void setOutputFileName(String newFileName) { outputFileName = newFileName; }
+    public void setDateSeparator(String newSeparator) { dateSeparator = newSeparator; }
+    public void setTimeSeparator(String newSeparator) { timeSeparator = newSeparator; }
+    
+    public void writeSettings() {
+        try {
+            RandomAccessFile settingsFile = new RandomAccessFile(CONFIG_FILE_NAME, FILE_READWRITE_MODE);
+            settingsFile.setLength(0);
+            
+            settingsFile.writeBytes(this.toString());
+            settingsFile.close();
+            
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }
