@@ -108,6 +108,10 @@ public class CompleteUnitTests {
     }
     @Test
     public void testDateCompleteCommandHasOneMatchesCanExecute () {
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
         JournalManager jManager = new TemporaryJournalManager();
         String startTime = "2013-10-12T12:00:00.000+08:00";
         String endTime = "2013-10-12T13:00:00.000+08:00";
@@ -122,7 +126,8 @@ public class CompleteUnitTests {
         String output = completeCmd.getOutput();
 
         assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
-                     "0, [12/10/2013] [12:00 - 13:00] do a TimedTask\n",
+                     "0, [12" + dSeparator + "10" + dSeparator + "2013] " + 
+                     "[12" + tSeparator + "00 - 13" + tSeparator + "00] do a TimedTask\n",
                      output);
 
     }

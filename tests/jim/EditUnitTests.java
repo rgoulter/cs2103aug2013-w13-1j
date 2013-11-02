@@ -61,6 +61,10 @@ public class EditUnitTests {
     // Tests Only Phase 3
     @Test
     public void testStrictSyntaxEditCommandOnePartCanExecute () {
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
         // Edit Command with the given change-to-task.
 
         // e.g. "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
@@ -97,9 +101,11 @@ public class EditUnitTests {
         // Check to see that the correct output is given to the user
         assertEquals("Output produced does not match expected output",
                      "The following task is edited\n"+
-                     "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
+                     "[10" + dSeparator + "11" + dSeparator + "2013] " + 
+                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyOldTask\n" +
                      "To\n"+
-                     "[31/12/2013] [14:00 - 15:00] MyNewTask\n",
+                     "[31" + dSeparator + "12" + dSeparator + "2013] " + 
+                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyNewTask\n",
                      editCmd.getOutput());
     }
 
@@ -110,6 +116,10 @@ public class EditUnitTests {
         // Edit command, getting input from inputLine()
         // e.g. "edit MyOldTask to MyNewTask 31/12/13 0000 31/12/13 2359";
 
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
         Calendar oldStartTimeCal = new GregorianCalendar(2013, 10, 10, 14, 0);
         Calendar oldEndTimeCal = new GregorianCalendar(2013, 10, 10, 15, 0);
         MutableDateTime oldStartTime = new MutableDateTime(oldStartTimeCal);
@@ -131,7 +141,8 @@ public class EditUnitTests {
         
         assertEquals("Returned feedback does not match expected feedback (Part 1)",
                      "The following Task will be edited.\n" +
-                     "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
+                     "[10" + dSeparator + "11" + dSeparator + "2013] " + 
+                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyOldTask\n"+
                      "Please enter a new task.\n",
                      feedback);
         
@@ -147,9 +158,11 @@ public class EditUnitTests {
         
         assertEquals("Returned feedback does not match expected feedback (Part 2)",
                      "The following task is edited\n"+
-                     "[10/11/2013] [14:00 - 15:00] MyOldTask\n"+
+                     "[10" + dSeparator + "11" + dSeparator + "2013] " + 
+                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyOldTask\n"+
                      "To\n"+
-                     "[31/12/2013] [00:00 - 23:59] MyNewTask\n",
+                     "[31" + dSeparator + "12" + dSeparator + "2013] " + 
+                     "[00" + tSeparator + "00 - 23" + tSeparator + "59] MyNewTask\n",
                      feedback);
         
         assertEquals("The task was not changed correctly in the JournalManager",
@@ -202,6 +215,10 @@ public class EditUnitTests {
     }
     @Test
     public void testDateEditCommandHasOneMatchesCanExecute () {
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
         JournalManager jManager = new TemporaryJournalManager();
         String startTime = "2013-10-12T12:00:00.000+08:00";
         String endTime = "2013-10-12T13:00:00.000+08:00";
@@ -216,8 +233,9 @@ public class EditUnitTests {
         String output = editCmd.getOutput();
 
         assertEquals("The following Task will be edited.\n" + 
-                        "[12/10/2013] [12:00 - 13:00] do a TimedTask\n" + 
-                            "Please enter a new task.\n",
+                     "[12" + dSeparator + "10" + dSeparator + "2013] " + 
+                     "[12" + tSeparator + "00 - 13" + tSeparator + "00] do a TimedTask\n" + 
+                     "Please enter a new task.\n",
                      output);
 
     }

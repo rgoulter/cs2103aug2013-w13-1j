@@ -65,6 +65,10 @@ public class DisplayUnitTests {
 
     @Test
     public void testStrictSyntaxDisplayCommandTimedTasksCanExecute() {
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
     	JournalManager jManager = new TemporaryJournalManager();
         Calendar startCal = new GregorianCalendar(2013, 10, 7);
         Calendar endCal = new GregorianCalendar(2013, 10, 8);
@@ -79,12 +83,17 @@ public class DisplayUnitTests {
     	String output = dispCmd.getOutput();
     	
         assertEquals("Display of Timed Task failed",
-                     "[8/11/2013] [00:00 - 00:00] Birthday Party\n",
+                     "[8" + dSeparator + "11" + dSeparator + "2013] " + 
+                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] Birthday Party\n",
                      output);
     }
 
     @Test
     public void testStrictSyntaxDisplayCommandOneArgsCanExecute () {
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
         JournalManager jManager = new TemporaryJournalManager();
 
         // Note that "January" is Month 0. October is month 9..
@@ -97,11 +106,16 @@ public class DisplayUnitTests {
         dispCmd.execute(jManager);
 
         String output = dispCmd.getOutput();
-        assertEquals("[10/10/2013] [00:00 - 00:00] CS2103 Lecture\n", output);
+        assertEquals("[10" + dSeparator + "10" + dSeparator + "2013] " + 
+                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n", output);
     }
     
     @Test
     public void testStrictSyntaxDisplayCommandMultipleItemsCanExecute() {
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
         JournalManager jManager = new TemporaryJournalManager();
         
         Calendar testDateCal = new GregorianCalendar(2013, 9, 10);
@@ -121,7 +135,8 @@ public class DisplayUnitTests {
         
         String output = dispCmd.getOutput();
         assertEquals("Display command test on multiple items failed",
-                     "[10/10/2013] [00:00 - 00:00] CS2103 Lecture\n",
+                     "[10" + dSeparator + "10" + dSeparator + "2013] " + 
+                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n",
                      output);
     }
 

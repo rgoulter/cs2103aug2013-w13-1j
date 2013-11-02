@@ -92,6 +92,10 @@ public class SearchUnitTests {
     }
     @Test
     public void testDateSearchCommandHasOneMatchesCanExecute () {
+        Configuration cManager = Configuration.getConfiguration();
+        String dSeparator = cManager.getDateSeparator();
+        String tSeparator = cManager.getTimeSeparator();
+        
         JournalManager jManager = new TemporaryJournalManager();
         String startTime = "2013-10-12T12:00:00.000+08:00";
         String endTime = "2013-10-12T13:00:00.000+08:00";
@@ -106,7 +110,8 @@ public class SearchUnitTests {
         String output = searchCmd.getOutput();
 
         assertEquals("Matches for 'null':\n" +
-                     "[12/10/2013] [12:00 - 13:00] do a TimedTask\n" + "\n",
+                     "[12" + dSeparator + "10" + dSeparator + "2013] " + 
+                     "[12" + tSeparator + "00 - 13" + tSeparator + "00] do a TimedTask\n" + "\n",
                      output);
 
     }
