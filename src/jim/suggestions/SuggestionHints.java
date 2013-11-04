@@ -8,7 +8,7 @@ public class SuggestionHints {
     // HTML Coloration Constants
     private static final String BLACK_COLOR = "black";
     private static final String RED_COLOR = "red";
-    private static final String BLUE_COLOR = "blue'>";
+    private static final String BLUE_COLOR = "blue";
     private static final String PURPLE_COLOR = "purple";
     private static final String GREEN_COLOR = "green";
     
