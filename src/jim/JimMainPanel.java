@@ -18,10 +18,9 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -44,7 +43,7 @@ import jim.journal.Task;
 @SuppressWarnings("serial")
 public class JimMainPanel extends JPanel {
 
-    protected JEditorPane inputTextField;
+    protected JTextField inputTextField;
     protected JFrame applicationWindow;
     protected JPanel viewPanel;
     protected JLabel helperTextLabel;
@@ -115,11 +114,12 @@ public class JimMainPanel extends JPanel {
     }
 
 
+    @SuppressWarnings("unchecked")
     private void initialiseUIComponents() {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
         
-        inputTextField = new JEditorPane();
+        inputTextField = new JTextField();
         Border outerBorder = BorderFactory.createLineBorder(COLOR_BLUE, 4);
         Border innerBorder = BorderFactory.createLineBorder(COLOR_BLACK, 1);
         Border inputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
