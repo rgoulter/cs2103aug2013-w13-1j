@@ -33,7 +33,9 @@ public class IntegrationTests {
         command.execute(jManager);
         String feedback = command.getOutput();
         
-        assertEquals(feedback, "hello\nworld\n");
+        assertEquals("-------------------- Tasks ----------------------\n" +
+                     "hello\nworld\n" +
+                     "\n--------------- Completed Tasks -----------------\n" , feedback);
     }
     
     
@@ -56,7 +58,9 @@ public class IntegrationTests {
         command.execute(jManager);
         String feedback = command.getOutput();
         
-        assertEquals(feedback, "hello\n");
+        assertEquals("-------------------- Tasks ----------------------\n" +
+                "hello\n" +
+                "\n--------------- Completed Tasks -----------------\n" , feedback);
     }
     
     
@@ -88,7 +92,9 @@ public class IntegrationTests {
         dispCmd.execute(jManager);
         
         String displayOutput = dispCmd.getOutput();
-        assertEquals(displayOutput, "[DONE] The Second!\n");
+        assertEquals("-------------------- Tasks ----------------------\n" +
+                     "\n--------------- Completed Tasks -----------------\n" +
+                     "The Second!\n", displayOutput);
     }
 
 }

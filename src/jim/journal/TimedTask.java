@@ -68,9 +68,9 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
 
 
     public String toString() {
-    	String taskName = "[%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d]" +
+    	String taskName = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
     	                  " [%02d" + TIME_SEPARATOR + "%02d - %02d" + TIME_SEPARATOR + "%02d] %s";
-    	String taskNameNoStartTime = "[%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d]" +
+    	String taskNameNoStartTime = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
                                      " [%02d" + TIME_SEPARATOR + "%02d] %s";
     	
     	//TODO: Do we still need to check startTime != null?? Isn't it DeadlineTask?
@@ -89,8 +89,8 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
     }
 
     public String toStringForEditCommand(){
-        String taskName = "%d/%d/%d %02d:%02d to %02d:%02d %s";
-        String taskNameNoStartTime = "%d/%d/%d %02d:%02d %s";
+        String taskName = "%02d/%02d/%02d %02d:%02d to %02d:%02d %s";
+        String taskNameNoStartTime = "%02d/%02d/%02d %02d:%02d %s";
         //TODO: Do we still need to check startTime != null?? Isn't it DeadlineTask?
         if (this.startTime == null) {
             return String.format(taskNameNoStartTime, 

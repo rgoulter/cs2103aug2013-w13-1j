@@ -37,14 +37,14 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
 
     public String toString() {
        
-        String taskNameDeadline = "[%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d] " + 
+        String taskNameDeadline = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d] " + 
                                   "[%02d" + TIME_SEPARATOR + "%02d] %s";
     	return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear(),endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
     }
 
     public String toStringForEditCommand() {
         
-        String taskNameDeadline = "%d" + DATE_SEPARATOR + "%d" + DATE_SEPARATOR + "%d %s";
+        String taskNameDeadline = "%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d %s";
         return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear()-2000,getDescription());
     }
 
