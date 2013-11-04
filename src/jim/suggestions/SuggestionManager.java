@@ -44,7 +44,7 @@ public class SuggestionManager {
     private ArrayList<SuggestionHint> generatedSuggestionHintsList;
     private Set<SuggestionHint> generatedSuggestionHintsSet;
     private SuggestionHints hintSet;
-    private int numberOfSuggestionsToKeep = 8;
+    private int numberOfSuggestionsToKeep = 8; // MAGIC
     
     private Parser inputParser;
     
@@ -68,9 +68,9 @@ public class SuggestionManager {
 		currentJournalManager = jm;
 	}
     
-    // Pre-Condition: Requires getSuggestionsToDisplay() to be called first
     public SuggestionHints getSuggestionHints() {
-        hintSet = new SuggestionHints(generatedSuggestionHintsList);
+        hintSet = new SuggestionHints(generatedSuggestionHintsList, filteringSubsequence);
+        hintSet.setSelectedHint(highlightedLine);
         return hintSet;
     }
 
@@ -78,8 +78,13 @@ public class SuggestionManager {
 
     public String getCurrentSuggestion() {
         String output = "";
-        if (getCurrentSuggestionIndex() != -1) {
-            output = generatedSuggestionHintsList.get(getCurrentSuggestionIndex()).toString();
+        int idx = getCurrentSuggestionIndex();
+        
+        if (idx != -1) {
+        	// "Index 0" is the current input subsequence.
+            output = idx == 0 ?
+            		 filteringSubsequence :
+            		 generatedSuggestionHintsList.get(getCurrentSuggestionIndex() - 1).toString();
         }
 
         return output;
@@ -89,7 +94,6 @@ public class SuggestionManager {
 
     public void setCurrentSuggestionIndex(int i) {
         highlightedLine = i;
-        hintSet.setSelectedHint(i);
     }
 
 
@@ -102,7 +106,7 @@ public class SuggestionManager {
 
     public void nextSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() + 1) %
-        		                  generatedSuggestionHintsList.size());
+        		                  (generatedSuggestionHintsList.size() + 1));
     }
 
 
@@ -110,7 +114,7 @@ public class SuggestionManager {
     public void prevSuggestion() {
         setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1));
         if (getCurrentSuggestionIndex() < 0) {
-            setCurrentSuggestionIndex(generatedSuggestionHintsList.size() - 1);
+            setCurrentSuggestionIndex(generatedSuggestionHintsList.size());
         }
     }
 

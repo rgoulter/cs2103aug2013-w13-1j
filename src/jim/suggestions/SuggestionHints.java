@@ -22,10 +22,12 @@ public class SuggestionHints {
     // Working Variables
     private List<SuggestionHint> suggestions;
     private static int selectedHint = -1;
+    private String currentInput;
     
     // Constructors
-    public SuggestionHints(List<SuggestionHint> suggestionHints) {
+    public SuggestionHints(List<SuggestionHint> suggestionHints, String currentInput) {
     	suggestions = suggestionHints;
+    	this.currentInput = currentInput;
     }
     
     
@@ -36,12 +38,17 @@ public class SuggestionHints {
     	// an HTML rendering..
         StringBuilder result = new StringBuilder(HTML_START_DOCUMENT);
         
-        for (int i = 0; i < suggestions.size(); i++) {            
+        // Display the current input as the top suggestion.
+        // Partly so the user can return to it; partly for debugging value..
+        result.append(selectedHint == 0 ? renderHighlighted(currentInput) : currentInput);
+        result.append(HTML_NEWLINE);
+        
+        for (int i = 1; i <= suggestions.size(); i++) {            
             if (i == selectedHint) {
-                result.append(renderHighlighted(renderSuggestion(suggestions.get(i))));
+                result.append(renderHighlighted(renderSuggestion(suggestions.get(i - 1))));
             }
             else {
-                result.append(renderSuggestion(suggestions.get(i)));
+                result.append(renderSuggestion(suggestions.get(i - 1)));
             }
             
             result.append(HTML_NEWLINE);
