@@ -131,7 +131,6 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
 
     @Override
     public int compareTo(TimedTask arg0) {
-        // TODO Auto-generated method stub
         return DateTimeComparator.getInstance().compare(this.getStartTime(), arg0.getStartTime());
     }
     

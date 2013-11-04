@@ -5,18 +5,20 @@ package jim.journal;
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 
 public class DisplayCommand extends Command {
 
-    MutableDateTime dateLimit;
+    MutableDateTime date;
+    JournalManager JM;
+    ArrayList<Task> matchingTasks = new ArrayList<Task>();
+    SearchTool searchTool;
 
-
-
-    public DisplayCommand(MutableDateTime date) {
-        dateLimit = date;
+    public DisplayCommand(MutableDateTime d) {
+        date = d;
     }
 
 
@@ -25,19 +27,19 @@ public class DisplayCommand extends Command {
         this(null);
     }
     
-    public void compareDate(MutableDateTime taskTime, Task current) {
-    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0) {
+    /*public void compareDate(MutableDateTime taskTime, Task current) {
+    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, date) == 0) {
     		outputln(current.toString());
     	}
-    }
+    }*/
     
 
     @Override
     public String execute(JournalManager journalManager) {
-        List<Task> allTasks = journalManager.getAllTasks();
+/*        List<Task> allTasks = journalManager.getAllTasks();
 
         for (Task current : allTasks) {
-            if (dateLimit == null) {
+            if (date == null) {
                 
                 if (current.isCompleted()) {
                     outputln("[DONE] " + current.toString());
@@ -56,12 +58,85 @@ public class DisplayCommand extends Command {
                 	compareDate(taskTime, current);
                 }
             }
-
+            
         }
-        return "Success";
+        System.out.println(this.getOutput());
+        */
+        JM = journalManager;
+        boolean uncompletedOnly = false;
+        boolean completedOnly = false;
+        searchTool = new SearchTool(JM);
+        if (date != null){
+            matchingTasks = searchTool.searchByDate(date);
+        }else{
+            matchingTasks = searchTool.getAllTasks();
+        }
+        
+        
+        if (uncompletedOnly){
+            this.generateUnCompletedTaskOutput();
+        }else if (completedOnly){
+            this.generateCompletedTaskOutput();
+        }else{
+            this.generateUnCompletedTaskOutput();
+            this.generateCompletedTaskOutput();
+        }
+        System.out.println(this.getOutput());
+        return "success";
+        
     }
-
-
+    public void generateUnCompletedTaskOutput(){
+        System.out.println("generatingUncompletedTaskOutput");
+        matchingTasks = searchTool.getuncompletedTasks(matchingTasks);
+        //display floating, deadline, timed not done
+        if (matchingTasks == null){
+            System.out.println("matchingTasks is null");
+        }
+        ArrayList<TimedTask> TimedTasksToDisplay = searchTool.getAllTimedTasks(matchingTasks);
+        ArrayList<DeadlineTask> DeadlineTasksToDisplay = searchTool.getAllDeadlineTasks(matchingTasks);
+        ArrayList<FloatingTask> FloatingTasksToDisplay = searchTool.getAllFloatingTasks(matchingTasks);
+        
+        
+        //sort
+        TimedTasksToDisplay = searchTool.sortTimedTasks(TimedTasksToDisplay);
+        DeadlineTasksToDisplay = searchTool.sortDeadlineTasks(DeadlineTasksToDisplay);
+        FloatingTasksToDisplay = searchTool.sortFloatingTasks(FloatingTasksToDisplay);
+        
+        outputln("Not Completed Tasks: ");
+        for (TimedTask current : TimedTasksToDisplay){
+            outputln(current.toString());
+        }
+        for (DeadlineTask current : DeadlineTasksToDisplay){
+            outputln(current.toString());
+        }
+        for (FloatingTask current : FloatingTasksToDisplay){
+            outputln(current.toString());
+        }
+    }
+    public void generateCompletedTaskOutput(){
+        matchingTasks = searchTool.getcompletedTasks(matchingTasks);
+        //display floating, deadline, timed not done
+        
+        ArrayList<TimedTask> TimedTasksToDisplay = searchTool.getAllTimedTasks(matchingTasks);
+        ArrayList<DeadlineTask> DeadlineTasksToDisplay = searchTool.getAllDeadlineTasks(matchingTasks);
+        ArrayList<FloatingTask> FloatingTasksToDisplay = searchTool.getAllFloatingTasks(matchingTasks);
+        
+        //sort
+        TimedTasksToDisplay = searchTool.sortTimedTasks(TimedTasksToDisplay);
+        DeadlineTasksToDisplay = searchTool.sortDeadlineTasks(DeadlineTasksToDisplay);
+        FloatingTasksToDisplay = searchTool.sortFloatingTasks(FloatingTasksToDisplay);
+        
+        outputln("Completed Tasks: ");
+        for (TimedTask current : TimedTasksToDisplay){
+            outputln("[DONE] " + current.toString());
+        }
+        for (DeadlineTask current : DeadlineTasksToDisplay){
+            outputln("[DONE] " + current.toString());
+        }
+        for (FloatingTask current : FloatingTasksToDisplay){
+            outputln("[DONE] " + current.toString());
+        }
+    }
 
     @Override
     public String secondExecute(String secondInput) {
