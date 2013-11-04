@@ -2,6 +2,7 @@ package jim.journal;
 
 import java.util.ArrayList;
 
+import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 
 
@@ -14,12 +15,7 @@ public class SearchTool {
         
             AllTasks = JManager.getAllTasks();
         
-    }/*
-   public static SearchTool getInstance(){
-      if (theOne == null){
-          theOne = new SearchTool();
-      }
-   }*/
+    }
    public void setJournalManager(JournalManager JM){
        this.JManager = JM;
    }
@@ -41,20 +37,34 @@ public class SearchTool {
     }
     
     //return task whoever has a date that matches the given date.
-    public ArrayList<Task> searchByDate(MutableDateTime date){
-        ArrayList<Task> matchingTasks = new ArrayList<Task>();
-        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks();
-        ArrayList<DeadlineTask> AllDeadlineTasks = this.getAllDeadlineTasks();
-        
-        for (TimedTask task : AllTimedTasks){
-            if (task.getStartTime().equals(date)||task.getEndTime().equals(date)){
-                matchingTasks.add(task);
-            }
+    public Task  compareDate(MutableDateTime taskTime, Task current, MutableDateTime dateLimit) {
+        if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0) {
+            return current;
+        }else{
+            return null;
         }
-        for (DeadlineTask task : AllDeadlineTasks){
-            if (task.getEndDate().equals(date)){
-                matchingTasks.add(task);
-            }
+    }
+    public ArrayList<Task> searchByDate(MutableDateTime dateLimit){
+        ArrayList<Task> matchingTasks = new ArrayList<Task>();
+        
+        
+        for (Task current : AllTasks) {
+            
+                if (current instanceof TimedTask) {
+                    MutableDateTime taskTime =((TimedTask) current).getStartTime();
+                    Task t = compareDate(taskTime, current, dateLimit);
+                    if (t != null){
+                        matchingTasks.add(t);
+                    }
+                } else if (current instanceof DeadlineTask){ 
+                    MutableDateTime taskTime =((DeadlineTask) current).getEndDate();
+                    Task t = compareDate(taskTime, current, dateLimit);
+                    if (t != null){
+                        matchingTasks.add(t);
+                    }
+                }
+            
+
         }
         return matchingTasks;
     }
@@ -65,9 +75,11 @@ public class SearchTool {
         ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks();
         
 
-        for (TimedTask task : AllTimedTasks){
-            if (task.getStartTime().equals(date)){
-                matchingTasks.add(task);
+        for (TimedTask current : AllTimedTasks){
+            MutableDateTime taskTime =((TimedTask) current).getStartTime();
+            Task t = compareDate(taskTime, current, date);
+            if (t != null){
+                matchingTasks.add(t);
             }
         }
         return matchingTasks;

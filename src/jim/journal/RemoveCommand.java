@@ -4,18 +4,21 @@ package jim.journal;
 
 import java.util.ArrayList;
 
+import jim.suggestions.Parser;
+
 import org.joda.time.MutableDateTime;
 
 
 
 public class RemoveCommand extends Command {
 
-    String description;
+    String description = null;
     JournalManager JM;
     MutableDateTime date;
     ArrayList<Task> matchingTasks = new ArrayList<Task>();
     ArrayList<Task> taskToRemove = new ArrayList<Task>();
 
+    Parser parser = new Parser();
     public RemoveCommand(String des) {
         description = des;
     }

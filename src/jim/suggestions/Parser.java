@@ -274,7 +274,7 @@ public class Parser {
 
 
 
-    protected Object doParse(String syntax, String input){
+    public Object doParse(String syntax, String input){
         return doParse(SyntaxFormat.valueOf(syntax), input.split(" "));
     }
 
