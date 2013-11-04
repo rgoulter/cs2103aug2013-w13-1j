@@ -510,9 +510,20 @@ public class JimMainPanel extends JPanel {
         }
         
         else {
-            jim.journal.Command command = suggestionManager.parseCommand(inputTokens);
+            jim.journal.Command command;
+            try {
+                command = suggestionManager.parseCommand(inputTokens);
+            } catch (IllegalArgumentException e) {
+                command = null;
+            }
+            
+            if (command == null) {
+                feedback = "Your input was not recognized.";
+                inputTextField.setText("");
+                refreshUI();
+            }
 
-            if (command != null) {
+            else if (command != null) {
                 lastCommand = command;
 
                 lastCommandState = command.execute(journalManager);
