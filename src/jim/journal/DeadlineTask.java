@@ -14,7 +14,6 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
 
     public DeadlineTask(MutableDateTime endDate, String desc) {
-        // Tasks with both start and end date and time.
         this.endDate = endDate;
         this.description = desc;
     }

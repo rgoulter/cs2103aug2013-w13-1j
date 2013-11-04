@@ -403,7 +403,20 @@ public class SyntaxParsers {
                                   return new DeadlineTask(date, description);
                               }
                           });
-        
+        registerSyntaxParser(p,
+                             "deadlinetask => <date> <time> <description>",
+                             new SyntaxParser() {
+                                 @Override
+                                 public Object parse(SyntaxTermSearchNode[] input) {
+                                     MutableDateTime date =
+                                             (MutableDateTime) p.doParse(input[0]);
+                                     MutableDateTime time =
+                                             (MutableDateTime) p.doParse(input[1]);
+                                     String description = input[2].getMatchedInput();
+                                     return new DeadlineTask(datetime(date, time),
+                                                             description);
+                                 }
+                             });
         
         registerSyntaxParser(p,
                           "floatingtask => <description>",

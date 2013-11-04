@@ -56,7 +56,7 @@ public class SyntaxGrammar {
 			  "<description> <date> <time> <date> <time> | " +
 			  "<date> <time> 'to' <time> <description> | " +
 			  "<date> <time> <time> <description>",
-			"<deadlinetask> := <date> <description>",
+			"<deadlinetask> := <date> <time> <description> | <date> <description>",
 			"<floatingtask> := <description>",
 			"<task> := <timedtask> | <deadlinetask> | <floatingtask>",
 
