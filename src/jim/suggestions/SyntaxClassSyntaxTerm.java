@@ -134,24 +134,31 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         return suggestedWord;
     }
     
+    // There has to be a better way to do the following...
+    
     private boolean isAddCmd(GenerationContext context, double t) {
-        return isCurrentHintFirstWordOneOf(context, t, new String[]{"add"}); // MAGIC
+    	String[] addCmdWords = new String[]{"add", "create", "new", "+"};
+        return isCurrentHintFirstWordOneOf(context, t, addCmdWords); // MAGIC
     }
 
     private boolean isCompleteCmd(GenerationContext context, double t) {
-        return isCurrentHintFirstWordOneOf(context, t, new String[]{"complete"}); // MAGIC
+    	String[] completeCmdWords = new String[]{"complete", "done", "finish", "*"}; 
+        return isCurrentHintFirstWordOneOf(context, t, completeCmdWords); // MAGIC
     }
 
     private boolean isSearchCmd(GenerationContext context, double t) {
-        return isCurrentHintFirstWordOneOf(context, t, new String[]{"search"}); // MAGIC
+    	String[] searchCmdWords = new String[]{"search", "find", "query", "?"}; 
+        return isCurrentHintFirstWordOneOf(context, t, searchCmdWords); // MAGIC
     }
 
     private boolean isRemoveCmd(GenerationContext context, double t) {
-        return isCurrentHintFirstWordOneOf(context, t, new String[]{"remove"}); // MAGIC
+    	String[] removeCmdWords = new String[]{"remove", "delete", "cancel", "-"};
+        return isCurrentHintFirstWordOneOf(context, t, removeCmdWords); // MAGIC
     }
 
     private boolean isEditCmd(GenerationContext context, double t) {
-        return isCurrentHintFirstWordOneOf(context, t, new String[]{"edit"}); // MAGIC
+    	String[] editCmdWords = new String[]{"edit", "modify", "change", "update", ":"};
+        return isCurrentHintFirstWordOneOf(context, t, editCmdWords); // MAGIC
     }
     
     private boolean isCurrentHintFirstWordOneOf(GenerationContext context, double t, String[] stringArray) {
