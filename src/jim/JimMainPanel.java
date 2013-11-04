@@ -13,6 +13,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -299,6 +302,11 @@ public class JimMainPanel extends JPanel {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(COLOR_TITLE_BLUE);
         
+        DraggingListener listener = new DraggingListener();
+        topPanel.addMouseMotionListener(listener);
+        topPanel.addMouseListener(listener);
+        
+        
         dateLabel = new JLabel("  xx-xx-xx");
         clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
         progNameLabel = new JLabel("JIM! v0.4    ");
@@ -334,6 +342,60 @@ public class JimMainPanel extends JPanel {
         add(viewPanel, BorderLayout.SOUTH);
         viewPanel.setLayout(new CardLayout(0, 0));
 
+    }
+    
+    // Nested class to facilitate window dragging
+    class DraggingListener implements MouseListener, MouseMotionListener {
+
+        private static final int STATE_NOT_TRACKING = 0;
+        private static final int STATE_TRACKING = 1;
+        
+        private int state;
+        private int lastX;
+        private int lastY;
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            lastX = e.getXOnScreen();
+            lastY = e.getYOnScreen();
+            state = STATE_TRACKING;
+        }
+        
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if (state == STATE_TRACKING) {
+                int newX = e.getXOnScreen();
+                int newY = e.getYOnScreen();
+                
+                int changeX = newX - lastX;
+                int changeY = newY - lastY;
+                
+                int frameCurrentX = applicationWindow.getLocation().x;
+                int frameCurrentY = applicationWindow.getLocation().y;
+                
+                int updatedX = frameCurrentX + changeX;
+                int updatedY = frameCurrentY + changeY;
+                
+                applicationWindow.setLocation(updatedX, updatedY);
+                
+                lastX = newX;
+                lastY = newY;
+            }
+            
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            state = STATE_NOT_TRACKING;
+        }
+        
+        // Unused methods: Required to fully implement listeners, but are not used
+        public void mouseMoved(MouseEvent e) {}
+        public void mouseClicked(MouseEvent e) {}
+        public void mouseEntered(MouseEvent e) {}
+        public void mouseExited(MouseEvent e) {}
+        
+        
     }
 
 
