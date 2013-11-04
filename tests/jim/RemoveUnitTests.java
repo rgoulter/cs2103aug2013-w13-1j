@@ -60,21 +60,10 @@ public class RemoveUnitTests {
         String executionStatus = removeCmd1.execute(jManager);
         String output = removeCmd1.getOutput();
         
-        assertEquals("Execution status not correctly updated to Pending (Phase 1)",
-                     "Pending", executionStatus);
-
-        assertEquals("Output generated does not match expected output (Phase 1)",
-                     "Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
-				     "0, CS2103 Lecture\n", output);
-        
-        executionStatus = removeCmd1.secondExecute("0");
-        output = removeCmd1.getOutput();
-        
-        assertEquals("Execution status not correctly updated to Success (Phase 2)",
+        assertEquals("Execution status not correctly updated to Success",
                      "Success", executionStatus);
 
-        assertEquals("Output generated does not match expected output (Phase 2)",
-                     "Removed task: CS2103 Lecture\n", output);
+        assertEquals("Removed task: CS2103 Lecture\n", output);
         
         
     }
@@ -185,8 +174,8 @@ public class RemoveUnitTests {
 
         String output = removeCmd.getOutput();
 
-        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
-                     "0, [12" + dSeparator + "10" + dSeparator + "2013] " + 
+        assertEquals("Removed task: " +
+                     "[12" + dSeparator + "10" + dSeparator + "2013] " + 
                      "[12" + tSeparator + "00 - 13" + tSeparator + "00] do a TimedTask\n",
                      output);
 

@@ -37,6 +37,10 @@ public class CompleteCommand extends Command {
         if (matchingTasks.size() == 0){
             outputln("Description was not matched.");
             return "Success";
+        }else if (matchingTasks.size() == 1){
+            taskToComplete.add(matchingTasks.get(0));
+            executeHelper();
+            return "Success";
         }else{
             outputln( "Type in just the index of tasks you wish to process. Please seperate them by ','");
             for (int i = 0; i < matchingTasks.size(); i++){

@@ -45,8 +45,8 @@ public class CompleteUnitTests {
 
         String output = completeCmd1.getOutput();
 
-        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
-				     "0, CS2103 Lecture\n", output);
+        assertEquals("Completed Task: " +
+				     "CS2103 Lecture\n", output);
     }
 
 
@@ -125,8 +125,8 @@ public class CompleteUnitTests {
 
         String output = completeCmd.getOutput();
 
-        assertEquals("Type in just the index of tasks you wish to process. Please seperate them by ','\n" +
-                     "0, [12" + dSeparator + "10" + dSeparator + "2013] " + 
+        assertEquals("Completed Task: " +
+                     "[12" + dSeparator + "10" + dSeparator + "2013] " + 
                      "[12" + tSeparator + "00 - 13" + tSeparator + "00] do a TimedTask\n",
                      output);
 

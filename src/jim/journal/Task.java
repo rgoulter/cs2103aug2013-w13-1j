@@ -24,5 +24,15 @@ public abstract class Task {
     public String toStringForEditCommand(){
         return description;
     }
+    public boolean equals(Object o) {
+        if (o instanceof Task) {
+            Task helper = (Task) o;
+            if (this.toString().equalsIgnoreCase(helper.toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     
 }

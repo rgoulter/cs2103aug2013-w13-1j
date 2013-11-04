@@ -1,4 +1,3 @@
-
 package jim;
 
 import javax.swing.JPanel;
@@ -13,18 +12,21 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
 import java.awt.CardLayout;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -42,7 +44,7 @@ import jim.journal.Task;
 @SuppressWarnings("serial")
 public class JimMainPanel extends JPanel {
 
-    protected JEditorPane inputTextField;
+    protected JTextField inputTextField;
     protected JFrame applicationWindow;
     protected JPanel viewPanel;
     protected JLabel helperTextLabel;
@@ -59,6 +61,11 @@ public class JimMainPanel extends JPanel {
     protected JournalManager journalManager;
     protected boolean isRunning;
     
+    private static final int HISTORY_MAX_COMMANDS = 10;
+    protected ArrayList<String> commandHistory;
+    protected int historyIndex;
+    protected int historyBrowsingIndex;
+    
     private static Configuration configManager = Configuration.getConfiguration();
     private static final String DATE_SEPARATOR = configManager.getDateSeparator();
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
@@ -74,6 +81,8 @@ public class JimMainPanel extends JPanel {
 
     // Arbitrary objects for ActionMap.
     private static final String ACTION_EXIT_WINDOW = "exit window";
+    private static final String ACTION_HISTORY_PREVIOUS = "history previous";
+    private static final String ACTION_HISTORY_NEXT = "history next";
     private static final String ACTION_EXECUTE_INPUT = "execute input";
     private static final String ACTION_SUGGESTIONS_FORWARD = "suggestions forward";
     private static final String ACTION_SUGGESTIONS_BACKWARD = "suggestions backward";
@@ -90,8 +99,15 @@ public class JimMainPanel extends JPanel {
 
     public JimMainPanel() {
         initialiseUIComponents();
+        
         lastCommandState = "Ready";
         isRunning = true;
+        commandHistory = new ArrayList<String>(HISTORY_MAX_COMMANDS);
+        for (int i=0; i<HISTORY_MAX_COMMANDS; i++) {
+            commandHistory.add("");
+        }
+        historyIndex = 0;
+        historyBrowsingIndex = 0;
 
         // Initialise the logic
         suggestionManager = new SuggestionManager();
@@ -113,11 +129,12 @@ public class JimMainPanel extends JPanel {
     }
 
 
+    @SuppressWarnings("unchecked")
     private void initialiseUIComponents() {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
         
-        inputTextField = new JEditorPane();
+        inputTextField = new JTextField();
         Border outerBorder = BorderFactory.createLineBorder(COLOR_BLUE, 4);
         Border innerBorder = BorderFactory.createLineBorder(COLOR_BLACK, 1);
         Border inputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
@@ -200,7 +217,48 @@ public class JimMainPanel extends JPanel {
 
                                               @Override
                                               public void actionPerformed(ActionEvent e) {
+                                                  commandHistory.set(historyIndex, inputTextField.getText());
+                                                  historyIndex++;
+                                                  historyBrowsingIndex = historyIndex;
+                                                  if (historyIndex > HISTORY_MAX_COMMANDS-1) { historyIndex = 0; }
+                                                  
                                                   executeInput();
+                                              }
+                                          });
+        
+     // Bind UP to previous in command history
+        inputTextField.getInputMap()
+                      .put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
+                           ACTION_HISTORY_PREVIOUS);
+        inputTextField.getActionMap().put(ACTION_HISTORY_PREVIOUS,
+                                          new AbstractAction() {
+
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  historyBrowsingIndex--;
+                                                  if (historyBrowsingIndex < 0) { historyBrowsingIndex = HISTORY_MAX_COMMANDS-1; }
+                                                  
+                                                  inputTextField.setText(commandHistory.get(historyBrowsingIndex));
+                                                  suggestionManager.updateBuffer(inputTextField.getText());
+                                                  refreshUI();
+                                              }
+                                          });
+        
+     // Bind DOWN to next in command history
+        inputTextField.getInputMap()
+                      .put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
+                           ACTION_HISTORY_NEXT);
+        inputTextField.getActionMap().put(ACTION_HISTORY_NEXT,
+                                          new AbstractAction() {
+
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  historyBrowsingIndex++;
+                                                  if (historyBrowsingIndex > HISTORY_MAX_COMMANDS-1) { historyBrowsingIndex = 0; }
+                                                  
+                                                  inputTextField.setText(commandHistory.get(historyBrowsingIndex));
+                                                  suggestionManager.updateBuffer(inputTextField.getText());
+                                                  refreshUI();
                                               }
                                           });
 
@@ -299,6 +357,11 @@ public class JimMainPanel extends JPanel {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(COLOR_TITLE_BLUE);
         
+        DraggingListener listener = new DraggingListener();
+        topPanel.addMouseMotionListener(listener);
+        topPanel.addMouseListener(listener);
+        
+        
         dateLabel = new JLabel("  xx-xx-xx");
         clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
         progNameLabel = new JLabel("JIM! v0.4    ");
@@ -334,6 +397,60 @@ public class JimMainPanel extends JPanel {
         add(viewPanel, BorderLayout.SOUTH);
         viewPanel.setLayout(new CardLayout(0, 0));
 
+    }
+    
+    // Nested class to facilitate window dragging
+    class DraggingListener implements MouseListener, MouseMotionListener {
+
+        private static final int STATE_NOT_TRACKING = 0;
+        private static final int STATE_TRACKING = 1;
+        
+        private int state;
+        private int lastX;
+        private int lastY;
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            lastX = e.getXOnScreen();
+            lastY = e.getYOnScreen();
+            state = STATE_TRACKING;
+        }
+        
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if (state == STATE_TRACKING) {
+                int newX = e.getXOnScreen();
+                int newY = e.getYOnScreen();
+                
+                int changeX = newX - lastX;
+                int changeY = newY - lastY;
+                
+                int frameCurrentX = applicationWindow.getLocation().x;
+                int frameCurrentY = applicationWindow.getLocation().y;
+                
+                int updatedX = frameCurrentX + changeX;
+                int updatedY = frameCurrentY + changeY;
+                
+                applicationWindow.setLocation(updatedX, updatedY);
+                
+                lastX = newX;
+                lastY = newY;
+            }
+            
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            state = STATE_NOT_TRACKING;
+        }
+        
+        // Unused methods: Required to fully implement listeners, but are not used
+        public void mouseMoved(MouseEvent e) {}
+        public void mouseClicked(MouseEvent e) {}
+        public void mouseEntered(MouseEvent e) {}
+        public void mouseExited(MouseEvent e) {}
+        
+        
     }
 
 
@@ -393,9 +510,20 @@ public class JimMainPanel extends JPanel {
         }
         
         else {
-            jim.journal.Command command = suggestionManager.parseCommand(inputTokens);
+            jim.journal.Command command;
+            try {
+                command = suggestionManager.parseCommand(inputTokens);
+            } catch (IllegalArgumentException e) {
+                command = null;
+            }
+            
+            if (command == null) {
+                feedback = "Your input was not recognized.";
+                inputTextField.setText("");
+                refreshUI();
+            }
 
-            if (command != null) {
+            else if (command != null) {
                 lastCommand = command;
 
                 lastCommandState = command.execute(journalManager);

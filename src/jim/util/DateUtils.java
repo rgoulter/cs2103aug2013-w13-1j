@@ -39,6 +39,13 @@ public class DateUtils {
     	return zeroBasedMonthOfYear + 1;
     }
     
+    public static int getDayOfWeekFromDayName(String dayName) {
+        final String DAYS_OF_WEEK = "sun mon tue wed thu fri sat";
+        int zeroBasedDayOfWeek = DAYS_OF_WEEK.indexOf(dayName.toLowerCase().substring(0, 3)) / 4;
+        
+        return zeroBasedDayOfWeek;
+    }
+    
     public static int getCurrentYear() {
     	return new MutableDateTime().getYear();
     }

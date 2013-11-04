@@ -1,7 +1,9 @@
 package jim.journal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 
 
@@ -12,14 +14,9 @@ public class SearchTool {
     public SearchTool(JournalManager journal){
         JManager = journal;
         
-            AllTasks = JManager.getAllTasks();
+        AllTasks = JManager.getAllTasks();
         
-    }/*
-   public static SearchTool getInstance(){
-      if (theOne == null){
-          theOne = new SearchTool();
-      }
-   }*/
+    }
    public void setJournalManager(JournalManager JM){
        this.JManager = JM;
    }
@@ -30,6 +27,27 @@ public class SearchTool {
      * TODO: Welcome to add new search method when needed.
      * 
      */
+ //return all the tasks that contains the key word.
+   public ArrayList<Task> searchByNonStrictDescription(String KeyWord){
+       ArrayList<Task> matchingTasks = new ArrayList<Task>();
+       for (Task task : AllTasks) {  
+           if (task.getDescription().contains(KeyWord)) {
+               matchingTasks.add(task);
+           }
+       }
+       return matchingTasks;
+   }
+   public ArrayList<Task> searchByNonStrictDescription(String KeyWord, ArrayList<Task> tasks){
+       ArrayList<Task> matchingTasks = new ArrayList<Task>();
+       for (Task task : tasks) {  
+           if (task.getDescription().contains(KeyWord)) {
+               matchingTasks.add(task);
+           }
+       }
+       return matchingTasks;
+   }
+   
+   
     public ArrayList<Task> searchByDescription(String des){
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
         for (Task task : AllTasks) {
@@ -39,22 +57,59 @@ public class SearchTool {
         }
         return matchingTasks;
     }
-    
-    //return task whoever has a date that matches the given date.
-    public ArrayList<Task> searchByDate(MutableDateTime date){
+    public ArrayList<Task> searchByDescription(String des, ArrayList<Task> tasks){
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
-        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks();
-        ArrayList<DeadlineTask> AllDeadlineTasks = this.getAllDeadlineTasks();
-        
-        for (TimedTask task : AllTimedTasks){
-            if (task.getStartTime().equals(date)||task.getEndTime().equals(date)){
+        for (Task task : tasks) {
+            if (task.getDescription().equals(des)) {
                 matchingTasks.add(task);
             }
         }
-        for (DeadlineTask task : AllDeadlineTasks){
-            if (task.getEndDate().equals(date)){
-                matchingTasks.add(task);
-            }
+        return matchingTasks;
+    }
+    //return task whoever has a date that matches the given date.
+    public Task  compareDate(MutableDateTime taskTime, Task current, MutableDateTime dateLimit) {
+        if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0) {
+            return current;
+        }else{
+            return null;
+        }
+    }
+    
+    public ArrayList<Task> searchByDate(MutableDateTime dateLimit){
+        ArrayList<Task> matchingTasks = new ArrayList<Task>();
+        for (Task current : AllTasks) {
+                if (current instanceof TimedTask) {
+                    MutableDateTime taskTime =((TimedTask) current).getStartTime();
+                    Task t = compareDate(taskTime, current, dateLimit);
+                    if (t != null){
+                        matchingTasks.add(t);
+                    }
+                } else if (current instanceof DeadlineTask){ 
+                    MutableDateTime taskTime =((DeadlineTask) current).getEndDate();
+                    Task t = compareDate(taskTime, current, dateLimit);
+                    if (t != null){
+                        matchingTasks.add(t);
+                    }
+                }
+        }
+        return matchingTasks;
+    }
+    public ArrayList<Task> searchByDate(MutableDateTime dateLimit, ArrayList<Task> tasks){
+        ArrayList<Task> matchingTasks = new ArrayList<Task>();
+        for (Task current : tasks) {
+                if (current instanceof TimedTask) {
+                    MutableDateTime taskTime =((TimedTask) current).getStartTime();
+                    Task t = compareDate(taskTime, current, dateLimit);
+                    if (t != null){
+                        matchingTasks.add(t);
+                    }
+                } else if (current instanceof DeadlineTask){ 
+                    MutableDateTime taskTime =((DeadlineTask) current).getEndDate();
+                    Task t = compareDate(taskTime, current, dateLimit);
+                    if (t != null){
+                        matchingTasks.add(t);
+                    }
+                }
         }
         return matchingTasks;
     }
@@ -62,12 +117,25 @@ public class SearchTool {
     //return task whose start date match the given date
     public ArrayList<Task> searchByStartDate(MutableDateTime date){
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
-        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks();
-        
-
-        for (TimedTask task : AllTimedTasks){
-            if (task.getStartTime().equals(date)){
-                matchingTasks.add(task);
+        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks(AllTasks);
+        for (TimedTask current : AllTimedTasks){
+            MutableDateTime taskTime =((TimedTask) current).getStartTime();
+            Task t = compareDate(taskTime, current, date);
+            if (t != null){
+                matchingTasks.add(t);
+            }
+        }
+        return matchingTasks;
+    }
+    
+    public ArrayList<Task> searchByStartDate(MutableDateTime date, ArrayList<Task> tasks){
+        ArrayList<Task> matchingTasks = new ArrayList<Task>();
+        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks(tasks);
+        for (TimedTask current : AllTimedTasks){
+            MutableDateTime taskTime =((TimedTask) current).getStartTime();
+            Task t = compareDate(taskTime, current, date);
+            if (t != null){
+                matchingTasks.add(t);
             }
         }
         return matchingTasks;
@@ -76,73 +144,74 @@ public class SearchTool {
     //return these tasks whose end date match the given date.
     public ArrayList<Task> searchByEndDate(MutableDateTime date){
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
-        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks();
-        ArrayList<DeadlineTask> AllDeadlineTasks = this.getAllDeadlineTasks();
+        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks(AllTasks);
+        ArrayList<DeadlineTask> AllDeadlineTasks = this.getAllDeadlineTasks(AllTasks);
 
-        for (TimedTask task : AllTimedTasks){
-            if (task.getEndTime().equals(date)){
-                matchingTasks.add(task);
+        for (TimedTask current : AllTimedTasks){
+            MutableDateTime taskTime =((TimedTask) current).getEndTime();
+            Task t = compareDate(taskTime, current, date);
+            if (t != null){
+                matchingTasks.add(t);
             }
         }
-        for (DeadlineTask task : AllDeadlineTasks){
-            if (task.getEndDate().equals(date)){
-                matchingTasks.add(task);
+        for (DeadlineTask current : AllDeadlineTasks){
+            MutableDateTime taskTime =((DeadlineTask) current).getEndDate();
+            Task t = compareDate(taskTime, current, date);
+            if (t != null){
+                matchingTasks.add(t);
             }
         }
         return matchingTasks;
     }
-    
-    //return all the tasks that contains the key word.
-    public ArrayList<Task> searchByNonStrictDescription(String KeyWord){
+    public ArrayList<Task> searchByEndDate(MutableDateTime date, ArrayList<Task> tasks){
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
-        for (Task task : AllTasks) {  
-            if (task.getDescription().contains(KeyWord)) {
-                matchingTasks.add(task);
+        ArrayList<TimedTask> AllTimedTasks = this.getAllTimedTasks(tasks);
+        ArrayList<DeadlineTask> AllDeadlineTasks = this.getAllDeadlineTasks(tasks);
+
+        for (TimedTask current : AllTimedTasks){
+            MutableDateTime taskTime =((TimedTask) current).getEndTime();
+            Task t = compareDate(taskTime, current, date);
+            if (t != null){
+                matchingTasks.add(t);
+            }
+        }
+        for (DeadlineTask current : AllDeadlineTasks){
+            MutableDateTime taskTime =((DeadlineTask) current).getEndDate();
+            Task t = compareDate(taskTime, current, date);
+            if (t != null){
+                matchingTasks.add(t);
             }
         }
         return matchingTasks;
+        
     }
     
-    public ArrayList<Task> searchCompletedTask(){
-        return this.getcompletedTasks();
-    }
-    public ArrayList<Task> searchUncompletedTask(){
-        return this.getuncompletedTasks();
-    }
-    public ArrayList<FloatingTask> searchFloatingTask(){
-        return this.getAllFloatingTasks();
+    public ArrayList<Task> getAllTasks(){
+        return AllTasks;
     }
     
     
-    
-    
-    
-    
-    
-    /*
-     * Second level methods all private
-     */
-    private ArrayList<TimedTask> getAllTimedTasks(){
+    public ArrayList<TimedTask> getAllTimedTasks(ArrayList<Task> tasks){
         ArrayList<TimedTask> AllTimedTask = new ArrayList<TimedTask>();
-        for (Task task : AllTasks){
+        for (Task task : tasks){
             if (task instanceof TimedTask){
                 AllTimedTask.add((TimedTask)task);
             }
         }
         return AllTimedTask;
     }
-    private ArrayList<FloatingTask> getAllFloatingTasks(){
+    public ArrayList<FloatingTask> getAllFloatingTasks(ArrayList<Task> tasks){
         ArrayList<FloatingTask> AllFloatingTask = new ArrayList<FloatingTask>();
-        for (Task task : AllTasks){
+        for (Task task : tasks){
             if (task instanceof FloatingTask){
                 AllFloatingTask.add((FloatingTask)task);
             }
         }
         return AllFloatingTask;
     }
-    private ArrayList<DeadlineTask> getAllDeadlineTasks(){
+    public ArrayList<DeadlineTask> getAllDeadlineTasks(ArrayList<Task> tasks){
         ArrayList<DeadlineTask> AllDeadlineTask = new ArrayList<DeadlineTask>();
-        for (Task task : AllTasks){
+        for (Task task : tasks){
             if (task instanceof DeadlineTask){
                 AllDeadlineTask.add((DeadlineTask)task);
             }
@@ -150,24 +219,34 @@ public class SearchTool {
         return AllDeadlineTask;
         
     }
-    private ArrayList<Task> getuncompletedTasks() {
+    public ArrayList<Task> getuncompletedTasks(ArrayList<Task> tasks) {
         ArrayList<Task> uncompletedTasks = new ArrayList<Task>();
-        for (Task t : AllTasks) {
+        for (Task t : tasks) {
             if (!t.isCompleted()) {
                 uncompletedTasks.add(t);
             }
         }
         return uncompletedTasks;
     }
-    private ArrayList<Task> getcompletedTasks() {
+    public ArrayList<Task> getcompletedTasks(ArrayList<Task> tasks) {
         ArrayList<Task> completedTasks = new ArrayList<Task>();
-        for (Task t : AllTasks) {
+        for (Task t : tasks) {
             if (t.isCompleted()) {
                 completedTasks.add(t);
             }
         }
         return completedTasks;
     }
-
-    
+    public ArrayList<TimedTask> sortTimedTasks(ArrayList<TimedTask> tasks){
+        Collections.sort(tasks);
+        return tasks;
+    }
+    public ArrayList<DeadlineTask> sortDeadlineTasks(ArrayList<DeadlineTask> tasks){
+        Collections.sort(tasks);
+        return tasks;
+    }
+    public ArrayList<FloatingTask> sortFloatingTasks(ArrayList<FloatingTask> tasks){
+        Collections.sort(tasks);
+        return tasks;
+    }
 }

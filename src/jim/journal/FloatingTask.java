@@ -1,7 +1,9 @@
 
 package jim.journal;
 
-public class FloatingTask extends Task {
+
+
+public class FloatingTask extends Task implements Comparable<FloatingTask>{
 
     public FloatingTask(String desc) {
         description = desc;
@@ -24,5 +26,9 @@ public class FloatingTask extends Task {
             }
         }
         return false;
+    }
+    @Override
+    public int compareTo(FloatingTask arg0) {
+        return this.getDescription().compareTo(arg0.getDescription());
     }
 }

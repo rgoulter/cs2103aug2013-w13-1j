@@ -36,11 +36,21 @@ public class SyntaxGrammar {
 			  "'October' | 'Oct' | 'Oct.' | " +
 			  "'November' | 'Nov' | 'Nov.' | " +
 			  "'December' | 'Dec' | 'Dec.'",
+			"<dayOfWeek> := " +
+			  "'Monday' | 'Mon' | 'Mon.' | " +
+			  "'Tuesday' | 'Tue' | 'Tue.' | 'Tues' | 'Tues.' | " +
+			  "'Wednesday' | 'Wed' | 'Wed.' | " +
+			  "'Thursday' | 'Thu' | 'Thu.' | 'Thur' | 'Thur.' | " +
+			  "'Friday' | 'Fri' | 'Fri.' | " +
+			  "'Saturday' | 'Sat' | 'Sat.' | " +
+			  "'Sunday' | 'Sun' | 'Sun.'",
 			"<dayofmonth> := /(\\d?\\d)(st|nd|rd|th)?/",
 			"<ddmmyy> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/",
 			"<yyyymmdd> := /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/",
 			"<monthday> := /\\d\\d/\\d\\d/ | <monthname> <dayofmonth> | <dayofmonth> <monthname>",
-			"<date> := <ddmmyy> | <yyyymmdd> | <monthday>",
+			"<constantRelativeDates> := 'yesterday' | 'today' | 'tomorrow' ",
+			"<relativeDays> := <dayOfWeek> | 'this' <dayOfWeek> | 'next' <dayOfWeek> | 'last' <dayOfWeek>",
+			"<date> := <ddmmyy> | <yyyymmdd> | <monthday> | <constantRelativeDates> | <relativeDays>",
 			"<hhmm> := /(\\d\\d):?(\\d\\d)[Hh]/ | /(\\d?\\d):?(\\d\\d)/",
 			"<ampmtime> := " +
 			  "/(\\d?\\d)([AaPp])[Mm]?/ | " +
@@ -56,30 +66,33 @@ public class SyntaxGrammar {
 			  "<description> <date> <time> <date> <time> | " +
 			  "<date> <time> 'to' <time> <description> | " +
 			  "<date> <time> <time> <description>",
-			"<deadlinetask> := <date> <description>",
+			"<deadlinetask> := <date> <time> <description> | <date> <description>",
 			"<floatingtask> := <description>",
 			"<task> := <timedtask> | <deadlinetask> | <floatingtask>",
 
-			"<addword> := 'add' | 'create'",
+			"<addword> := 'add' | 'create' | 'new' | '+'",
 			"<addcmd> := <addword> <task>",
-			"<completeword> := 'complete' | 'done' | 'finished'",
-			"<completecmd> := <completeword> <description> | <completeword> <date>",
-			"<removeword> := 'remove' | 'delete'",
-			"<removecmd> := <removeword> <description> | <removeword> <date>",
-			"<editword> := 'edit' | 'modify' | 'change'",
-			"<editcmd> := <editword> <description> | <editword> <date>",
-			"<searchword> := 'search' | 'find'",
-			"<searchcmd> := <searchword> <description> | <searchword> <date>",
-			"<displayword> := 'display'",
+			"<completeword> := 'complete' | 'done' | 'finish' | '*'",
+			"<completecmd> := <completeword> <date> | <completeword> <description>",
+			"<removeword> := 'remove' | 'delete' | 'cancel' | '-'",
+			"<removecmd> := <removeword> <date> | <removeword> <description>",
+			"<editword> := 'edit' | 'modify' | 'change' | 'update' | ':'",
+			"<editcmd> := <editword> <date> | <editword> <description>",
+			"<searchword> := 'search' | 'find' | 'query' | '?'",
+			"<searchcmd> := <searchword> <date> | <searchword> <description>",
+			"<displayword> := 'display' | 'show' | '!'",
 			"<displaycmd> := <displayword> | <displayword> <date>",
 			"<configword> := 'config' | 'configuration' | 'configure'",
 			"<configcmd> := <configword> | <configword> <description> <description> | <configword> <description>",
+			"<helpword> := 'help'",
+			"<helpcmd> := <helpword> | <helpword> <description>",
 			"<undocmd> := 'undo'",
 			"<redocmd> := 'redo'",
 			
 			"<cmd> := " +
-			  "<addcmd> | <completecmd> | <removecmd> | <editcmd> | " + 
-			  "<searchcmd> | <displaycmd> | <undocmd> | <redocmd> | <configcmd>"
+			  "<addcmd> | <completecmd> | <removecmd> | <editcmd> | <searchcmd> | " + 
+			  "<displaycmd> | <undocmd> | <redocmd> | <configcmd> | <helpcmd>"
+			  
         };
         
         for (String syntaxDefinitionLine : syntaxes) {

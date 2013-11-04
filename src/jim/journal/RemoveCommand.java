@@ -4,18 +4,21 @@ package jim.journal;
 
 import java.util.ArrayList;
 
+import jim.suggestions.Parser;
+
 import org.joda.time.MutableDateTime;
 
 
 
 public class RemoveCommand extends Command {
 
-    String description;
+    String description = null;
     JournalManager JM;
     MutableDateTime date;
     ArrayList<Task> matchingTasks = new ArrayList<Task>();
     ArrayList<Task> taskToRemove = new ArrayList<Task>();
 
+    Parser parser = new Parser();
     public RemoveCommand(String des) {
         description = des;
     }
@@ -38,6 +41,10 @@ public class RemoveCommand extends Command {
        
             if (matchingTasks.size() == 0){
                 outputln("Description was not matched.");
+                return "Success";
+            }else if (matchingTasks.size() == 1){
+                taskToRemove.add(matchingTasks.get(0));
+                executeHelper();
                 return "Success";
             }else{
                 outputln("Type in just the index of tasks you wish to process. Please seperate them by ','");

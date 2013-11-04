@@ -54,13 +54,12 @@ public class DisplayUnitTests {
 
         String output = dispCmd.getOutput();
 
-        boolean stringsMatch = false;
-        if (output.equals("CS2103 Lecture\n")) {
-            stringsMatch = true;
-        }
+       
 
-        assertTrue("Display command test (on zero arguments) has failed",
-                   stringsMatch);
+        assertEquals("-------------------- Tasks ----------------------\n" +
+                     "CS2103 Lecture\n" +
+                     "\n--------------- Completed Tasks -----------------\n",
+                     output);
     }
 
     @Test
@@ -83,8 +82,10 @@ public class DisplayUnitTests {
     	String output = dispCmd.getOutput();
     	
         assertEquals("Display of Timed Task failed",
-                     "[8" + dSeparator + "11" + dSeparator + "2013] " + 
-                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] Birthday Party\n",
+                     "-------------------- Tasks ----------------------\n" + 
+                     "[08" + dSeparator + "11" + dSeparator + "2013] " + 
+                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] Birthday Party\n"+
+                     "\n--------------- Completed Tasks -----------------\n",
                      output);
     }
 
@@ -106,8 +107,10 @@ public class DisplayUnitTests {
         dispCmd.execute(jManager);
 
         String output = dispCmd.getOutput();
-        assertEquals("[10" + dSeparator + "10" + dSeparator + "2013] " + 
-                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n", output);
+        assertEquals("-------------------- Tasks ----------------------\n" +
+                     "[10" + dSeparator + "10" + dSeparator + "2013] " + 
+                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
+                     "\n--------------- Completed Tasks -----------------\n", output);
     }
     
     @Test
@@ -135,8 +138,10 @@ public class DisplayUnitTests {
         
         String output = dispCmd.getOutput();
         assertEquals("Display command test on multiple items failed",
+                     "-------------------- Tasks ----------------------\n" +
                      "[10" + dSeparator + "10" + dSeparator + "2013] " + 
-                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n",
+                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
+                     "\n--------------- Completed Tasks -----------------\n",
                      output);
     }
 
