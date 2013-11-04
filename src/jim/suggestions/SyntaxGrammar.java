@@ -92,6 +92,7 @@ public class SyntaxGrammar {
 			"<cmd> := " +
 			  "<addcmd> | <completecmd> | <removecmd> | <editcmd> | <searchcmd> | " + 
 			  "<displaycmd> | <undocmd> | <redocmd> | <configcmd> | <helpcmd>"
+			  
         };
         
         for (String syntaxDefinitionLine : syntaxes) {

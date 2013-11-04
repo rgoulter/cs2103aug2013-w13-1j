@@ -75,7 +75,7 @@ public class StringUtils {
         return findDate;
     }
 
-
+    
 
     public static int[] splitDate(String date_in_string) {
         final int LENGTH_OF_DATE = 3; // [DD][MM][YY]
@@ -115,7 +115,12 @@ public class StringUtils {
     	return matchingStrings;
     }
     
-    
+    public static String unescape(String input) {
+        if (input.substring(0,1).equals("\\")) {
+            return input.substring(1);
+        }
+        return input;
+    }
     
     public static boolean isSubsequenceMatch(String str, String subseq) {
     	char[] strChars = str.toCharArray();

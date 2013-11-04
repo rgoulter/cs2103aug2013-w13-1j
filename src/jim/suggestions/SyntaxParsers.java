@@ -4,6 +4,7 @@ import static jim.util.DateUtils.datetime;
 import static jim.util.DateUtils.getCurrentYear;
 import static jim.util.DateUtils.getMonthOfYearFromMonthName;
 import static jim.util.DateUtils.getDayOfWeekFromDayName;
+import static jim.util.StringUtils.unescape;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,6 +123,7 @@ public class SyntaxParsers {
                 return parseDDMMYY(inputTerm);
             }
         };
+        
         registerSyntaxParser(p,
                           "ddmmyy => /" + REGEX_DATE_DDMMYY + "/",
                           genericDDMMYYParser);
@@ -382,11 +384,10 @@ public class SyntaxParsers {
                           new SyntaxTermParser() {
 
                               @Override
-                              public Object parse(String inputTerm) {
+                              public Object parse(String inputTerm) {   
                                   return inputTerm;
                               }
                           });
-
 
         // Redundant?
         registerSyntaxParser(p,
@@ -399,6 +400,7 @@ public class SyntaxParsers {
                                   return inputTerm;
                               }
                           });
+        
         registerSyntaxParser(p,
                           "phrase => <word> <phrase>",
                           new SyntaxTermParser() {
@@ -408,7 +410,7 @@ public class SyntaxParsers {
                                   return input;
                               }
                           });
-
+        
 
         registerSyntaxParser(p,
                           "timedtask => <date> <time> <date> <time> <description>",
@@ -425,7 +427,7 @@ public class SyntaxParsers {
                                           (MutableDateTime) p.doParse(input[3]);
                                   String description = input[4].getMatchedInput();
                                   return new TimedTask(datetime(startDate, startTime),
-                                                       datetime(endDate, endTime), description);
+                                                       datetime(endDate, endTime), unescape(description));
                               }
                           });
         registerSyntaxParser(p,
@@ -443,7 +445,7 @@ public class SyntaxParsers {
                         MutableDateTime endTime =
                                 (MutableDateTime) p.doParse(input[4]);
                         return new TimedTask(datetime(startDate, startTime),
-                                             datetime(endDate, endTime), description);
+                                             datetime(endDate, endTime), unescape(description));
                     }
                 });
         registerSyntaxParser(p,
@@ -460,7 +462,7 @@ public class SyntaxParsers {
                                   String description = input[4].getMatchedInput();
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
-                                                       description);
+                                                       unescape(description));
                               }
                           });
         registerSyntaxParser(p,
@@ -477,7 +479,7 @@ public class SyntaxParsers {
                                   String description = input[3].getMatchedInput();
                                   return new TimedTask(datetime(date, startTime),
                                                        datetime(date, endTime),
-                                                       description);
+                                                       unescape(description));
                               }
                           });
         registerSyntaxParser(p,
@@ -488,7 +490,7 @@ public class SyntaxParsers {
                                   MutableDateTime date =
                                           (MutableDateTime) p.doParse(input[0]);
                                   String description = input[1].getMatchedInput();
-                                  return new DeadlineTask(date, description);
+                                  return new DeadlineTask(date, unescape(description));
                               }
                           });
         registerSyntaxParser(p,
@@ -502,7 +504,7 @@ public class SyntaxParsers {
                                              (MutableDateTime) p.doParse(input[1]);
                                      String description = input[2].getMatchedInput();
                                      return new DeadlineTask(datetime(date, time),
-                                                             description);
+                                                             unescape(description));
                                  }
                              });
         
@@ -511,7 +513,7 @@ public class SyntaxParsers {
                           new SyntaxTermParser() {
                               @Override
                               public Object parse(String input) {
-                                  return new FloatingTask(input);
+                                  return new FloatingTask(unescape(input));
                               }
                           });
         
@@ -533,7 +535,7 @@ public class SyntaxParsers {
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
-                                  return new jim.journal.CompleteCommand(input[1]);
+                                  return new jim.journal.CompleteCommand(unescape(input[1]));
                               }
                           });
         
@@ -555,7 +557,7 @@ public class SyntaxParsers {
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
-                                  return new jim.journal.RemoveCommand(input[1]);
+                                  return new jim.journal.RemoveCommand(unescape(input[1]));
                               }
                           });
         
@@ -578,7 +580,7 @@ public class SyntaxParsers {
                               @Override
                               public Object parse(String[] input) {
                                   String description = input[1];
-                                  EditCommand editCmd = new EditCommand(description);
+                                  EditCommand editCmd = new EditCommand(unescape(description));
                                   
                                   return editCmd;
                               }
@@ -602,7 +604,7 @@ public class SyntaxParsers {
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
-                                  return new SearchCommand(input[1]);
+                                  return new SearchCommand(unescape(input[1]));
                               }
                           });
         
@@ -635,7 +637,7 @@ public class SyntaxParsers {
                               @Override
                               public Object parse(String[] input) {
                                   MutableDateTime date =
-                                        (MutableDateTime) p.doParse("<date>", input[1]);
+                                        (MutableDateTime) p.doParse("<date>", unescape(input[1]));
 
                                   return new jim.journal.DisplayCommand(date);
                               }
