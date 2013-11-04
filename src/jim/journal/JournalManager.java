@@ -219,11 +219,15 @@ public class JournalManager {
     }
 
     public void editTask(Task old_task, Task new_task) {
-    	clearPastCmds();
-        getAllTasks();
-        storeAllTasks.remove(old_task);
-        storeAllTasks.add(new_task);
-        saveToStorage();
+    	if (old_task.toString().equals(new_task.toString())){
+    	    return;
+    	}else{
+    	    clearPastCmds();
+    	    getAllTasks();
+    	    storeAllTasks.remove(old_task);
+    	    storeAllTasks.add(new_task);
+    	    saveToStorage();
+    	}
     }
     
     public String getPreviousCommand(){
