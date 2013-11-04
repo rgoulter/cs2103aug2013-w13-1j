@@ -3,6 +3,7 @@ package jim.suggestions;
 import static jim.util.DateUtils.datetime;
 import static jim.util.DateUtils.getCurrentYear;
 import static jim.util.DateUtils.getMonthOfYearFromMonthName;
+import static jim.util.DateUtils.getDayOfWeekFromDayName;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -202,6 +203,93 @@ public class SyntaxParsers {
 											 					 0);
 								  }
 							  });
+        
+        registerSyntaxParser(p,
+                             "constantRelativeDates => 'yesterday'",
+                              new SimpleSyntaxParser() {
+                                  @Override
+                                  public Object parse(String[] inputTerm) {
+                                      MutableDateTime today = new MutableDateTime();
+                                      today.setTime(0,0,0,0);
+                                      today.addDays(-1);
+                                      return today;
+                                  }
+                              });
+        
+        registerSyntaxParser(p,
+                             "constantRelativeDates => 'today'",
+                              new SimpleSyntaxParser() {
+                                  @Override
+                                  public Object parse(String[] inputTerm) {
+                                      MutableDateTime today = new MutableDateTime();
+                                      today.setTime(0,0,0,0);
+                                      return today;
+                                  }
+                              });
+        
+        registerSyntaxParser(p,
+                             "constantRelativeDates => 'tomorrow'",
+                              new SimpleSyntaxParser() {
+                                  @Override
+                                  public Object parse(String[] inputTerm) {
+                                      MutableDateTime today = new MutableDateTime();
+                                      today.setTime(0,0,0,0);
+                                      today.addDays(1);
+                                      return today;
+                                  }
+                              });
+        
+        registerSyntaxParser(p,
+                             "relativeDays => <dayOfWeek>",
+                              new SimpleSyntaxParser() {
+                                  @Override
+                                  public Object parse(String[] inputTerm) {
+                                      MutableDateTime today = new MutableDateTime();
+                                      today.setTime(0,0,0,0);
+                                      today.setDayOfWeek(getDayOfWeekFromDayName(inputTerm[0]));
+                                      return today;
+                                  }
+                              });
+        
+        registerSyntaxParser(p,
+                             "relativeDays => 'this' <dayOfWeek>",
+                              new SimpleSyntaxParser() {
+                                  @Override
+                                  public Object parse(String[] inputTerm) {
+                                      MutableDateTime today = new MutableDateTime();
+                                      today.setTime(0,0,0,0);
+                                      today.setDayOfWeek(getDayOfWeekFromDayName(inputTerm[1]));
+                                      return today;
+                                  }
+                              });
+        
+        registerSyntaxParser(p,
+                             "relativeDays => 'next' <dayOfWeek>",
+                              new SimpleSyntaxParser() {
+                                  @Override
+                                  public Object parse(String[] inputTerm) {
+                                      MutableDateTime today = new MutableDateTime();
+                                      today.setTime(0,0,0,0);
+                                      today.setDayOfWeek(getDayOfWeekFromDayName(inputTerm[1]));
+                                      today.addDays(7);
+                                      
+                                      return today;
+                                  }
+                              });
+        
+        registerSyntaxParser(p,
+                             "relativeDays => 'last' <dayOfWeek>",
+                              new SimpleSyntaxParser() {
+                                  @Override
+                                  public Object parse(String[] inputTerm) {
+                                      MutableDateTime today = new MutableDateTime();
+                                      today.setTime(0,0,0,0);
+                                      today.setDayOfWeek(getDayOfWeekFromDayName(inputTerm[1]));
+                                      today.addDays(-7);
+                                      
+                                      return today;
+                                  }
+                              });
 
         registerSyntaxParser(p,
                           "hhmm => /(\\d\\d):?(\\d\\d)[Hh]/",

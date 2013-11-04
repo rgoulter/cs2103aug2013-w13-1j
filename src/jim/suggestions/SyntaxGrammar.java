@@ -36,11 +36,21 @@ public class SyntaxGrammar {
 			  "'October' | 'Oct' | 'Oct.' | " +
 			  "'November' | 'Nov' | 'Nov.' | " +
 			  "'December' | 'Dec' | 'Dec.'",
+			"<dayOfWeek> := " +
+			  "'Monday' | 'Mon' | 'Mon.' | " +
+			  "'Tuesday' | 'Tue' | 'Tue.' | 'Tues' | 'Tues.' | " +
+			  "'Wednesday' | 'Wed' | 'Wed.' | " +
+			  "'Thursday' | 'Thu' | 'Thu.' | 'Thur' | 'Thur.' | " +
+			  "'Friday' | 'Fri' | 'Fri.' | " +
+			  "'Saturday' | 'Sat' | 'Sat.' | " +
+			  "'Sunday' | 'Sun' | 'Sun.'",
 			"<dayofmonth> := /(\\d?\\d)(st|nd|rd|th)?/",
 			"<ddmmyy> := /" + REGEX_DATE_DDMMYY + "/ | /\\d\\d\\d\\d\\d\\d/ | /\\d\\d-\\d\\d-\\d\\d/",
 			"<yyyymmdd> := /(\\d\\d\\d\\d)[/-]?(\\d\\d)[/-]?(\\d\\d)/",
 			"<monthday> := /\\d\\d/\\d\\d/ | <monthname> <dayofmonth> | <dayofmonth> <monthname>",
-			"<date> := <ddmmyy> | <yyyymmdd> | <monthday>",
+			"<constantRelativeDates> := 'yesterday' | 'today' | 'tomorrow' ",
+			"<relativeDays> := <dayOfWeek> | 'this' <dayOfWeek> | 'next' <dayOfWeek> | 'last' <dayOfWeek>",
+			"<date> := <ddmmyy> | <yyyymmdd> | <monthday> | <constantRelativeDates> | <relativeDays>",
 			"<hhmm> := /(\\d\\d):?(\\d\\d)[Hh]/ | /(\\d?\\d):?(\\d\\d)/",
 			"<ampmtime> := " +
 			  "/(\\d?\\d)([AaPp])[Mm]?/ | " +
