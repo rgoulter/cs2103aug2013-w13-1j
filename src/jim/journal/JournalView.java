@@ -66,7 +66,8 @@ public class JournalView extends JimView {
         
 
         // Build text from current journal content.
-        if (!lastFeedbackSource.equals("Display") && !lastFeedbackSource.equals("Search")) {
+        if (!lastFeedbackSource.equals("Display") && !lastFeedbackSource.equals("Search") &&
+            !lastFeedbackSource.equals("Help")) {
             String outputText = journalManager.getDisplayString();
             journalText = journalText + outputText;
         } else {

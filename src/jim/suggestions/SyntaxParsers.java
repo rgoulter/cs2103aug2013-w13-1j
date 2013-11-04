@@ -584,6 +584,24 @@ public class SyntaxParsers {
                                      return new jim.ConfigCommand(input[1]);
                                  }
                              });
+        
+        registerSyntaxParser(p,
+                             "helpcmd => <helpword>",
+                             new SimpleSyntaxParser() {
+                                 @Override
+                                 public Object parse(String[] input) {
+                                     return new jim.HelpCommand("");
+                                 }
+                             });
+        
+        registerSyntaxParser(p,
+                             "helpcmd => <helpword> <description>",
+                             new SimpleSyntaxParser() {
+                                 @Override
+                                 public Object parse(String[] input) {
+                                     return new jim.HelpCommand(input[1]);
+                                 }
+                             });
     }
 
 
