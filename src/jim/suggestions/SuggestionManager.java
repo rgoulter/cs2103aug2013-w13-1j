@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import static jim.util.StringUtils.isStringSurroundedBy;
 import static jim.util.StringUtils.join;
 import static jim.util.StringUtils.stripStringPrefixSuffix;
+import static jim.util.StringUtils.isSubsequenceMatch;
 
 
 
@@ -194,6 +195,25 @@ public class SuggestionManager {
     private SuggestionHint generateRandomSuggestion() {
     	// TODO: Get rid of this dependency on inputParser.
     	List<SyntaxFormat> syntaxFormats = inputParser.getDisplayableSyntaxTreeLeafNodes();
+    	
+    	// Assumption: First word is the operative command word.
+    	// Assumption: Subsequence Filtering String separates its matching words with space.
+    	
+    	String[] subseqFilterParts = filteringSubsequence.split(" ");
+        String subseqToMatch = (subseqFilterParts.length > 0) ?
+                               subseqFilterParts[0] :
+                               "";
+
+        // Filter out the syntax formats
+        // whose firstWord
+        for (int i = syntaxFormats.size() - 1; i >= 0; i--) {
+        	String syntaxFirstWord = syntaxFormats.get(i).getSyntaxTerms()[0].toString();
+        	boolean matches = isSubsequenceMatch(syntaxFirstWord, subseqToMatch);
+        	
+        	if (!matches) {
+        		syntaxFormats.remove(i);
+        	}
+        }
     	
     	int i = (int) Math.floor(Math.random() * syntaxFormats.size());
     	double rnd = Math.random();
