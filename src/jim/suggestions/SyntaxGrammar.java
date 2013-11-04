@@ -60,26 +60,28 @@ public class SyntaxGrammar {
 			"<floatingtask> := <description>",
 			"<task> := <timedtask> | <deadlinetask> | <floatingtask>",
 
-			"<addword> := 'add' | 'create'",
+			"<addword> := 'add' | 'create' | 'new' | '+'",
 			"<addcmd> := <addword> <task>",
-			"<completeword> := 'complete' | 'done' | 'finished'",
+			"<completeword> := 'complete' | 'done' | 'finish' | '*'",
 			"<completecmd> := <completeword> <date> | <completeword> <description>",
-			"<removeword> := 'remove' | 'delete'",
+			"<removeword> := 'remove' | 'delete' | 'cancel' | '-'",
 			"<removecmd> := <removeword> <date> | <removeword> <description>",
-			"<editword> := 'edit' | 'modify' | 'change'",
+			"<editword> := 'edit' | 'modify' | 'change' | 'update' | ':'",
 			"<editcmd> := <editword> <date> | <editword> <description>",
-			"<searchword> := 'search' | 'find'",
+			"<searchword> := 'search' | 'find' | 'query' | '?'",
 			"<searchcmd> := <searchword> <date> | <searchword> <description>",
-			"<displayword> := 'display'",
+			"<displayword> := 'display' | 'show' | '!'",
 			"<displaycmd> := <displayword> | <displayword> <date>",
 			"<configword> := 'config' | 'configuration' | 'configure'",
 			"<configcmd> := <configword> | <configword> <description> <description> | <configword> <description>",
+			"<helpword> := 'help'",
+			"<helpcmd> := <helpword> | <helpword> <description>",
 			"<undocmd> := 'undo'",
 			"<redocmd> := 'redo'",
 			
 			"<cmd> := " +
-			  "<addcmd> | <completecmd> | <removecmd> | <editcmd> | " + 
-			  "<searchcmd> | <displaycmd> | <undocmd> | <redocmd> | <configcmd>"
+			  "<addcmd> | <completecmd> | <removecmd> | <editcmd> | <searchcmd> | " + 
+			  "<displaycmd> | <undocmd> | <redocmd> | <configcmd> | <helpcmd>"
         };
         
         for (String syntaxDefinitionLine : syntaxes) {

@@ -1,4 +1,3 @@
-
 package jim;
 
 import javax.swing.JPanel;
