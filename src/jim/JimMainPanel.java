@@ -18,15 +18,15 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
 import java.awt.CardLayout;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -44,7 +44,7 @@ import jim.journal.Task;
 @SuppressWarnings("serial")
 public class JimMainPanel extends JPanel {
 
-    protected JEditorPane inputTextField;
+    protected JTextField inputTextField;
     protected JFrame applicationWindow;
     protected JPanel viewPanel;
     protected JLabel helperTextLabel;
@@ -61,6 +61,11 @@ public class JimMainPanel extends JPanel {
     protected JournalManager journalManager;
     protected boolean isRunning;
     
+    private static final int HISTORY_MAX_COMMANDS = 10;
+    protected ArrayList<String> commandHistory;
+    protected int historyIndex;
+    protected int historyBrowsingIndex;
+    
     private static Configuration configManager = Configuration.getConfiguration();
     private static final String DATE_SEPARATOR = configManager.getDateSeparator();
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
@@ -76,6 +81,8 @@ public class JimMainPanel extends JPanel {
 
     // Arbitrary objects for ActionMap.
     private static final String ACTION_EXIT_WINDOW = "exit window";
+    private static final String ACTION_HISTORY_PREVIOUS = "history previous";
+    private static final String ACTION_HISTORY_NEXT = "history next";
     private static final String ACTION_EXECUTE_INPUT = "execute input";
     private static final String ACTION_SUGGESTIONS_FORWARD = "suggestions forward";
     private static final String ACTION_SUGGESTIONS_BACKWARD = "suggestions backward";
@@ -92,8 +99,15 @@ public class JimMainPanel extends JPanel {
 
     public JimMainPanel() {
         initialiseUIComponents();
+        
         lastCommandState = "Ready";
         isRunning = true;
+        commandHistory = new ArrayList<String>(HISTORY_MAX_COMMANDS);
+        for (int i=0; i<HISTORY_MAX_COMMANDS; i++) {
+            commandHistory.add("");
+        }
+        historyIndex = 0;
+        historyBrowsingIndex = 0;
 
         // Initialise the logic
         suggestionManager = new SuggestionManager();
@@ -115,11 +129,12 @@ public class JimMainPanel extends JPanel {
     }
 
 
+    @SuppressWarnings("unchecked")
     private void initialiseUIComponents() {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
         
-        inputTextField = new JEditorPane();
+        inputTextField = new JTextField();
         Border outerBorder = BorderFactory.createLineBorder(COLOR_BLUE, 4);
         Border innerBorder = BorderFactory.createLineBorder(COLOR_BLACK, 1);
         Border inputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
@@ -202,7 +217,48 @@ public class JimMainPanel extends JPanel {
 
                                               @Override
                                               public void actionPerformed(ActionEvent e) {
+                                                  commandHistory.set(historyIndex, inputTextField.getText());
+                                                  historyIndex++;
+                                                  historyBrowsingIndex = historyIndex;
+                                                  if (historyIndex > HISTORY_MAX_COMMANDS-1) { historyIndex = 0; }
+                                                  
                                                   executeInput();
+                                              }
+                                          });
+        
+     // Bind UP to previous in command history
+        inputTextField.getInputMap()
+                      .put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
+                           ACTION_HISTORY_PREVIOUS);
+        inputTextField.getActionMap().put(ACTION_HISTORY_PREVIOUS,
+                                          new AbstractAction() {
+
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  historyBrowsingIndex--;
+                                                  if (historyBrowsingIndex < 0) { historyBrowsingIndex = HISTORY_MAX_COMMANDS-1; }
+                                                  
+                                                  inputTextField.setText(commandHistory.get(historyBrowsingIndex));
+                                                  suggestionManager.updateBuffer(inputTextField.getText());
+                                                  refreshUI();
+                                              }
+                                          });
+        
+     // Bind DOWN to next in command history
+        inputTextField.getInputMap()
+                      .put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
+                           ACTION_HISTORY_NEXT);
+        inputTextField.getActionMap().put(ACTION_HISTORY_NEXT,
+                                          new AbstractAction() {
+
+                                              @Override
+                                              public void actionPerformed(ActionEvent e) {
+                                                  historyBrowsingIndex++;
+                                                  if (historyBrowsingIndex > HISTORY_MAX_COMMANDS-1) { historyBrowsingIndex = 0; }
+                                                  
+                                                  inputTextField.setText(commandHistory.get(historyBrowsingIndex));
+                                                  suggestionManager.updateBuffer(inputTextField.getText());
+                                                  refreshUI();
                                               }
                                           });
 
