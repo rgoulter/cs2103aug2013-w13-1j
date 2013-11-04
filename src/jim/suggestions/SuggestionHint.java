@@ -96,18 +96,15 @@ public class SuggestionHint implements Comparable<SuggestionHint> {
 	
 	public boolean matchesSubsequence(String subsequence) {
 		int i = 0;
-    	int lastIndex = 0;
     	
     	String hintPhrase = join(words, ' ');
     	
-    	while (i < subsequence.length() && lastIndex >= 0) {
-    		char charToLookFor = subsequence.charAt(i);
-    		lastIndex = hintPhrase.indexOf(charToLookFor, lastIndex);
-    		
-    		if (lastIndex >= 0) {
-    			lastIndex += 1;
-			}
-    		i++;
+    	for (int j = 0;
+             j < hintPhrase.length() && i < subsequence.length();
+             j++) {
+    		if (hintPhrase.charAt(j) == subsequence.charAt(i)) {
+    			i++;
+    		}
     	}
     	
 		return i == subsequence.length();
