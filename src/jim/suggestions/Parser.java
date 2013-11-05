@@ -5,9 +5,13 @@ import static jim.util.StringUtils.stripStringPrefixSuffix;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,14 +35,67 @@ public class Parser {
 
 
     /**
+     * InputTerm encapsulates the space-separated words of input;
+     * it also helps us memoize string comparison computations.
+     */
+    private class InputTerm {
+        private String inputTermString;
+        private Set<SyntaxTerm> matchedSyntaxTerms;
+        private Set<String> maybeMatchClassNames;
+
+        public InputTerm(String inputTermStr) {
+            inputTermString = inputTermStr;
+            matchedSyntaxTerms = new HashSet<SyntaxTerm>();
+            maybeMatchClassNames = new HashSet<String>();
+
+            // Pre-compute all string comparisons now.
+            for (SyntaxTerm baseTerm : getAllBaseSyntaxTerms()) {
+                if (baseTerm.matches(inputTermString)) {
+                    matchedSyntaxTerms.add(baseTerm);
+                }
+            }
+
+            // Build set of which classes this input term may match
+            // (There is probably a better way of doing this).
+            Set<String> synClassNames = baseSyntaxTerms.keySet();
+            
+            for (String synClassName : synClassNames) {
+                Set<SyntaxTerm> baseTerms = baseSyntaxTerms.get(synClassName);
+
+                for (SyntaxTerm term : baseTerms) {
+                    if (matchedSyntaxTerms.contains(term)) {
+                        maybeMatchClassNames.add(synClassName);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public boolean hasMatchWith(SyntaxTerm term) {
+            return matchedSyntaxTerms.contains(term);
+        }
+
+        public boolean mightBeSyntaxClass(String syntaxClassName) {
+            return maybeMatchClassNames.contains(syntaxClassName);
+        }
+
+        @Override
+        public String toString() {
+            return inputTermString;
+        }
+    }
+
+
+
+    /**
      * SearchNode class helps us match input with the
      * syntax tree.
      */
     private class SearchNode {
         List<SyntaxTermSearchNode> syntaxFormat;
-        String[] inputArray;
+        InputTerm[] inputArray;
 
-        public SearchNode(List<SyntaxTermSearchNode> syntax, String[] input){
+        public SearchNode(List<SyntaxTermSearchNode> syntax, InputTerm[] input){
             syntaxFormat = syntax;
             inputArray = input;
         }
@@ -170,9 +227,9 @@ public class Parser {
             
             result.append("<-");
             
-            for (String inputStr : inputArray) {
+            for (InputTerm inputTerm : inputArray) {
                 result.append(" ");
-                result.append(inputStr);
+                result.append(inputTerm.toString());
             }
             
             return result.toString();
@@ -239,13 +296,15 @@ public class Parser {
             }
         }
 
-        public boolean isMatched(String input) {
-            // Get the logic here from isMatchSyntaxTermWithInputTerm...
-            boolean matched = syntaxTerm.matches(input);
+        public boolean isMatched(InputTerm input) {
+            assert isTerminal();
+
+            // Check that the inputTerm has matched against this synTerm.
+            boolean matched = input.hasMatchWith(syntaxTerm);
 
             if (matched) {
                 // We record the last input term we successfully matched against.
-                inputTerm = input;
+                inputTerm = input.toString();
             }
             
             return matched;
@@ -257,12 +316,68 @@ public class Parser {
 
     private final Map<String, List<SyntaxFormat>> syntaxClassesMap = new HashMap<String, List<SyntaxFormat>>();
     private final Map<SyntaxParserKey, SyntaxParser> syntaxParsers = new HashMap<SyntaxParserKey, SyntaxParser>();
+    private final Map<String, Set<SyntaxTerm>> baseSyntaxTerms = new HashMap<String, Set<SyntaxTerm>>();
     
     
     
     public Parser() {
         initSyntax(syntaxClassesMap);
         initSyntaxParsers(this);
+        findBaseSyntaxTerms();
+    }
+
+
+
+    private void findBaseSyntaxTerms() {
+        // Build up baseSyntaxTerms using syntaxClassesMap.
+        
+        String topLevel = "cmd"; // MAGIC Top-level element.
+        buildBaseSyntaxTerms(topLevel);
+    }
+
+
+
+    private Set<SyntaxTerm> getAllBaseSyntaxTerms() {
+        return baseSyntaxTerms.get("cmd");
+    }
+
+
+
+    private void buildBaseSyntaxTerms(String synClassName) {
+        assert syntaxClassesMap.containsKey(synClassName);
+
+        if (baseSyntaxTerms.containsKey(synClassName)) {
+            return;
+        }
+
+        List<SyntaxFormat> formats = syntaxClassesMap.get(synClassName);
+
+        Set<SyntaxTerm> setOfBaseTerms = new HashSet<SyntaxTerm>();
+        baseSyntaxTerms.put(synClassName, setOfBaseTerms);
+
+        for (SyntaxFormat format : formats) {
+            SyntaxTerm[] synTerms = format.getSyntaxTerms();
+
+            for (SyntaxTerm formatSynTerm : synTerms) {
+                if (formatSynTerm instanceof SyntaxClassSyntaxTerm) {
+                    String nextSynClassName =
+                        ((SyntaxClassSyntaxTerm) formatSynTerm)
+                        .getSyntaxClassName();
+
+                    // Recursively search for baseterms for the next syntax class
+                    buildBaseSyntaxTerms(nextSynClassName);
+
+                    // Add all of these to our set
+                    Set<SyntaxTerm> childBaseTerms = baseSyntaxTerms.get(nextSynClassName);
+                    setOfBaseTerms.addAll(childBaseTerms);
+                } else {
+                    assert formatSynTerm instanceof LiteralSyntaxTerm ||
+                           formatSynTerm instanceof RegexSyntaxTerm;
+
+                    setOfBaseTerms.add(formatSynTerm);
+                }
+            }
+        }
     }
 
 
@@ -289,14 +404,19 @@ public class Parser {
     protected Object doParse(SyntaxFormat syntaxFormat, String[] input){
         LOGGER.log(Level.INFO, "doParse: " + syntaxFormat + " " + join(input, ' '));
         
-        SearchNode matchedSearchNode = doSyntaxTreeSearch(syntaxFormat, input);
+        InputTerm[] inputTerms = new InputTerm[input.length];
+        for (int i = 0; i < input.length; i++) {
+            inputTerms[i] = new InputTerm(input[i]);
+        }
+
+        SearchNode matchedSearchNode = doSyntaxTreeSearch(syntaxFormat, inputTerms);
         SyntaxTermSearchNode rootNode = getRootSyntaxTermSearchNodeOfMatchedSearchNode(matchedSearchNode);
         return doParse(rootNode);
     }
     
     
     
-    private SearchNode doSyntaxTreeSearch(SyntaxFormat syntaxFormat, String[] input){
+    private SearchNode doSyntaxTreeSearch(SyntaxFormat syntaxFormat, InputTerm[] input){
     	// Our search-tree is implemented as a STACK,
         // (i.e. a DFS exploration of solution space).
         // A PriorityQueue may make more sense?
@@ -342,7 +462,12 @@ public class Parser {
         // If we get to here, then
         // the input could not be matched with any of the
         // defined syntax formats.
-        throw new IllegalArgumentException("Given arguments do not conform to any defined syntax: " + join(input, ' '));
+        StringBuilder iaStrBldr = new StringBuilder();
+        iaStrBldr.append("Given arguments do not conform to any defined syntax:");
+        for (InputTerm inputTerm : input) {
+        	iaStrBldr.append(inputTerm.toString());
+        }
+        throw new IllegalArgumentException(iaStrBldr.toString());
     }
     
     
@@ -512,7 +637,7 @@ public class Parser {
 
         List<SyntaxTermSearchNode> initialSyntaxFormat = new ArrayList<SyntaxTermSearchNode>();
         initialSyntaxFormat.add(new SyntaxTermSearchNode(SyntaxTerm.valueOf("<cmd>"))); // <cmd> as the root.
-        searchNodes.push(new SearchNode(initialSyntaxFormat, new String[]{}));
+        searchNodes.push(new SearchNode(initialSyntaxFormat, new InputTerm[]{}));
 
         while(!searchNodes.isEmpty()) {
             SearchNode searchNode = searchNodes.pop();
