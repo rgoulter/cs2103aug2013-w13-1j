@@ -6,6 +6,16 @@ import static jim.util.StringUtils.stripStringPrefixSuffix;
 abstract class SyntaxTerm {
     public abstract boolean matches(String s);
 
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof SyntaxTerm && toString().equals(o.toString());
+    }
+
     public boolean isDisplayable() {
         return false;
     }
