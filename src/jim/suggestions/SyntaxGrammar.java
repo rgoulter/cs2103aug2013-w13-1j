@@ -89,8 +89,8 @@ public class SyntaxGrammar {
 			"<redocmd> := 'redo'",
 			
 			"<cmd> := " +
-			  "<addcmd> | <completecmd> | <uncompletecmd> | <removecmd> | <editcmd> | <searchcmd> | " + 
-			  "<displaycmd> | <undocmd> | <redocmd> | <configcmd> | <helpcmd>"
+			"<addcmd> | <completecmd> | <uncompletecmd> | <removecmd> | <editcmd> | <searchcmd> | " + 
+			"<displaycmd> | <undocmd> | <redocmd> | <configcmd> | <helpcmd>"
 			  
         };
         

@@ -31,7 +31,7 @@ public class SearchTool {
    public ArrayList<Task> searchByNonStrictDescription(String KeyWord){
        ArrayList<Task> matchingTasks = new ArrayList<Task>();
        for (Task task : AllTasks) {  
-           if (task.getDescription().contains(KeyWord)) {
+           if (task.getDescription().toLowerCase().contains(KeyWord)) {
                matchingTasks.add(task);
            }
        }
