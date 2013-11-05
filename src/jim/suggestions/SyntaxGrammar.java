@@ -14,9 +14,6 @@ public class SyntaxGrammar {
 	private SyntaxGrammar() {
 		
 	}
-    
-    
-
 
     protected static void initSyntax(Map<String, List<SyntaxFormat>> syntaxClassesMap) {
     	
@@ -73,7 +70,9 @@ public class SyntaxGrammar {
 			"<addword> := 'add' | 'create' | 'new' | '+'",
 			"<addcmd> := <addword> <task>",
 			"<completeword> := 'complete' | 'done' | 'finish' | '*'",
+			"<uncompleteword> := 'uncomplete' | 'undone' | 'unfinish' | '**'",
 			"<completecmd> := <completeword> <date> | <completeword> <description>",
+			"<uncompletecmd> := <uncompleteword> <date> | <uncompleteword> <description>",
 			"<removeword> := 'remove' | 'delete' | 'cancel' | '-'",
 			"<removecmd> := <removeword> <date> | <removeword> <description>",
 			"<editword> := 'edit' | 'modify' | 'change' | 'update' | ':'",
@@ -90,7 +89,7 @@ public class SyntaxGrammar {
 			"<redocmd> := 'redo'",
 			
 			"<cmd> := " +
-			  "<addcmd> | <completecmd> | <removecmd> | <editcmd> | <searchcmd> | " + 
+			  "<addcmd> | <completecmd> | <uncompletecmd> | <removecmd> | <editcmd> | <searchcmd> | " + 
 			  "<displaycmd> | <undocmd> | <redocmd> | <configcmd> | <helpcmd>"
 			  
         };

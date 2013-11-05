@@ -68,6 +68,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         // Delegate to other methods, if we can.
         if (isSearchCmd(context, t) ||
             isCompleteCmd(context, t) ||
+            isUncompleteCmd(context, t) ||
             isEditCmd(context, t) ||
             isRemoveCmd(context, t)) {
             return generateSuggestionHintFromWordsInCurrentTasks(context, t);
@@ -146,6 +147,11 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         return isCurrentHintFirstWordOneOf(context, t, completeCmdWords); // MAGIC
     }
 
+    private boolean isUncompleteCmd(GenerationContext context, double t) {
+    	String[] uncompleteCmdWords = new String[]{"uncomplete", "undone", "unfinish", "**"}; 
+        return isCurrentHintFirstWordOneOf(context, t, uncompleteCmdWords); // MAGIC
+    }
+    
     private boolean isSearchCmd(GenerationContext context, double t) {
     	String[] searchCmdWords = new String[]{"search", "find", "query", "?"}; 
         return isCurrentHintFirstWordOneOf(context, t, searchCmdWords); // MAGIC

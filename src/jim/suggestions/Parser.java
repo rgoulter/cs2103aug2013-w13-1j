@@ -468,6 +468,7 @@ public class Parser {
                                                     "task",
                                                     "addcmd",
                                                     "completecmd",
+                                                    "uncompletecmd",
                                                     "removecmd",
                                                     "editcmd",
                                                     "searchcmd",

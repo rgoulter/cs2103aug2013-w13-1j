@@ -539,7 +539,6 @@ public class SyntaxParsers {
                               }
                           });
         
-        
         registerSyntaxParser(p,
                           "completecmd => <completeword> <date>",
                           new SyntaxParser() {
@@ -551,6 +550,25 @@ public class SyntaxParsers {
                               }
                           });
         
+        registerSyntaxParser(p,
+                "uncompletecmd => <uncompleteword> <description>",
+                new SimpleSyntaxParser() {
+                    @Override
+                    public Object parse(String[] input) {
+                        return new jim.journal.UncompleteCommand(unescape(input[1]));
+                    }
+                });
+        
+        registerSyntaxParser(p,
+                "uncompletecmd => <uncompleteword> <date>",
+                new SyntaxParser() {
+                    @Override
+                    public Object parse(SyntaxTermSearchNode[] input) {
+                        MutableDateTime date =
+                                (MutableDateTime) p.doParse(input[1]);
+                        return new jim.journal.UncompleteCommand(date);
+                    }
+                });
         
         registerSyntaxParser(p,
                           "removecmd => <removeword> <description>",

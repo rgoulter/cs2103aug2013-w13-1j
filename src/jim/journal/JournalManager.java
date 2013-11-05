@@ -182,8 +182,6 @@ public class JournalManager {
         return result;
     }
 
-
-
     public String completeTask(Task task) {
     	clearPastCmds();
         if (task.isCompleted()) {
@@ -196,6 +194,21 @@ public class JournalManager {
             storeAllTasks.add(task);
             saveToStorage();
             return "Completed Task: " + task.toString();
+        }
+    }
+    
+    public String uncompleteTask(Task task) {
+    	clearPastCmds();
+        if (!task.isCompleted()) {
+            return "Task " +
+                   task.toString() +
+                  " has not been completed.";
+        } else {
+            storeAllTasks.remove(task);
+            task.markAsIncompleted();
+            storeAllTasks.add(task);
+            saveToStorage();
+            return "Uncompleted Task: " + task.toString();
         }
     }
     
@@ -260,6 +273,8 @@ public class JournalManager {
 		    	addTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("complete")){
 		    	incompleteTask(LastCommand.getSomeTask());
+		    } else if (LastCommand.getCommand().equals("uncomplete")){
+		    	completeTask(LastCommand.getSomeTask());
 		    } else {
 		        //error
 		    }
@@ -284,6 +299,8 @@ public class JournalManager {
 		    	removeTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("complete")){
 		    	completeTask(LastCommand.getSomeTask());
+		    } else if (LastCommand.getCommand().equals("uncomplete")){
+		    	uncompleteTask(LastCommand.getSomeTask());
 		    } else {
 		        //error
 		    }
