@@ -75,6 +75,15 @@ public class Parser {
             return matchedSyntaxTerms.contains(term);
         }
 
+        public boolean mightMatch(SyntaxTerm synTerm) {
+            if (synTerm instanceof SyntaxClassSyntaxTerm) {
+                String synClassName = ((SyntaxClassSyntaxTerm) synTerm).getSyntaxClassName();
+                return mightBeSyntaxClass(synClassName);
+            } else {
+                return hasMatchWith(synTerm);
+            }
+        }
+
         public boolean mightBeSyntaxClass(String syntaxClassName) {
             return maybeMatchClassNames.contains(syntaxClassName);
         }
@@ -94,6 +103,7 @@ public class Parser {
     private class SearchNode {
         List<SyntaxTermSearchNode> syntaxFormat;
         InputTerm[] inputArray;
+        SearchMatchState matchState = null;
 
         public SearchNode(List<SyntaxTermSearchNode> syntax, InputTerm[] input){
             syntaxFormat = syntax;
@@ -101,16 +111,35 @@ public class Parser {
         }
 
         public SearchMatchState getMatchedState() {
-            if (syntaxFormat.size() > inputArray.length) {
-                // Cannot have more terms to match against than we have terms.
-                return SearchMatchState.NO;
-            } else if(!isAllSyntaxNodesTerminal()) {
-                return SearchMatchState.MAYBE;
-            } else {
-                return isMatched() ?
-                       SearchMatchState.YES :
-                       SearchMatchState.NO;
+            if (matchState == null) {
+                if (syntaxFormat.size() > inputArray.length) {
+                    // Cannot have more terms to match against than we have terms.
+                    matchState = SearchMatchState.NO;
+                } else if(!isAllSyntaxNodesTerminal()) {
+                    // Subsequence logic to check match state:
+                    // We have a list of SyntaxTerms we expect to be able to find.
+                    // So, we check through to see that at least one of the syntax terms might match
+                    // Each of them.
+                    int expectTermIdx = 0;
+
+                    for (int i = 0; i < inputArray.length && expectTermIdx < syntaxFormat.size(); i++) {
+                        SyntaxTerm expectedSyntaxTerm = syntaxFormat.get(expectTermIdx).getSyntaxTerm();
+                        if (inputArray[i].mightMatch(expectedSyntaxTerm)) {
+                            expectTermIdx++;
+                        }
+                    }
+
+                    matchState = expectTermIdx == syntaxFormat.size() ?
+                                                  SearchMatchState.MAYBE :
+                                                  SearchMatchState.NO;
+                } else {
+                    matchState = isMatched() ?
+                                 SearchMatchState.YES :
+                                 SearchMatchState.NO;
+                }
             }
+
+            return matchState;
         }
 
         protected boolean isDisplayable() {
@@ -277,6 +306,10 @@ public class Parser {
             // "if not a syntax class"
             return syntaxTerm instanceof LiteralSyntaxTerm ||
                    syntaxTerm instanceof RegexSyntaxTerm;
+        }
+
+        public SyntaxTerm getSyntaxTerm() {
+            return syntaxTerm;
         }
 
         public List<SyntaxTermSearchNode> getChildren() {
