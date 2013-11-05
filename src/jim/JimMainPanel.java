@@ -479,9 +479,7 @@ public class JimMainPanel extends JPanel {
         } else {
             // Show the Journal view
             cardLayout.show(viewPanel, CARDLAYOUT_JOURNAL_VIEW);
-            suggestionManager.setCurrentSuggestionIndex(-1); // Reset suggestion
-                                                             // to -1 (No
-                                                             // selection)
+            suggestionManager.updateBuffer(""); // Reset suggestion
         }
     }
 

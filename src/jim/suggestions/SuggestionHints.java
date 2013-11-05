@@ -21,7 +21,7 @@ public class SuggestionHints {
     
     // Working Variables
     private List<SuggestionHint> suggestions;
-    private static int selectedHint = -1;
+    private int selectedHint = 0;
     private String currentInput;
     
     // Constructors

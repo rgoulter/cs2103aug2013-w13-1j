@@ -40,7 +40,7 @@ import static jim.util.StringUtils.isSubsequenceMatch;
 
 
 public class SuggestionManager {
-    private int highlightedLine = -1;
+    private int highlightedLine = 0;
     private String filteringSubsequence = "";
     private ArrayList<SuggestionHint> generatedSuggestionHintsList;
     private Set<SuggestionHint> generatedSuggestionHintsSet;
@@ -81,12 +81,10 @@ public class SuggestionManager {
         String output = "";
         int idx = getCurrentSuggestionIndex();
         
-        if (idx != -1) {
-        	// "Index 0" is the current input subsequence.
-            output = idx == 0 ?
-            		 filteringSubsequence :
-            		 generatedSuggestionHintsList.get(getCurrentSuggestionIndex() - 1).toString();
-        }
+    	// "Index 0" is the current input subsequence.
+        output = idx == 0 ?
+        		 filteringSubsequence :
+        		 generatedSuggestionHintsList.get(getCurrentSuggestionIndex() - 1).toString();
 
         return output;
     }
@@ -94,6 +92,8 @@ public class SuggestionManager {
 
 
     public void setCurrentSuggestionIndex(int i) {
+        assert i >= 0;
+        
         highlightedLine = i;
     }
 
