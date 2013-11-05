@@ -40,10 +40,10 @@ public class DateUtils {
     }
     
     public static int getDayOfWeekFromDayName(String dayName) {
-        final String DAYS_OF_WEEK = "sun mon tue wed thu fri sat";
+        final String DAYS_OF_WEEK = "mon tue wed thu fri sat sun";
         int zeroBasedDayOfWeek = DAYS_OF_WEEK.indexOf(dayName.toLowerCase().substring(0, 3)) / 4;
         
-        return zeroBasedDayOfWeek;
+        return zeroBasedDayOfWeek+1;
     }
     
     public static int getCurrentYear() {
