@@ -15,7 +15,7 @@ public class SearchCommand extends Command {
 
 
     public SearchCommand(String operand) {
-        description = operand.toLowerCase();
+        description = operand;
     }
     public SearchCommand(MutableDateTime d){
         date = d;
@@ -30,8 +30,8 @@ public class SearchCommand extends Command {
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
         SearchTool searchTool = new SearchTool(journalManager);
         if (description != null ){
-            searchTerm = description;
-            matchingTasks = searchTool.searchByNonStrictDescription(description);
+            searchTerm = description.toLowerCase();
+            matchingTasks = searchTool.searchByNonStrictDescription(searchTerm);
         } else if (date != null ){
             matchingTasks = searchTool.searchByDate(date);
         }
