@@ -186,7 +186,8 @@ public class SuggestionManager {
     		boolean added = false;
     		
     		for (int attempts = 0; !added && attempts < 6; attempts++) { // MAGIC
-    			hint = generateRandomSuggestion();
+                double t = Math.random();
+    			hint = generateSuggestion(t);
     			
 	    		if (hint.matchesSubsequence(filteringSubsequence) &&
 	    			!generatedSuggestionHintsSet.contains(hint)) {
@@ -203,7 +204,7 @@ public class SuggestionManager {
     
     
     
-    private SuggestionHint generateRandomSuggestion() {
+    private SuggestionHint generateSuggestion(double t) {
     	// TODO: Get rid of this dependency on inputParser.
     	List<SyntaxFormat> syntaxFormats = inputParser.getDisplayableSyntaxTreeLeafNodes();
     	
@@ -225,13 +226,18 @@ public class SuggestionManager {
         		syntaxFormats.remove(i);
         	}
         }
-    	
-    	int i = (int) Math.floor(Math.random() * syntaxFormats.size());
-    	double rnd = Math.random();
+        
+    	int i = (int) Math.floor(t * syntaxFormats.size());
 
+        // We need to transform our t so that its range
+        // is between i and i+1.
+        double rnd = (t * syntaxFormats.size()) - i;
+
+        
     	GenerationContext genCtx = getGenerationContext();
     	SuggestionHint hint = syntaxFormats.get(i).generate(genCtx, rnd);
-		LOGGER.finer("Generating Hint: " + hint);
+    	LOGGER.info("Generating for format: " + syntaxFormats.get(i).toString());
+		LOGGER.info("Generating Hint: " + hint);
     	return hint;
     }
     
