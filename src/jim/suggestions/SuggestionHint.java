@@ -201,7 +201,10 @@ public class SuggestionHint implements Comparable<SuggestionHint> {
 			return lenDiff;
 		} else {
 			// If the same length, sort by the strings..
-			return join(words, ' ').compareTo(join(otherHint.words, ' '));
+            String thisStr = toString();
+            String otherStr = otherHint.toString();
+
+			return thisStr.compareTo(otherStr);
 		}
 	}
 }
