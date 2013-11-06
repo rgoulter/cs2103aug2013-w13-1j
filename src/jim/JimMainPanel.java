@@ -594,6 +594,10 @@ public class JimMainPanel extends JPanel {
                                                                refreshUI();
                                                                inputTextField.setText("");
                                                            }
+                                                           else if(!inputTextField.getText().isEmpty()) {
+                                                               inputTextField.setText("");
+                                                               refreshUI();
+                                                           }
                                                            else {
                                                                applicationWindow.dispose();
                                                                isRunning = false;
