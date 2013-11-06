@@ -12,6 +12,9 @@ public class SuggestionHints {
     private static final String PURPLE_COLOR = "purple";
     private static final String GREEN_COLOR = "green";
 
+    private static final String TEXT_COLOR = BLACK_COLOR;
+    private static final String SYNTAX_CLASS_COLOR = PURPLE_COLOR;
+
     // HTML Constants (Other Commands)
     private static final String HTML_NEWLINE = "<br>";
     private static final String HTML_START_BOLD = "<b>";
@@ -85,7 +88,7 @@ public class SuggestionHints {
     
     private static String renderWord(String word, boolean[] matchMask, SyntaxTerm type) {
     	if (type instanceof LiteralSyntaxTerm) {
-    		String htmlColor = BLACK_COLOR;
+    		String htmlColor = TEXT_COLOR;
     		String synTermValue = ((LiteralSyntaxTerm) type).getLiteralValue();
     		
     		if (synTermValue.equals("add")) {
@@ -102,7 +105,7 @@ public class SuggestionHints {
     	} else if (word.isEmpty()) {
             return renderSyntaxClass(type);
         } else {
-    		return renderTextWithColor(word, matchMask, BLACK_COLOR);
+    		return renderTextWithColor(word, matchMask, TEXT_COLOR);
     	}
     }
 
@@ -111,7 +114,7 @@ public class SuggestionHints {
 
         String synClassName = ((SyntaxClassSyntaxTerm) type).getSyntaxClassName();
         StringBuilder result = new StringBuilder();
-        String htmlColor = "#FF00FF";
+        String htmlColor = SYNTAX_CLASS_COLOR;
 
 
     	result.append("<font color='");
