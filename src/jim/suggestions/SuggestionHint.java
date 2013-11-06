@@ -42,7 +42,23 @@ public class SuggestionHint implements Comparable<SuggestionHint> {
 	
 	@Override
 	public String toString() {
-		return join(words, ' ');
+        if (words.length < 1) {
+            return "";
+        }
+
+        // The "String" of this Hint is the largest prefix sequence
+        // which has non-empty words
+        
+        StringBuilder result = new StringBuilder();
+
+        result.append(words[0]);
+
+        for (int i = 1; i < words.length && !words[i].isEmpty(); i++) {
+            result.append(' ');
+            result.append(words[i]);
+        }
+
+		return result.toString();
 	}
 	
 	protected boolean[][] getMatchingMask() {

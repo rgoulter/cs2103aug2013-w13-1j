@@ -37,6 +37,20 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     public SuggestionHint generate(GenerationContext context, double t) {
         assert context != null;
         
+        // LIMITATION: We must assume that the input subsequence has spaces between things matched.
+        String[] subseqParts = context.getInputSubsequence().split(" ");
+        SuggestionHint currentHint = context.getCurrentGeneratedHint();
+        int numWordsSoFar = currentHint.getWords().length;
+
+        // For hints beyond the # of subsequences,
+        // SuggestionHints assumes we give a blank string for the value.
+        if (numWordsSoFar >= subseqParts.length) {
+    		SuggestionHint blankHint =  new SuggestionHint(new String[]{""},
+                                                           context.getInputSubsequence(),
+                                                           new SyntaxTerm[]{this});
+            return blankHint;
+        }
+
         if ("description".equals(syntaxClassName)) {
             return generateDescriptionSuggestionHint(context, t);
         } else if ("date".equals(syntaxClassName)) {
