@@ -23,9 +23,11 @@ class SyntaxFormat {
     public SuggestionHint generate(GenerationContext context, double t) {		
 		SuggestionHint generatedHint = syntaxTerms[0].generate(context, t);
 		
+		System.out.println("Gen Fmt:" + toString());
 		for (int i = 1; i < syntaxTerms.length; i++) {
 			context.setCurrentGeneratedHint(generatedHint);
 			SuggestionHint tmpHint = syntaxTerms[i].generate(context, t);
+			System.out.println("Gen:'" + tmpHint.toString() + "', type:" + syntaxTerms[i].toString());
 			generatedHint = SuggestionHint.combine(generatedHint, tmpHint);
 		}
 		

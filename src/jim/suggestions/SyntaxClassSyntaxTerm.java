@@ -45,6 +45,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         // For hints beyond the # of subsequences,
         // SuggestionHints assumes we give a blank string for the value.
         if (numWordsSoFar >= subseqParts.length) {
+        	System.out.println("<<Gen Blank>>");
     		SuggestionHint blankHint =  new SuggestionHint(new String[]{""},
                                                            context.getInputSubsequence(),
                                                            new SyntaxTerm[]{this});
@@ -95,7 +96,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         	return new SuggestionHint(new String[]{""},
                                       context.getInputSubsequence(),
                                       new SyntaxTerm[]{this});
-        }	
+        }
         
         // Generate a first-word for the date
         String firstWord = generateSuggestionWord(dateFirstWordsSet, subseqParts[numWordsSoFar], t);
@@ -119,12 +120,12 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         		nextWord = generateSuggestionWord(dayNumbersSet, nextSubseq, t);
             } else if (relativeDayWordsSet.contains(firstWord)) {
                 // yesterday|today|tomorrow
-                // ..do nothing..
+        		return generatedHint;
         	} else if (relativeModifierWordsSet.contains(firstWord)) {
                 // prev|this|next Monday|Tues...
         		nextWord = generateSuggestionWord(daysOfWeekSet, nextSubseq, t);
         	} else {
-        		// Dunno, lol.
+        		return generatedHint;
         	}
         	
     		SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{nextWord},
@@ -214,17 +215,17 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
                                                            new SyntaxTerm[]{this});
         int numWordsGenerated = 1;
         
-        while (numWordsSoFar + numWordsGenerated < subseqParts.length) {
-            numWordsGenerated++;
-            int subseqPartIdx = numWordsSoFar + numWordsGenerated;
-            double tt = Math.pow(1 + t, subseqPartIdx) % 1; // need to redistribute t
-            subseqForGenWord = (subseqPartIdx < subseqParts.length) ? subseqParts[subseqPartIdx] : "";
-            suggestedWord = generateSuggestionWord(wordsToGenFrom, subseqForGenWord, tt);
-            SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{suggestedWord},
-                                                               context.getInputSubsequence(),
-                                                               new SyntaxTerm[]{this});
-            generatedHint = SuggestionHint.combine(generatedHint, nextGeneratedHint);
-        }
+//        while (numWordsSoFar + numWordsGenerated < subseqParts.length) {
+//            numWordsGenerated++;
+//            int subseqPartIdx = numWordsSoFar + numWordsGenerated;
+//            double tt = Math.pow(1 + t, subseqPartIdx) % 1; // need to redistribute t
+//            subseqForGenWord = (subseqPartIdx < subseqParts.length) ? subseqParts[subseqPartIdx] : "";
+//            suggestedWord = generateSuggestionWord(wordsToGenFrom, subseqForGenWord, tt);
+//            SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{suggestedWord},
+//                                                               context.getInputSubsequence(),
+//                                                               new SyntaxTerm[]{this});
+//            generatedHint = SuggestionHint.combine(generatedHint, nextGeneratedHint);
+//        }
         
         // Generate enough words for the given subsequence hint.
         return generatedHint;

@@ -195,12 +195,18 @@ public class SuggestionManager {
                 double t = Math.random();
     			hint = generateSuggestion(t);
     			
-	    		if (hint.matchesSubsequence(filteringSubsequence) &&
-	    			!generatedSuggestionHintsSet.contains(hint)) {
+    			boolean matchesSubseq = hint.matchesSubsequence(filteringSubsequence);
+    			boolean isDuplicate = generatedSuggestionHintsSet.contains(hint);
+    			
+	    		if (matchesSubseq &&
+	    			!isDuplicate) {
 	    			LOGGER.finer("Adding Hint to Queue: " + hint);
 	    			generatedSuggestionHintsList.add(hint);
 	    			generatedSuggestionHintsSet.add(hint);
 	    			added = true;
+	    		} else {
+	    			LOGGER.info("Filtering out Hint: " + hint +
+                                " match '" + filteringSubsequence + "'? " + matchesSubseq + " uniq? " + !isDuplicate);
 	    		}
     		}
     	}
