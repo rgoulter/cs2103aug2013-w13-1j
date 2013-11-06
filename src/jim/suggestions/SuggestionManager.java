@@ -133,6 +133,13 @@ public class SuggestionManager {
      *            The input currently in the textfield.
      */
     public void updateBuffer(String text) {
+        if (text == null ||
+            filteringSubsequence == null ||
+            text.length() > filteringSubsequence.length()) {
+            // Reset the selection
+            highlightedLine = 0;
+        }
+
     	filteringSubsequence = text;
     	
     	// This is very clunky at the moment, since,
@@ -146,7 +153,6 @@ public class SuggestionManager {
 	    	filterThroughGeneratedSuggestions();
 	    	generateMoreSuggestionsIfNecessary();
     	} else {
-    		highlightedLine = 0;
     		hintSet = null;
     		generatedSuggestionHintsList.clear();
     		generatedSuggestionHintsSet.clear();
