@@ -182,7 +182,8 @@ public class SuggestionHint implements Comparable<SuggestionHint> {
 		if (o instanceof SuggestionHint) {
 			SuggestionHint other = (SuggestionHint) o;
 			
-			return Arrays.equals(words, other.words);
+			return Arrays.equals(words, other.words) &&
+				   Arrays.equals(terms, other.terms);
 		}
 		
 		return false;
