@@ -3,6 +3,7 @@ package jim.suggestions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,9 +76,15 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
             return generateSuggestionHintFromWordsInCurrentTasks(context, t);
         } else if(isAddCmd(context, t)) {
             return generateSuggestionHintFromWordsInCurrentTasks(context, t);
+        } else if(isConfigureCmd(context, t)) {
+        	return generateSuggestionHintForConfiguration(context, t);
         }
         
-        List<String> wordList = Arrays.asList(new String[]{"monkey", "banana"}); // Temporary MAGIC
+        // These magic values are for Config. This is not very elegant.
+        List<String> wordList = Arrays.asList(new String[]{"outputfilename",
+        		                                           "dateseparator",
+        		                                           "timeseparator",
+        		                                           "reset"}); // Temporary MAGIC
         String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
         
         return new SuggestionHint(new String[]{suggestedWord},
@@ -89,6 +96,17 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         Set<String> wordsFromCurrentTasks = context.getAllWordsFromCurrentTasks();
 
         return generateSuggestionHintFromSetOfWords(context, t, wordsFromCurrentTasks);
+    }
+    
+    private SuggestionHint generateSuggestionHintForConfiguration(GenerationContext context, double t) {
+    	// TODO: Presumably only the first word should be one of the following. Oh well.
+        Set<String> configurationWords = new HashSet<String>();
+        configurationWords.addAll(Arrays.asList(new String[]{"outputfilename",
+                                                             "dateseparator",
+                                                             "timeseparator",
+                                                             "reset"}));
+
+        return generateSuggestionHintFromSetOfWords(context, t, configurationWords);
     }
 
     private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom) {
@@ -166,6 +184,11 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     private boolean isEditCmd(GenerationContext context, double t) {
     	String[] editCmdWords = new String[]{"edit", "modify", "change", "update", ":"};
         return isCurrentHintFirstWordOneOf(context, t, editCmdWords); // MAGIC
+    }
+
+    private boolean isConfigureCmd(GenerationContext context, double t) {
+    	String[] configCmdWords = new String[]{"config", "configuration", "configure"};
+        return isCurrentHintFirstWordOneOf(context, t, configCmdWords); // MAGIC
     }
     
     private boolean isCurrentHintFirstWordOneOf(GenerationContext context, double t, String[] stringArray) {
