@@ -45,7 +45,7 @@ public class SuggestionManager {
     private ArrayList<SuggestionHint> generatedSuggestionHintsList;
     private Set<SuggestionHint> generatedSuggestionHintsSet;
     private SuggestionHints hintSet;
-    private int numberOfSuggestionsToKeep = 8; // MAGIC
+    private int numberOfSuggestionsToKeep = 16; // MAGIC
     
     private Parser inputParser;
     
