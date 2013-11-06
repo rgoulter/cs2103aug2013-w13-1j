@@ -67,15 +67,20 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
     	String[] daysOfWeekNames =
         	    new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}; // MAGIC
-    	String[] relativeWords = new String[]{"next", "this", "last"};
+    	String[] relativeDayWords =
+        	    new String[]{"yesterday", "today", "tomorrow"}; // MAGIC
+    	String[] relativeModifierWords = new String[]{"next", "this", "last"};
 
     	Set<String> monthNamesSet = new HashSet<String>(Arrays.asList(monthNames));
     	Set<String> daysOfWeekSet = new HashSet<String>(Arrays.asList(daysOfWeekNames));
-    	Set<String> relativeWordsSet = new HashSet<String>(Arrays.asList(relativeWords));
+    	Set<String> relativeDayWordsSet = new HashSet<String>(Arrays.asList(relativeDayWords));
+    	Set<String> relativeModifierWordsSet = new HashSet<String>(Arrays.asList(relativeModifierWords));
     	
     	Set<String> dateFirstWordsSet = new HashSet<String>();
     	dateFirstWordsSet.addAll(monthNamesSet);
-    	dateFirstWordsSet.addAll(relativeWordsSet);
+    	dateFirstWordsSet.addAll(daysOfWeekSet);
+    	dateFirstWordsSet.addAll(relativeDayWordsSet);
+    	dateFirstWordsSet.addAll(relativeModifierWordsSet);
 
 
         SuggestionHint currentHint = context.getCurrentGeneratedHint();
@@ -112,7 +117,11 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         			dayNumbersSet.add(Integer.toString(i));
         		}
         		nextWord = generateSuggestionWord(dayNumbersSet, nextSubseq, t);
-        	} else if (relativeWordsSet.contains(firstWord)) {
+            } else if (relativeDayWordsSet.contains(firstWord)) {
+                // yesterday|today|tomorrow
+                // ..do nothing..
+        	} else if (relativeModifierWordsSet.contains(firstWord)) {
+                // prev|this|next Monday|Tues...
         		nextWord = generateSuggestionWord(daysOfWeekSet, nextSubseq, t);
         	} else {
         		// Dunno, lol.
