@@ -49,12 +49,68 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     }
 
     private SuggestionHint generateDateSuggestionHint(GenerationContext context, double t) {
-        List<String> wordList = Arrays.asList(new String[]{"05/11/13", "31/12/13"}); // Temporary MAGIC
-        String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
+    	String[] monthNames =
+        	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
+    	String[] daysOfWeekNames =
+        	    new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}; // MAGIC
+    	String[] relativeWords = new String[]{"next", "this", "last"};
+
+    	Set<String> monthNamesSet = new HashSet<String>(Arrays.asList(monthNames));
+    	Set<String> daysOfWeekSet = new HashSet<String>(Arrays.asList(daysOfWeekNames));
+    	Set<String> relativeWordsSet = new HashSet<String>(Arrays.asList(relativeWords));
+    	
+    	Set<String> dateFirstWordsSet = new HashSet<String>();
+    	dateFirstWordsSet.addAll(monthNamesSet);
+    	dateFirstWordsSet.addAll(relativeWordsSet);
+
+
+        SuggestionHint currentHint = context.getCurrentGeneratedHint();
+        int numWordsSoFar = currentHint.getWords().length;
         
-        return new SuggestionHint(new String[]{suggestedWord},
-                                  context.getInputSubsequence(),
-                                  new SyntaxTerm[]{this});
+        // LIMITATION: We must assume that the input subsequence has spaces between things matched.
+        String[] subseqParts = context.getInputSubsequence().split(" ");
+        int numLeftToGenerate = subseqParts.length - numWordsSoFar;
+
+        // This happens 
+        if (numLeftToGenerate < 1) {
+        	return new SuggestionHint(new String[]{""},
+                                      context.getInputSubsequence(),
+                                      new SyntaxTerm[]{this});
+        }	
+        
+        // Generate a first-word for the date
+        String firstWord = generateSuggestionWord(dateFirstWordsSet, subseqParts[numWordsSoFar], t);
+        SuggestionHint generatedHint =  new SuggestionHint(new String[]{firstWord},
+                context.getInputSubsequence(),
+                new SyntaxTerm[]{this});
+        
+        
+        // I'm unsure of the condition so that we generate days this way.
+        if (numLeftToGenerate > 1) {
+        	// Now generate the second word
+        	String nextWord = "";
+    		String nextSubseq = (numLeftToGenerate > 1) ? subseqParts[numWordsSoFar + 1] : "";
+        	
+        	if (monthNamesSet.contains(firstWord)) {
+        		int daysThisMonth = 31; // MAGIC
+        		Set<String> dayNumbersSet = new HashSet<String>();
+        		for (int i = 1; i <= daysThisMonth; i++) {
+        			dayNumbersSet.add(Integer.toString(i));
+        		}
+        		nextWord = generateSuggestionWord(dayNumbersSet, nextSubseq, t);
+        	} else if (relativeWordsSet.contains(firstWord)) {
+        		nextWord = generateSuggestionWord(daysOfWeekSet, nextSubseq, t);
+        	} else {
+        		// Dunno, lol.
+        	}
+        	
+    		SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{nextWord},
+                    context.getInputSubsequence(),
+                    new SyntaxTerm[]{this});
+    		generatedHint = SuggestionHint.combine(generatedHint, nextGeneratedHint);
+        }
+        
+        return generatedHint;
     }
     
     private SuggestionHint generateTimeSuggestionHint(GenerationContext context, double t) {
