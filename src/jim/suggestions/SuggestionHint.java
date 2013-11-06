@@ -1,6 +1,7 @@
 package jim.suggestions;
 
 import static jim.util.StringUtils.join;
+import static jim.util.StringUtils.isLowercase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,11 +50,18 @@ public class SuggestionHint implements Comparable<SuggestionHint> {
 	}
 	
 	private static boolean[][] getMatchMaskForWords(String subseq, String[] words) {
+		// Smart case logic
+		boolean ignoreCase = isLowercase(subseq);
+		
 		int i = 0;
     	int lastIndex = 0;
     	
     	String hintPhrase = join(words, ' ');
     	List<Integer> matchingIndices = new ArrayList<Integer>(subseq.length());
+    	
+    	if (ignoreCase) {
+    		hintPhrase = hintPhrase.toLowerCase();
+    	}
     	
     	while (i < subseq.length() && lastIndex >= 0) {
     		char charToLookFor = subseq.charAt(i);
@@ -95,6 +103,9 @@ public class SuggestionHint implements Comparable<SuggestionHint> {
 	}
 	
 	public boolean matchesSubsequence(String subsequence) {
+		// Smart case logic
+		boolean ignoreCase = isLowercase(subsequence);
+		
 		int i = 0;
     	
     	String hintPhrase = join(words, ' ');
@@ -102,7 +113,11 @@ public class SuggestionHint implements Comparable<SuggestionHint> {
     	for (int j = 0;
              j < hintPhrase.length() && i < subsequence.length();
              j++) {
-    		if (hintPhrase.charAt(j) == subsequence.charAt(i)) {
+    		char hintChar = hintPhrase.charAt(j);
+    		char subseqChar = subsequence.charAt(i);
+    		
+    		if ((ignoreCase && Character.toLowerCase(hintChar) == Character.toLowerCase(subseqChar)) ||
+    			hintChar == subseqChar) {
     			i++;
     		}
     	}

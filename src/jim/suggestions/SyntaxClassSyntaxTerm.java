@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import static jim.util.StringUtils.filterMatchBySubseq;
+import static jim.util.StringUtils.filterSmartCaseMatchBySubseq;
 
 class SyntaxClassSyntaxTerm extends SyntaxTerm {
     private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName()); 
@@ -124,8 +125,8 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     }
     
     private String generateSuggestionWord(Set<String> words, String subseqForGenWord, double t) {
-        Set<String> matchingWordSet = filterMatchBySubseq(words,
-                                                          subseqForGenWord);
+        Set<String> matchingWordSet = filterSmartCaseMatchBySubseq(words,
+                                                                   subseqForGenWord);
         List<String> wordList = new ArrayList<String>(matchingWordSet);
         
         // If no words matched, we'll just use the subsequence.

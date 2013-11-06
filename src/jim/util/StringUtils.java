@@ -1,5 +1,7 @@
 package jim.util;
 
+import static jim.util.StringUtils.isLowercase;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -115,11 +117,46 @@ public class StringUtils {
     	return matchingStrings;
     }
     
+    
+    
+    public static Set<String> filterSmartCaseMatchBySubseq(Set<String> setOfStrings, String subseq) {
+    	Set<String> matchingStrings = new HashSet<String>();
+    	
+    	for (String s : setOfStrings) {
+    		if (isSubsequenceSmartCaseMatch(s, subseq)) {
+    			matchingStrings.add(s);
+    		}
+    	}
+    	
+    	return matchingStrings;
+    }
+    
     public static String unescape(String input) {
         if (input.substring(0,1).equals("\\")) {
             return input.substring(1);
         }
         return input;
+    }
+    
+    public static boolean isSubsequenceSmartCaseMatch(String str, String subseq) {
+		// Smart case logic
+		boolean ignoreCase = isLowercase(subseq);
+		
+		if (ignoreCase) {
+			str = str.toLowerCase();
+		}
+		
+    	char[] strChars = str.toCharArray();
+    	char[] subseqChars = subseq.toCharArray();
+    	int charIdx = 0;
+    	
+    	for (int i = 0; i < strChars.length && charIdx < subseqChars.length; i++) {
+    		if (strChars[i] == subseqChars[charIdx]) {
+    			charIdx++;
+    		}
+    	}
+    	
+    	return charIdx == subseqChars.length;
     }
     
     public static boolean isSubsequenceMatch(String str, String subseq) {
@@ -134,5 +171,9 @@ public class StringUtils {
     	}
     	
     	return charIdx == subseqChars.length;
+    }
+    
+    public static boolean isLowercase(String str) {
+    	return str.equals(str.toLowerCase());
     }
 }
