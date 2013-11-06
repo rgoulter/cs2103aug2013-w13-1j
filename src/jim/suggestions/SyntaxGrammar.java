@@ -79,7 +79,7 @@ public class SyntaxGrammar {
 			"<editcmd> := <editword> <date> | <editword> <description>",
 			"<searchword> := 'search' | 'find' | 'query' | '?'",
 			"<searchcmd> := <searchword> <date> | <searchword> <description>",
-			"<displayword> := 'display' | 'show' | '!'",
+			"<displayword> := 'display' | 'show' | '!' | 'ls'",
 			"<displaycmd> := <displayword> | <displayword> <date>",
 			"<configword> := 'config' | 'configuration' | 'configure'",
 			"<configcmd> := <configword> | <configword> <description> <description> | <configword> <description>",
