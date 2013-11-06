@@ -364,7 +364,7 @@ public class JimMainPanel extends JPanel {
         
         dateLabel = new JLabel("  xx-xx-xx");
         clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
-        progNameLabel = new JLabel("JIM! v0.4    ");
+        progNameLabel = new JLabel("JIM! v0.5    ");
         
         dateLabel.setFont(FONT_MAIN);
         clockLabel.setFont(FONT_MAIN);

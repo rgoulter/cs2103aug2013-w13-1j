@@ -83,7 +83,9 @@ public class HelpCommand extends Command {
                                             "<b>TAB</b> - Select the next suggestion when suggestions are displayed<br>" +
                                             "<b>Shift-TAB</b> - Select the previous suggestion when suggestions are displayed<br>" +
                                             "<b>CTRL-Z</b> - Performs an Undo<br>" +
-                                            "<b>CTRL-Y</b> - Performs a Redo";
+                                            "<b>CTRL-Y</b> - Performs a Redo<br><br>" + 
+                                            "If you wish to use a 'date word' (eg. Friday) as part of a description, add a '\\' " +
+                                            "in front of it (eg. //Friday) to prevent it from being parsed.";
     
     private String command;
 
