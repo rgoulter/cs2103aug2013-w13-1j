@@ -178,14 +178,23 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     }
     
     private SuggestionHint generateSuggestionHintForConfiguration(GenerationContext context, double t) {
-    	// TODO: Presumably only the first word should be one of the following. Oh well.
+        // LIMITATION: We must assume that the input subsequence has spaces between things matched.
+        String[] subseqParts = context.getInputSubsequence().split(" ");
+        SuggestionHint currentHint = context.getCurrentGeneratedHint();
+        int numWordsSoFar = currentHint.getWords().length;
+        
         Set<String> configurationWords = new HashSet<String>();
         configurationWords.addAll(Arrays.asList(new String[]{"outputfilename",
                                                              "dateseparator",
                                                              "timeseparator",
                                                              "reset"}));
 
-        return generateSuggestionHintFromSetOfWords(context, t, configurationWords);
+        String suggestedWord = numWordsSoFar == 1 ?
+                               generateSuggestionWord(configurationWords, subseqParts[numWordsSoFar], t) :
+                               "";
+        return new SuggestionHint(new String[]{suggestedWord},
+                                  context.getInputSubsequence(),
+                                  new SyntaxTerm[]{this});
     }
 
     private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom) {
