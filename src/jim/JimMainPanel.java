@@ -479,7 +479,7 @@ public class JimMainPanel extends JPanel {
         } else {
             // Show the Journal view
             cardLayout.show(viewPanel, CARDLAYOUT_JOURNAL_VIEW);
-            suggestionManager.updateBuffer(""); // Reset suggestion
+            suggestionManager.updateBuffer(null); // Reset suggestion
         }
     }
 

@@ -113,7 +113,11 @@ public class SuggestionManager {
 
 
     public void prevSuggestion() {
-        setCurrentSuggestionIndex((getCurrentSuggestionIndex() - 1));
+    	int prevIndex = (getCurrentSuggestionIndex() - 1);
+    	if (prevIndex < 0) {
+    		prevIndex += generatedSuggestionHintsList.size() + 1;
+    	}
+        setCurrentSuggestionIndex(prevIndex);
         if (getCurrentSuggestionIndex() < 0) {
             setCurrentSuggestionIndex(generatedSuggestionHintsList.size());
         }
@@ -138,8 +142,15 @@ public class SuggestionManager {
     	//  from current suggestions. (GenerationContext would allow this?).
     	// or other alternatives; but the above may be alright..
     	
-    	filterThroughGeneratedSuggestions();
-    	generateMoreSuggestionsIfNecessary();
+    	if (filteringSubsequence != null) {
+	    	filterThroughGeneratedSuggestions();
+	    	generateMoreSuggestionsIfNecessary();
+    	} else {
+    		highlightedLine = 0;
+    		hintSet = null;
+    		generatedSuggestionHintsList.clear();
+    		generatedSuggestionHintsSet.clear();
+    	}
     }
     
     
