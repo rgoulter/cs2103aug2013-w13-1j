@@ -215,17 +215,18 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
                                                            new SyntaxTerm[]{this});
         int numWordsGenerated = 1;
         
-//        while (numWordsSoFar + numWordsGenerated < subseqParts.length) {
-//            numWordsGenerated++;
-//            int subseqPartIdx = numWordsSoFar + numWordsGenerated;
-//            double tt = Math.pow(1 + t, subseqPartIdx) % 1; // need to redistribute t
-//            subseqForGenWord = (subseqPartIdx < subseqParts.length) ? subseqParts[subseqPartIdx] : "";
-//            suggestedWord = generateSuggestionWord(wordsToGenFrom, subseqForGenWord, tt);
-//            SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{suggestedWord},
-//                                                               context.getInputSubsequence(),
-//                                                               new SyntaxTerm[]{this});
-//            generatedHint = SuggestionHint.combine(generatedHint, nextGeneratedHint);
-//        }
+        while (numWordsSoFar + numWordsGenerated < subseqParts.length &&
+               numWordsSoFar >= 2) { // REALLY Dirty hack.
+            numWordsGenerated++;
+            int subseqPartIdx = numWordsSoFar + numWordsGenerated;
+            double tt = Math.pow(1 + t, subseqPartIdx) % 1; // need to redistribute t
+            subseqForGenWord = (subseqPartIdx < subseqParts.length) ? subseqParts[subseqPartIdx] : "";
+            suggestedWord = generateSuggestionWord(wordsToGenFrom, subseqForGenWord, tt);
+            SuggestionHint nextGeneratedHint =  new SuggestionHint(new String[]{suggestedWord},
+                                                               context.getInputSubsequence(),
+                                                               new SyntaxTerm[]{this});
+            generatedHint = SuggestionHint.combine(generatedHint, nextGeneratedHint);
+        }
         
         // Generate enough words for the given subsequence hint.
         return generatedHint;
