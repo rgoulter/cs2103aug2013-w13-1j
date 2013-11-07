@@ -85,7 +85,7 @@ public class HelpCommand extends Command {
                                             "<b>CTRL-Z</b> - Performs an Undo<br>" +
                                             "<b>CTRL-Y</b> - Performs a Redo<br><br>" + 
                                             "If you wish to use a 'date word' (eg. Friday) as part of a description, add a '\\' " +
-                                            "in front of it (eg. //Friday) to prevent it from being parsed.";
+                                            "in front of it (eg. \\Friday) to prevent it from being parsed.";
     
     private String command;
 
