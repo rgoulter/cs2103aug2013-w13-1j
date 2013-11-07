@@ -121,6 +121,9 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
             } else if (relativeDayWordsSet.contains(firstWord)) {
                 // yesterday|today|tomorrow
         		return generatedHint;
+        	} else if (daysOfWeekSet.contains(firstWord)) {
+                // Monday|...
+        		return generatedHint;
         	} else if (relativeModifierWordsSet.contains(firstWord)) {
                 // prev|this|next Monday|Tues...
         		nextWord = generateSuggestionWord(daysOfWeekSet, nextSubseq, t);
