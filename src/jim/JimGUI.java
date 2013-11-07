@@ -16,7 +16,6 @@ public class JimGUI {
 
     public static void main(String args[]) {
         JimMainPanel jimPanel = new JimMainPanel();
-        jimPanel.runWindow();
     }
 
 }

@@ -23,7 +23,6 @@ import org.junit.runners.Suite.SuiteClasses;
                StringUtilsTests.class,
                ParserDateTimeTests.class,
                SuggestionManagerTest.class,
-               ViewTests.class,
                UndoUnitTests.class,
                TaskStorageUnitTests.class,
                IntegrationTests.class})

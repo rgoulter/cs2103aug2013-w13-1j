@@ -1,3 +1,4 @@
+//@author A0096790N
 package jim;
 
 import javax.swing.JPanel;
@@ -44,9 +45,11 @@ import jim.journal.Task;
 @SuppressWarnings("serial")
 public class JimMainPanel extends JPanel {
 
-    protected JTextField inputTextField;
+    protected Thread clockThread;
+    
+    public JTextField inputTextField;
     protected JFrame applicationWindow;
-    protected JPanel viewPanel;
+    public JPanel viewPanel;
     protected JLabel helperTextLabel;
     protected JLabel clockLabel;
     protected JLabel dateLabel;
@@ -94,12 +97,22 @@ public class JimMainPanel extends JPanel {
     private static final String CARDLAYOUT_JOURNAL_VIEW = "journal view";
     private static final String CARDLAYOUT_SUGGESTION_VIEW = "suggestion view";
 
+    // Actually meaningful attributes that can tweak JIM!'s behavior
     public static final int VIEW_AREA_WIDTH = 600;
     public static final int VIEW_AREA_HEIGHT = 400;
-
+    public static final int SUGGESTIONS_DISPLAY_THRESHOLD = 0;
+    
     public JimMainPanel() {
-        initialiseUIComponents();
+        initializeUIComponents();
+        initializeCommandHistoryLogic();
+        initializeProgramLogic();
         
+        initializeMainJFrame();
+        refreshUI();
+        runClock();
+    }
+
+    private void initializeCommandHistoryLogic() {
         lastCommandState = "Ready";
         isRunning = true;
         commandHistory = new ArrayList<String>(HISTORY_MAX_COMMANDS);
@@ -108,8 +121,9 @@ public class JimMainPanel extends JPanel {
         }
         historyIndex = 0;
         historyBrowsingIndex = 0;
-
-        // Initialise the logic
+    }
+    
+    private void initializeProgramLogic() {
         suggestionManager = new SuggestionManager();
         journalManager = new JournalManager();
         
@@ -127,10 +141,8 @@ public class JimMainPanel extends JPanel {
         viewPanel.add(suggestionView, CARDLAYOUT_SUGGESTION_VIEW);
         viewPanel.add(journalView, CARDLAYOUT_JOURNAL_VIEW);
     }
-
-
-    @SuppressWarnings("unchecked")
-    private void initialiseUIComponents() {
+    
+    private void initializeUIComponents() {
         // Add UI components.
         setLayout(new BorderLayout(0, 0));
         
@@ -140,6 +152,55 @@ public class JimMainPanel extends JPanel {
         Border inputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
         inputTextField.setBorder(inputFieldBorder);
 
+        bindKeystrokes();
+
+        // Set up top bar
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(COLOR_TITLE_BLUE);
+        
+        DraggingListener listener = new DraggingListener();
+        topPanel.addMouseMotionListener(listener);
+        topPanel.addMouseListener(listener);
+        
+        
+        dateLabel = new JLabel("  xx-xx-xx");
+        clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
+        progNameLabel = new JLabel("JIM! v0.5    ");
+        
+        dateLabel.setFont(FONT_MAIN);
+        clockLabel.setFont(FONT_MAIN);
+        progNameLabel.setFont(FONT_TITLE);
+        
+        topPanel.add(dateLabel, BorderLayout.WEST);
+        topPanel.add(clockLabel, BorderLayout.CENTER);
+        topPanel.add(progNameLabel, BorderLayout.EAST);
+        add(topPanel, BorderLayout.NORTH);
+        
+        // Set up input box
+        JPanel inputPanel = new JPanel(new BorderLayout());
+        add(inputPanel, BorderLayout.CENTER);
+        helperTextLabel = new JLabel("");
+        inputPanel.add(inputTextField, BorderLayout.CENTER);
+        inputPanel.add(helperTextLabel, BorderLayout.WEST);
+        
+        // The viewPanel here is to contain the "Views" which JIM! may need to
+        // display,
+        // i.e. show a JournalView, or a SuggestionView (or maybe
+        // half-and-half).
+        viewPanel = new JPanel();
+        outerBorder = BorderFactory.createLineBorder(COLOR_BLUE, 4);
+        innerBorder = BorderFactory.createLoweredSoftBevelBorder();
+        Border outputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
+        viewPanel.setBorder(outputFieldBorder);
+
+        viewPanel.setPreferredSize(new Dimension(VIEW_AREA_WIDTH,
+                                                 VIEW_AREA_HEIGHT));
+        add(viewPanel, BorderLayout.SOUTH);
+        viewPanel.setLayout(new CardLayout(0, 0));
+
+    }
+
+    private void bindKeystrokes() {
         // Disable default focus traversal keys so we can rebind TAB and
         // SHIFT+TAB
         inputTextField.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
@@ -308,7 +369,6 @@ public class JimMainPanel extends JPanel {
                                                   inputTextField.setText("undo");
                                                   executeInput();
                                                   inputTextField.setText("");
-                                                  // refreshUI();
                                               }
                                           });
         
@@ -352,51 +412,37 @@ public class JimMainPanel extends JPanel {
                                                   journalView.scrollPageDown();
                                               }
                                           });
+        
+     // We bind the key "Escape" from the InputField so that
+        // when pressed, our window closes.
+        inputTextField.getInputMap()
+                               .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,
+                                                           0),
+                                    ACTION_EXIT_WINDOW);
 
-        // Set up top bar
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(COLOR_TITLE_BLUE);
-        
-        DraggingListener listener = new DraggingListener();
-        topPanel.addMouseMotionListener(listener);
-        topPanel.addMouseListener(listener);
-        
-        
-        dateLabel = new JLabel("  xx-xx-xx");
-        clockLabel = new JLabel("xx:xx:xx", JLabel.CENTER);
-        progNameLabel = new JLabel("JIM! v0.5    ");
-        
-        dateLabel.setFont(FONT_MAIN);
-        clockLabel.setFont(FONT_MAIN);
-        progNameLabel.setFont(FONT_TITLE);
-        
-        topPanel.add(dateLabel, BorderLayout.WEST);
-        topPanel.add(clockLabel, BorderLayout.CENTER);
-        topPanel.add(progNameLabel, BorderLayout.EAST);
-        add(topPanel, BorderLayout.NORTH);
-        
-        // Set up input box
-        JPanel inputPanel = new JPanel(new BorderLayout());
-        add(inputPanel, BorderLayout.CENTER);
-        helperTextLabel = new JLabel("");
-        inputPanel.add(inputTextField, BorderLayout.CENTER);
-        inputPanel.add(helperTextLabel, BorderLayout.WEST);
-        
-        // The viewPanel here is to contain the "Views" which JIM! may need to
-        // display,
-        // i.e. show a JournalView, or a SuggestionView (or maybe
-        // half-and-half).
-        viewPanel = new JPanel();
-        outerBorder = BorderFactory.createLineBorder(COLOR_BLUE, 4);
-        innerBorder = BorderFactory.createLoweredSoftBevelBorder();
-        Border outputFieldBorder = new CompoundBorder(outerBorder, innerBorder);
-        viewPanel.setBorder(outputFieldBorder);
+        inputTextField.getActionMap().put(ACTION_EXIT_WINDOW,
+                                                   new AbstractAction() {
 
-        viewPanel.setPreferredSize(new Dimension(VIEW_AREA_WIDTH,
-                                                 VIEW_AREA_HEIGHT));
-        add(viewPanel, BorderLayout.SOUTH);
-        viewPanel.setLayout(new CardLayout(0, 0));
-
+                                                       @Override
+                                                       public void actionPerformed(ActionEvent e) {
+                                                           
+                                                           if (lastCommandState.equals("Pending") ||
+                                                               lastCommandState.equals("NeedNewTask")) {
+                                                               clearLastCommand();
+                                                               journalView.unholdFeedback();
+                                                               refreshUI();
+                                                               inputTextField.setText("");
+                                                           }
+                                                           else if(!inputTextField.getText().isEmpty()) {
+                                                               inputTextField.setText("");
+                                                               refreshUI();
+                                                           }
+                                                           else {
+                                                               applicationWindow.dispose();
+                                                               isRunning = false;
+                                                           }
+                                                       }
+                                                   });
     }
     
     // Nested class to facilitate window dragging
@@ -464,20 +510,16 @@ public class JimMainPanel extends JPanel {
     private void refreshUI() {
         journalView.updateViewWithContent();
         suggestionView.updateViewWithContent();
-
-        // Ensure that the "View" is the right "View".
-        // Skeleton rule: If empty, show calendar. Otherwise, show suggestion.
-        // Some Magic here:
-        // Depends on the way we add the things to viewPanel's CardLayout.
+        this.selectDisplayedCard();
+    }
+    
+    private void selectDisplayedCard() {
         CardLayout cardLayout = (CardLayout) viewPanel.getLayout();
 
-        // TODO: 0 is a magic number here, oddly enough.
-        if (inputTextField.getText().length() > 0 &&
+        if (inputTextField.getText().length() > SUGGESTIONS_DISPLAY_THRESHOLD &&
            (!lastCommandState.equals("Pending") && !lastCommandState.equals("NeedNewTask"))) {
-            // Show the Suggestion view
             cardLayout.show(viewPanel, CARDLAYOUT_SUGGESTION_VIEW);
         } else {
-            // Show the Journal view
             cardLayout.show(viewPanel, CARDLAYOUT_JOURNAL_VIEW);
             suggestionManager.updateBuffer(null); // Reset suggestion
         }
@@ -485,72 +527,95 @@ public class JimMainPanel extends JPanel {
 
 
 
-    // This method is called when we want to execute input
-    private void executeInput() {
-        // Discussion: One thing which may have been neglected is 'feedback' to
-        // user.
-        // Feedback mechanism now implemented! Read commit log for details ~CC
 
+    private void executeInput() {
         String input = inputTextField.getText();
         String inputTokens[] = input.split(" ");
-        String feedback = "";
         
-        // Check before execution
         if (lastCommandState.equals("Pending")) {
-            lastCommandState = lastCommand.secondExecute(input);
-            feedback = lastCommand.getOutput();
+            executePendingCommand(input);
         }
-        
         else if (lastCommandState.equals("NeedNewTask")) {
-            Task newTask = suggestionManager.parseTask(inputTokens);
-            lastCommandState = lastCommand.thirdExecute(newTask);
-            feedback = lastCommand.getOutput();
+            executeNeedNewTaskCommand(inputTokens);
         }
-        
         else {
-            jim.journal.Command command;
-            try {
-                command = suggestionManager.parseCommand(inputTokens);
-            } catch (IllegalArgumentException e) {
-                command = null;
-            }
-            
-            if (command == null) {
-                feedback = "Your input was not recognized.";
-                inputTextField.setText("");
-                refreshUI();
-            }
-
-            else if (command != null) {
-                lastCommand = command;
-
-                lastCommandState = command.execute(journalManager);
-                feedback = command.getOutput();
-            }
-            
-            if (lastCommandState.equals("Pending") || lastCommandState.equals("NeedNewTask")) {
-                helperTextLabel.setText("  " + lastCommand.toString() + " :  ");
-            }
+            executeNewCommand(inputTokens);
         }
 
-        // Check after execution
+        // Post Execution Checks
         if (lastCommandState.equals("Success") || lastCommandState.equals("Failure")) {
-            clearLastCommand();
-            journalView.unholdFeedback();
-            inputTextField.setText("");
-            
-            lastCommandState = "Ready";
-            journalView.setFeedbackSource(lastCommand.toString());
+            clearCompletedCommand();
         }
         else if (lastCommandState.equals("Pending")) {
-            journalView.holdFeedback();
-            inputTextField.setText("");
+            holdPendingCommand();
         }
         else if (lastCommandState.equals("NeedNewTask")) {
-            inputTextField.setText( ((EditCommand) lastCommand).getSelectedTaskDescription() );
+            holdNeedNewTaskCommand();
         }
         
-        journalView.setFeedbackMessage(feedback);
+    }
+
+    private void holdNeedNewTaskCommand() {
+        helperTextLabel.setText("  " + lastCommand.toString() + " :  ");
+        inputTextField.setText( ((EditCommand) lastCommand).getSelectedTaskDescription() );
+    }
+
+    private void holdPendingCommand() {
+        helperTextLabel.setText("  " + lastCommand.toString() + " :  ");
+        journalView.holdFeedback();
+        inputTextField.setText("");
+    }
+
+    private void clearCompletedCommand() {
+        clearLastCommand();
+        journalView.unholdFeedback();
+        inputTextField.setText("");
+        
+        lastCommandState = "Ready";
+        journalView.setFeedbackSource(lastCommand.toString());
+    }
+
+
+    private void executeNewCommand(String[] inputTokens) {
+        jim.journal.Command command;
+        try {
+            command = suggestionManager.parseCommand(inputTokens);
+        } catch (IllegalArgumentException e) {
+            command = null;
+        }
+        
+        if (command == null) {
+            reactToUnparsableCommand();
+        }
+
+        else if (command != null) {
+            reactToParsedCommand(command);
+        }
+        
+    }
+
+    private void reactToParsedCommand(jim.journal.Command command) {
+        lastCommand = command;
+
+        lastCommandState = command.execute(journalManager);
+        journalView.setFeedbackMessage( command.getOutput() );
+    }
+
+    private void reactToUnparsableCommand() {
+        journalView.setFeedbackMessage("Your input was not recognized.");
+        inputTextField.setText("");
+        refreshUI();
+    }
+
+    private void executeNeedNewTaskCommand(String[] inputTokens) {
+        Task newTask = suggestionManager.parseTask(inputTokens);
+        lastCommandState = lastCommand.thirdExecute(newTask);
+        journalView.setFeedbackMessage( lastCommand.getOutput() );
+    }
+
+    private void executePendingCommand(String input) {
+        lastCommandState = lastCommand.secondExecute(input);
+        journalView.setFeedbackMessage( lastCommand.getOutput() );
     }
 
     private void clearLastCommand() {
@@ -559,12 +624,9 @@ public class JimMainPanel extends JPanel {
     }
 
 
-    // To be lazy, this method is called to run the JIM! GUI
-    public void runWindow() {
+    private void initializeMainJFrame() {
         applicationWindow = new JFrame("JIM!");
         applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Beautify Program Window
         applicationWindow.setUndecorated(true);
         
         Border border = BorderFactory.createLineBorder(COLOR_DARK_BLUE, 3, true);
@@ -573,38 +635,7 @@ public class JimMainPanel extends JPanel {
 
         applicationWindow.getContentPane().add(this);
         applicationWindow.pack();
-
-        // We bind the key "Escape" from the InputField so that
-        // when pressed, our window closes.
-        this.inputTextField.getInputMap()
-                               .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,
-                                                           0),
-                                    ACTION_EXIT_WINDOW);
-
-        this.inputTextField.getActionMap().put(ACTION_EXIT_WINDOW,
-                                                   new AbstractAction() {
-
-                                                       @Override
-                                                       public void actionPerformed(ActionEvent e) {
-                                                           
-                                                           if (lastCommandState.equals("Pending") ||
-                                                               lastCommandState.equals("NeedNewTask")) {
-                                                               clearLastCommand();
-                                                               journalView.unholdFeedback();
-                                                               refreshUI();
-                                                               inputTextField.setText("");
-                                                           }
-                                                           else if(!inputTextField.getText().isEmpty()) {
-                                                               inputTextField.setText("");
-                                                               refreshUI();
-                                                           }
-                                                           else {
-                                                               applicationWindow.dispose();
-                                                               isRunning = false;
-                                                           }
-                                                       }
-                                                   });
-
+        
         // Centering Window
         Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         int locX = ((int) screen.getWidth() / 2) - (VIEW_AREA_WIDTH / 2);
@@ -612,9 +643,6 @@ public class JimMainPanel extends JPanel {
 
         applicationWindow.setLocation(locX, locY);
         applicationWindow.setVisible(true);
-
-        this.refreshUI(); // Load current journal on startup
-        runClock();
     }
 
     private void runClock() {
@@ -623,7 +651,6 @@ public class JimMainPanel extends JPanel {
             @Override
             public void run() {
                 while (isRunning) {
-                    
                     GregorianCalendar calendar = new GregorianCalendar();
                     String dateString = String.format(" %02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d",
                                                       calendar.get(Calendar.DATE),
@@ -649,8 +676,7 @@ public class JimMainPanel extends JPanel {
     }
 
     public static void main(String args[]) {
-        JimMainPanel jimPanel = new JimMainPanel();
-        jimPanel.runWindow();
+        new JimMainPanel();
     }
 
 }
