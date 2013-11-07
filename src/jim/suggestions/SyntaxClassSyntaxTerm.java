@@ -121,6 +121,9 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
             } else if (relativeDayWordsSet.contains(firstWord)) {
                 // yesterday|today|tomorrow
         		return generatedHint;
+        	} else if (daysOfWeekSet.contains(firstWord)) {
+                // Monday|...
+        		return generatedHint;
         	} else if (relativeModifierWordsSet.contains(firstWord)) {
                 // prev|this|next Monday|Tues...
         		nextWord = generateSuggestionWord(daysOfWeekSet, nextSubseq, t);
@@ -216,7 +219,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         int numWordsGenerated = 1;
         
         while (numWordsSoFar + numWordsGenerated < subseqParts.length &&
-               numWordsSoFar >= 2) { // REALLY Dirty hack.
+               (!isAddCmd(context, t) || numWordsSoFar >= 2)) { // REALLY Dirty hack.
             numWordsGenerated++;
             int subseqPartIdx = numWordsSoFar + numWordsGenerated;
             double tt = Math.pow(1 + t, subseqPartIdx) % 1; // need to redistribute t
