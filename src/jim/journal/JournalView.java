@@ -19,11 +19,17 @@ public class JournalView extends JimView {
     private JTextPane outputTextArea;
     private JScrollPane scrollingPane;
     private JournalManager journalManager;
-    private String lastFeedback = "";
+    private String lastFeedback = EMPTY_STRING;
     private boolean holdingFeedback = false;
 
     private int selectionPosition = 0;
-    private String lastFeedbackSource = "";
+    private String lastFeedbackSource = EMPTY_STRING;
+    
+    private static final String OUTPUT_TEMPLATE = "<html><font face=Tahoma>%s</font></html>";
+    private static final String EMPTY_STRING = "";
+    private static final String SOURCE_HELP = "Help";
+    private static final String SOURCE_SEARCH = "Search";
+    private static final String SOURCE_DISPLAY = "Display";
 
 
     public JournalView() {
@@ -54,36 +60,54 @@ public class JournalView extends JimView {
     public void updateViewWithContent() {
         assert(journalManager != null);
         
-        // Load up and display feedback, if any, from previous command
-        // We also clear the feedback (unless explicitly told not to) to prevent double-display of feedback
-        String journalText = "<font face=Tahoma>";
-        if (!lastFeedback.equals("")) {
-            journalText = journalText + lastFeedback + "<br><br>";
-        }
-        if (!holdingFeedback) {
-            lastFeedback = "";
-        }
-        
+        String journalText = registerCommandFeedback();
+        journalText = addHtmlTags(journalText);
+        outputToTextArea(journalText);
+    }
 
-        // Build text from current journal content.
-        if (!lastFeedbackSource.equals("Display") && !lastFeedbackSource.equals("Search") &&
-            !lastFeedbackSource.equals("Help")) {
-            String outputText = journalManager.getDisplayString();
-            journalText = journalText + outputText;
-        } else {
-            lastFeedbackSource = "";
-        }
-        
-        journalText = journalText + "</font>";
-        
-            
+
+
+    private void outputToTextArea(String journalText) {
+        outputTextArea.setText(journalText);
+        outputTextArea.select(0,0);
+    }
+
+
+
+    private String addHtmlTags(String journalText) {
         journalText = journalText.replace("\n", "<br>");
         journalText = journalText.replace("Upcoming Events:", "<b><u>Upcoming Events:</u></b>");
         journalText = journalText.replace("Todo:", "<b><u>Todo:</u></b>");
+        journalText = journalText.replace("-------------------- Tasks ----------------------",
+                                          "<b>-------------------- Tasks ----------------------</b>");
+        journalText = journalText.replace("--------------- Completed Tasks -----------------",
+                                          "<b>--------------- Completed Tasks -----------------</b>");
+        return journalText;
+    }
 
-        // Output to the Text Area
-        outputTextArea.setText(journalText);
-        outputTextArea.select(0,0);
+
+
+    private String registerCommandFeedback() {
+        // Load up and display feedback, if any, from previous command
+        // We also clear the feedback (unless explicitly told not to) to prevent double-display of feedback
+        String journalText = EMPTY_STRING;
+        if (!lastFeedback.isEmpty()) {
+            journalText = journalText + lastFeedback + "\n\n";
+        }
+        if (!holdingFeedback) {
+            lastFeedback = EMPTY_STRING;
+        }
+        
+        // Build text from current journal content.
+        if (!lastFeedbackSource.equals(SOURCE_DISPLAY) && !lastFeedbackSource.equals(SOURCE_SEARCH) &&
+            !lastFeedbackSource.equals(SOURCE_HELP)) {
+            String outputText = journalManager.getDisplayString();
+            journalText = journalText + outputText;
+        } else {
+            lastFeedbackSource = EMPTY_STRING;
+        }
+
+        return String.format(OUTPUT_TEMPLATE, journalText);
     }
     
     public void scrollPageDown() {
