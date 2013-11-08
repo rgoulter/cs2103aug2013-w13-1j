@@ -119,6 +119,10 @@ public class JimMainPanel extends JPanel {
     public static final int VIEW_AREA_HEIGHT = 400;
     public static final int SUGGESTIONS_DISPLAY_THRESHOLD = 0;
 
+    // -----------------------------------------------------------
+    // Initialization of GUI and important variables
+    // -----------------------------------------------------------
+    
     public JimMainPanel() {
         initializeUIComponents();
         initializeCommandHistoryLogic();
@@ -129,6 +133,66 @@ public class JimMainPanel extends JPanel {
         runClock();
     }
 
+
+    private void initializeMainJFrame() {
+        applicationWindow = new JFrame(JIM_CURRENT_VERSION);
+        applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        applicationWindow.setUndecorated(true);
+
+        Border border = BorderFactory.createLineBorder(COLOR_DARK_BLUE, 3, true);
+        this.setBorder(border);
+        this.setBackground(COLOR_BLUE);
+
+        applicationWindow.getContentPane().add(this);
+        applicationWindow.pack();
+
+        // Centering Window
+        Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        int locX = ((int) screen.getWidth() / 2) - (VIEW_AREA_WIDTH / 2);
+        int locY = ((int) screen.getHeight() / 2) - (VIEW_AREA_HEIGHT / 2);
+
+        applicationWindow.setLocation(locX, locY);
+        applicationWindow.setVisible(true);
+    }
+
+    private void runClock() {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (isRunning) {
+                    displayDateAndTime();
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+
+            private void displayDateAndTime() {
+                GregorianCalendar calendar = new GregorianCalendar();
+                String dateString = String.format(DATE_TEMPLATE_STRING,
+                                                  calendar.get(Calendar.DATE),
+                                                  calendar.get(Calendar.MONTH)+1,
+                                                  calendar.get(Calendar.YEAR));
+                String timeString = String.format(TIME_TEMPLATE_STRING,
+                                                  calendar.get(Calendar.HOUR_OF_DAY),
+                                                  calendar.get(Calendar.MINUTE),
+                                                  calendar.get(Calendar.SECOND));
+
+                dateLabel.setText(dateString);
+                clockLabel.setText(timeString);
+            }
+
+        }).run();
+    }
+
+    public static void main(String args[]) {
+        new JimMainPanel();
+    }
+    
     private void initializeCommandHistoryLogic() {
         lastCommandState = COMMAND_STATE_READY;
         isRunning = true;
@@ -517,13 +581,16 @@ public class JimMainPanel extends JPanel {
 
     }
 
-
-
+    // -----------------------------------------------------------
+    
+    
+    // -----------------------------------------------------------
+    // Methods used in Refreshing
+    // -----------------------------------------------------------
+    
     private void displayAutoComplete(String text) {
         inputTextField.setText(text);
     }
-
-
 
     private void refreshUI() {
         journalView.updateViewWithContent();
@@ -543,8 +610,12 @@ public class JimMainPanel extends JPanel {
         }
     }
 
+    // -----------------------------------------------------------
 
-
+    
+    // -----------------------------------------------------------
+    // Drivers for parsing and executing input
+    // -----------------------------------------------------------
 
     private void executeInput() {
         String input = inputTextField.getText();
@@ -623,7 +694,6 @@ public class JimMainPanel extends JPanel {
     private void reactToUnparsableCommand() {
         journalView.setFeedbackMessage(FEEDBACK_INPUT_NOT_RECOGNIZED);
         inputTextField.setText(INPUT_BLANK);
-        refreshUI();
     }
 
     private void executeNeedNewTaskCommand(String[] inputTokens) {
@@ -642,64 +712,6 @@ public class JimMainPanel extends JPanel {
         helperTextLabel.setText(INPUT_BLANK);
     }
 
-
-    private void initializeMainJFrame() {
-        applicationWindow = new JFrame(JIM_CURRENT_VERSION);
-        applicationWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        applicationWindow.setUndecorated(true);
-
-        Border border = BorderFactory.createLineBorder(COLOR_DARK_BLUE, 3, true);
-        this.setBorder(border);
-        this.setBackground(COLOR_BLUE);
-
-        applicationWindow.getContentPane().add(this);
-        applicationWindow.pack();
-
-        // Centering Window
-        Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        int locX = ((int) screen.getWidth() / 2) - (VIEW_AREA_WIDTH / 2);
-        int locY = ((int) screen.getHeight() / 2) - (VIEW_AREA_HEIGHT / 2);
-
-        applicationWindow.setLocation(locX, locY);
-        applicationWindow.setVisible(true);
-    }
-
-    private void runClock() {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                while (isRunning) {
-                    displayDateAndTime();
-
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-            }
-
-            private void displayDateAndTime() {
-                GregorianCalendar calendar = new GregorianCalendar();
-                String dateString = String.format(DATE_TEMPLATE_STRING,
-                                                  calendar.get(Calendar.DATE),
-                                                  calendar.get(Calendar.MONTH)+1,
-                                                  calendar.get(Calendar.YEAR));
-                String timeString = String.format(TIME_TEMPLATE_STRING,
-                                                  calendar.get(Calendar.HOUR_OF_DAY),
-                                                  calendar.get(Calendar.MINUTE),
-                                                  calendar.get(Calendar.SECOND));
-
-                dateLabel.setText(dateString);
-                clockLabel.setText(timeString);
-            }
-
-        }).run();
-    }
-
-    public static void main(String args[]) {
-        new JimMainPanel();
-    }
+    // -----------------------------------------------------------
 
 }
