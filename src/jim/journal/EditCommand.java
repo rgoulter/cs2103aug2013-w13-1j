@@ -50,7 +50,7 @@ public class EditCommand extends Command {
                 taskToEdit = matchingTasks.get(0);
                 executeHelper();
                 return "Success";
-            } else if (matchingTasks.size() == 1 && taskChangedTo == null){
+            } else if (matchingTasks.size() == 1 && taskChangedTo == null){                
                 outputln("The following Task will be edited.");
                 outputln(matchingTasks.get(0).toString());
                 taskToEdit = matchingTasks.get(0);

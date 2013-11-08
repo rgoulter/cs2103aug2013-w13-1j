@@ -558,6 +558,7 @@ public class JimMainPanel extends JPanel {
     private void holdNeedNewTaskCommand() {
         helperTextLabel.setText("  " + lastCommand.toString() + " :  ");
         inputTextField.setText( ((EditCommand) lastCommand).getSelectedTaskDescription() );
+        refreshUI();
     }
 
     private void holdPendingCommand() {

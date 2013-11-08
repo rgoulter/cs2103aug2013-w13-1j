@@ -45,12 +45,12 @@ public class HelpCommand extends Command {
                                               "<b>config reset</b> - Resets all settings to default<br>" +
                                               "<b>config (setting name) (new value)</b> - Sets a setting to the new value";
     private static final String HELP_DISPLAY = "<b><u>Display Command</u></b><br>" +
-                                               "<b>Aliases: </b>show, !" +
+                                               "<b>Aliases: </b>show, !<br>" +
                                                "Use the <b>display</b> command to show all items within a date window:<br>" + 
                                                "<b>display</b> - Shows the tasks from the past and coming weeks<br>" + 
                                                "<b>display (date)</b> - Shows all tasks occuring on a particular date";
     private static final String HELP_EDIT = "<b><u>Edit Command</u></b><br>" +
-                                            "<b>Aliases: </b>modify, change, update, :" +
+                                            "<b>Aliases: </b>modify, change, update, :<br>" +
                                             "Use the <b>edit</b> command to edit an existing task:<br>" +
                                             "<b>edit (description)</b> - Selects an item for editing<br><br>" +
                                             String.format(HELP_MULTIPART, "edit") +
