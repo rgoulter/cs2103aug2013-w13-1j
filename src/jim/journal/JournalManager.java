@@ -178,7 +178,7 @@ public class JournalManager {
             result = true;
             saveToStorage();
         }
-  //      System.out.println("history Index = " + historyIndex);
+        // System.out.println("DEBUG: history Index = " + historyIndex);
         return result;
     }
 

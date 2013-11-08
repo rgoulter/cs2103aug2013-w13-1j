@@ -4,6 +4,7 @@ import jim.Configuration;
 
 import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
+import org.joda.time.chrono.ISOChronology;
 
 
 public class TimedTask extends Task implements Comparable<TimedTask>{
@@ -109,6 +110,12 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
     public boolean equals(Object o) {
         if (o instanceof TimedTask) {
             TimedTask helper = (TimedTask) o;
+            
+            this.startTime.setChronology(ISOChronology.getInstance());
+            this.endTime.setChronology(ISOChronology.getInstance());
+            helper.getStartTime().setChronology(ISOChronology.getInstance());
+            helper.getEndTime().setChronology(ISOChronology.getInstance());
+            
             if ((this.startTime.equals(helper.getStartTime())) &&
                 (this.endTime.equals(helper.getEndTime())) &&
                 (this.description.equalsIgnoreCase(helper.getDescription()))) {
