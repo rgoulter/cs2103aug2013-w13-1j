@@ -1,4 +1,4 @@
-
+//@author A0096790N
 package jim.journal;
 
 import jim.JimView;
@@ -56,9 +56,9 @@ public class JournalView extends JimView {
         
         // Load up and display feedback, if any, from previous command
         // We also clear the feedback (unless explicitly told not to) to prevent double-display of feedback
-        String journalText = "";
+        String journalText = "<font face=Tahoma>";
         if (!lastFeedback.equals("")) {
-            journalText = lastFeedback + "<br><br>";
+            journalText = journalText + lastFeedback + "<br><br>";
         }
         if (!holdingFeedback) {
             lastFeedback = "";
@@ -73,6 +73,8 @@ public class JournalView extends JimView {
         } else {
             lastFeedbackSource = "";
         }
+        
+        journalText = journalText + "</font>";
         
             
         journalText = journalText.replace("\n", "<br>");

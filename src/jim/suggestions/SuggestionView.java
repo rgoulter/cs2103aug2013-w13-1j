@@ -1,4 +1,4 @@
-
+//@author A0096790N
 package jim.suggestions;
 
 import java.awt.BorderLayout;
@@ -16,6 +16,8 @@ import javax.swing.JList;
 
 
 public class SuggestionView extends JimView {
+    
+    private static final String OUTPUT_HTML_STRING = "<html><font face=Tahoma>%s</font></html>"; 
 
     // Here we want SuggestionView to display a bunch of current suggestions,
     // and give some indication as to which is the user's "current" selection..
@@ -48,7 +50,7 @@ public class SuggestionView extends JimView {
         
         SuggestionHints hintSet = suggestionManager.getSuggestionHints();
         outputPane.invalidate();
-        outputPane.setText(hintSet.toString());
+        outputPane.setText(String.format(OUTPUT_HTML_STRING, hintSet.toString()));
         outputPane.repaint();
     }
 
