@@ -1,3 +1,4 @@
+//@author A0096790N
 /* CONFIG FILE FORMAT:
  * 
  * outputFileName=<output file name>

@@ -1,3 +1,4 @@
+//@author A0096790N
 package jim;
 
 import jim.journal.JournalManager;
@@ -5,14 +6,25 @@ import jim.journal.Task;
 
 
 public class ConfigCommand extends jim.journal.Command {
+    
     private static final String QUERY_MODE_OUTPUT = "Available Settings:\n"+
                                                     "%s\n";
     private static final String STRING_NEED_RESTART = "You may need to restart <i>JIM!</i> for " + 
                                                       "your changes to be applied.";
     
+    // Feedback Strings
+    private static final String FEEDBACK_STRING_UNRECOGNIZED = "Your input was not recognized. You may only modify one of the following:\n\n%s";
+    private static final String FEEDBACK_TIME_SUCCESSFUL = "Time separator has been set to %s";
+    private static final String FEEDBACK_DATE_SUCCESSFUL = "Date separator has been set to %s";
+    private static final String FEEDBACK_FILENAME_SUCCESSFUL = "Task Storage file has been set to %s";
+    private static final String FEEDBACK_RESET = "Configuration has been reset to defaults";
+    
+    // Execution States
+    private static final String EXECUTION_FAILED = "Failure";
+    private static final String EXECUTION_SUCCESSFUL = "Success";
+    
     private String selectedConfiguration;
     private String newParameter;
-    
     private Configuration configManager;
 
     public ConfigCommand(String configType, String parameter) {        
@@ -35,7 +47,7 @@ public class ConfigCommand extends jim.journal.Command {
         if (selectedConfiguration == null) {
             // Query Mode
             outputln(String.format(QUERY_MODE_OUTPUT, configManager.toString()));
-            return "Success";
+            return EXECUTION_SUCCESSFUL;
         }
         
         else {
@@ -44,48 +56,40 @@ public class ConfigCommand extends jim.journal.Command {
                 configManager.setOutputFileName(Configuration.DEFAULT_FILENAME);
                 configManager.setDateSeparator(Configuration.DEFAULT_DATE_SEPARATOR);
                 configManager.setTimeSeparator(Configuration.DEFAULT_TIME_SEPARATOR);
-                outputln("Configuration has been reset to defaults");
+                outputln(FEEDBACK_RESET);
                 outputln(STRING_NEED_RESTART);
             }
             
-            else if (selectedConfiguration.equals("outputfilename")) {
+            else if (selectedConfiguration.equals("outputfilename") && newParameter != null) {
                 configManager.setOutputFileName(newParameter);
-                outputln("Task Storage file has been set to " + newParameter);
+                outputln(String.format(FEEDBACK_FILENAME_SUCCESSFUL, newParameter));
                 outputln(STRING_NEED_RESTART);
             }
             
-            else if (selectedConfiguration.equals("dateseparator")) {
+            else if (selectedConfiguration.equals("dateseparator") && newParameter != null) {
                 configManager.setDateSeparator(newParameter);
-                outputln("Date separator has been set to " + newParameter);
+                outputln(String.format(FEEDBACK_DATE_SUCCESSFUL, newParameter));
                 outputln(STRING_NEED_RESTART);
             }
             
-            else if (selectedConfiguration.equals("timeseparator")) {
+            else if (selectedConfiguration.equals("timeseparator") && newParameter != null) {
                 configManager.setTimeSeparator(newParameter);
-                outputln("Time separator has been set to " + newParameter);
+                outputln(String.format(FEEDBACK_TIME_SUCCESSFUL, newParameter));
                 outputln(STRING_NEED_RESTART);
             }
             
             else {
-                outputln("Your input was not recognized");
-                return "Failure";
+                outputln(String.format(FEEDBACK_STRING_UNRECOGNIZED, configManager.toString()));
+                return EXECUTION_FAILED;
             }
             
             configManager.writeSettings();
-            return "Success";
+            return EXECUTION_SUCCESSFUL;
         }
     }
 
-    @Override
-    public String secondExecute(String secondInput) {
-        // Will never be called
-        return null;
-    }
-
-    @Override
-    public String thirdExecute(Task task) {
-        // Will never be called
-        return null;
-    }
+    // The following functions will never be called, and are only present to correctly extend Command.class
+    public String secondExecute(String secondInput) { return null; }
+    public String thirdExecute(Task task) { return null; }
     
 }
