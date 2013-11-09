@@ -39,13 +39,6 @@ public class DateUtils {
     	return zeroBasedMonthOfYear + 1;
     }
     
-    public static int getDayOfWeekFromDayName(String dayName) {
-        final String DAYS_OF_WEEK = "mon tue wed thu fri sat sun";
-        int zeroBasedDayOfWeek = DAYS_OF_WEEK.indexOf(dayName.toLowerCase().substring(0, 3)) / 4;
-        
-        return zeroBasedDayOfWeek+1;
-    }
-    
     public static int getCurrentYear() {
     	return new MutableDateTime().getYear();
     }
@@ -60,5 +53,13 @@ public class DateUtils {
     
     // Not to be instantiated.
     private DateUtils() {
+    }
+    
+    //@author A0096790N
+    public static int getDayOfWeekFromDayName(String dayName) {
+        final String DAYS_OF_WEEK = "mon tue wed thu fri sat sun";
+        int zeroBasedDayOfWeek = DAYS_OF_WEEK.indexOf(dayName.toLowerCase().substring(0, 3)) / 4;
+        
+        return zeroBasedDayOfWeek+1;
     }
 }

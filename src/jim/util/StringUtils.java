@@ -131,13 +131,6 @@ public class StringUtils {
     	return matchingStrings;
     }
     
-    public static String unescape(String input) {
-        if (input.substring(0,1).equals("\\")) {
-            return input.substring(1);
-        }
-        return input;
-    }
-    
     public static boolean isSubsequenceSmartCaseMatch(String str, String subseq) {
 		// Smart case logic
 		boolean ignoreCase = isLowercase(subseq);
@@ -175,5 +168,13 @@ public class StringUtils {
     
     public static boolean isLowercase(String str) {
     	return str.equals(str.toLowerCase());
+    }
+    
+    //@author A0096790N
+    public static String unescape(String input) {
+        if (input.substring(0,1).equals("\\")) {
+            return input.substring(1);
+        }
+        return input;
     }
 }

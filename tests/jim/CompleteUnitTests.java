@@ -71,7 +71,6 @@ public class CompleteUnitTests {
     }
 
 
-
     @Test
     public void testStrictSyntaxCompleteCommandHasMultipleMatchesButCompletedCanExecute () {
         JournalManager jManager = new TemporaryJournalManager();

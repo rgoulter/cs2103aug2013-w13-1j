@@ -1,4 +1,4 @@
-
+//@author A0096790N
 package jim;
 
 import java.util.Scanner;
@@ -8,14 +8,16 @@ import jim.journal.JournalManager;
 import jim.suggestions.SuggestionManager;
 
 
-
-/**
- * The entry-point for command-line executions of Jim!. Should $java -jar
- * Jim.jar jim.Jim be too ugly to type, we could probably put this in a .bat or
- * .sh script.
- */
+// Deprecated: Formerly the entry point of JIM! via CLI
+//             Old code has been commented out in case of future need for CLI integration
+//             Working code on this page launches the GUI
 public class Jim {
     
+    public static void main(String[] args) {
+        new JimMainPanel();
+    }
+    
+    /*
     public static void main(String[] args) {
         
         // Load Journal logic.
@@ -32,6 +34,6 @@ public class Jim {
             System.out.println("Unable to parse arguments.");
         }
         
-    }
+    } */
 
 }

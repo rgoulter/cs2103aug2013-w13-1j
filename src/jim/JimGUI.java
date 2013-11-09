@@ -1,4 +1,4 @@
-
+//@author A0096790N
 package jim;
 
 import java.awt.event.KeyEvent;
@@ -9,13 +9,11 @@ import javax.swing.JPanel;
 
 
 
-/**
- * The entry-point for the Jim! GUI application.
- */
+// JIM! GUI Entry point
 public class JimGUI {
 
     public static void main(String args[]) {
-        JimMainPanel jimPanel = new JimMainPanel();
+        new JimMainPanel();
     }
 
 }
