@@ -322,7 +322,14 @@ public class JimMainPanel extends JPanel {
 
                     // Send text to suggestionmanager
                 default:
-                    suggestionManager.updateBuffer(inputTextField.getText());
+                    
+                    try {
+                        suggestionManager.updateBuffer(inputTextField.getText());
+                    } catch (IndexOutOfBoundsException e) {
+                        // No need to handle exception. Program continues to run with expected behavior
+                    }
+                    
+                    
                     refreshUI();
                     break;
                 }

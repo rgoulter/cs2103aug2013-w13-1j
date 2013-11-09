@@ -3,6 +3,7 @@ package jim.journal;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -112,7 +113,14 @@ public class TaskStorage {
 		String Description;
 		String Status;
 		Task currentTask = null;
-		filereader = new FileReader(StorageFile);
+		
+		try {
+		    filereader = new FileReader(StorageFile);
+		} catch (FileNotFoundException e) {
+		    return AllTasks;
+		}
+		
+		
 		bufferedreader = new BufferedReader(filereader);
 		String crtLine;
 		while ((crtLine = bufferedreader.readLine()) != null){
