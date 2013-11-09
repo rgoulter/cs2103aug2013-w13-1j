@@ -4,12 +4,8 @@ package jim.journal;
 import jim.JimView;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Point;
 
-import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
 

@@ -1,11 +1,11 @@
 //@author A0096790N
 package jim;
 
-import java.util.Scanner;
+/* import java.util.Scanner;
 
 import jim.journal.Command;
 import jim.journal.JournalManager;
-import jim.suggestions.SuggestionManager;
+import jim.suggestions.SuggestionManager; */
 
 
 // Deprecated: Formerly the entry point of JIM! via CLI

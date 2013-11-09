@@ -68,7 +68,6 @@ public class IntegrationTests {
     // Runs ALL five major commands, but only tests the final output
     @Test
     public void basicAllEncompassingTest() {
-        SuggestionManager sManager = new SuggestionManager();
         TemporaryJournalManager jManager = new TemporaryJournalManager();
         
         AddCommand addCmd1 = new AddCommand(new FloatingTask("Item the First!"));

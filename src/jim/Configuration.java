@@ -42,13 +42,13 @@ public class Configuration {
             return new Scanner(new File(CONFIG_FILE_NAME));
             
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
         return null;
     }
     
+    @SuppressWarnings("resource") // Warning surpressed. fileScanner is closed at the end of the method
     private Configuration() {
         Scanner fileScanner;
         try {
@@ -100,7 +100,6 @@ public class Configuration {
             settingsFile.close();
             
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
