@@ -743,15 +743,12 @@ public class SyntaxParsers {
 
 
     private static MutableDateTime parseDDMMYY(String date) {
-        // TODO: Abstract Date parsing like AddCommand
         // ACCEPTED FORMATS: dd/mm/yy
-        //SimpleDateFormat dateFormat = new SimpleDateFormat(DATEFORMAT_DATE_DDMMYY);
         
         int[] takeDateArray = splitDate(removeAllSymbols(date));
         int YY = takeDateArray[2], MM = takeDateArray[1], DD = takeDateArray[0];
 
         MutableDateTime result = new MutableDateTime(YY,MM,DD,0,0,0,0);
-        /*result.setDateTime(dateFormat.parse(date));*/
 
         return result;
     }
