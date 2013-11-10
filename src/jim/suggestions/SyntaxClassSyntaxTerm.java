@@ -85,7 +85,6 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         // For hints beyond the # of subsequences,
         // SuggestionHints assumes we give a blank string for the value.
         if (numWordsSoFar >= subseqParts.length) {
-        	System.out.println("<<Gen Blank>>");
     		SuggestionHint blankHint =  new SuggestionHint(new String[]{""},
                                                            context.getInputSubsequence(),
                                                            new SyntaxTerm[]{this});
