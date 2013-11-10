@@ -14,8 +14,32 @@ import static jim.util.StringUtils.filterSmartCaseMatchBySubseq;
 
 //@author A0088816N
 class SyntaxClassSyntaxTerm extends SyntaxTerm {
-    private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName()); 
+    private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName());
+
+    private static Set<String> timeSuggestions = new HashSet<String>();
     
+	private static final String[] MONTH_WORDS =
+    	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
+	private static final String[] DAYSOFWEEK_WORDS =
+    	    new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}; // MAGIC
+	private static final String[] RELATIVEDAYS_WORDS =
+    	    new String[]{"yesterday", "today", "tomorrow"}; // MAGIC
+	private static final String[] RELATIVEMODIFIERS_WORDS = new String[]{"next", "this", "last"};
+
+	private static final Set<String> MONTHNAMES_SET = new HashSet<String>(Arrays.asList(MONTH_WORDS));
+	private static final Set<String> DAYSOFWEEK_SET = new HashSet<String>(Arrays.asList(DAYSOFWEEK_WORDS));
+	private static final Set<String> RELATIVEDAYS_SET = new HashSet<String>(Arrays.asList(RELATIVEDAYS_WORDS));
+	private static final Set<String> RELATIVEMODIFIERS_SET = new HashSet<String>(Arrays.asList(RELATIVEMODIFIERS_WORDS));
+	
+	private static final Set<String> DATE_FIRSTWORDS_SET = new HashSet<String>();
+	
+	{
+		DATE_FIRSTWORDS_SET.addAll(MONTHNAMES_SET);
+		DATE_FIRSTWORDS_SET.addAll(DAYSOFWEEK_SET);
+		DATE_FIRSTWORDS_SET.addAll(RELATIVEDAYS_SET);
+		DATE_FIRSTWORDS_SET.addAll(RELATIVEMODIFIERS_SET);
+	}
+	
     private static Map<String, List<SyntaxFormat>> syntaxClassesMap = null;
     
     private String syntaxClassName;
@@ -65,26 +89,6 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     }
 
     private SuggestionHint generateDateSuggestionHint(GenerationContext context, double t) {
-    	String[] monthNames =
-        	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
-    	String[] daysOfWeekNames =
-        	    new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}; // MAGIC
-    	String[] relativeDayWords =
-        	    new String[]{"yesterday", "today", "tomorrow"}; // MAGIC
-    	String[] relativeModifierWords = new String[]{"next", "this", "last"};
-
-    	Set<String> monthNamesSet = new HashSet<String>(Arrays.asList(monthNames));
-    	Set<String> daysOfWeekSet = new HashSet<String>(Arrays.asList(daysOfWeekNames));
-    	Set<String> relativeDayWordsSet = new HashSet<String>(Arrays.asList(relativeDayWords));
-    	Set<String> relativeModifierWordsSet = new HashSet<String>(Arrays.asList(relativeModifierWords));
-    	
-    	Set<String> dateFirstWordsSet = new HashSet<String>();
-    	dateFirstWordsSet.addAll(monthNamesSet);
-    	dateFirstWordsSet.addAll(daysOfWeekSet);
-    	dateFirstWordsSet.addAll(relativeDayWordsSet);
-    	dateFirstWordsSet.addAll(relativeModifierWordsSet);
-
-
         SuggestionHint currentHint = context.getCurrentGeneratedHint();
         int numWordsSoFar = currentHint.getWords().length;
         
@@ -100,7 +104,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         }
         
         // Generate a first-word for the date
-        String firstWord = generateSuggestionWord(dateFirstWordsSet, subseqParts[numWordsSoFar], t);
+        String firstWord = generateSuggestionWord(DATE_FIRSTWORDS_SET, subseqParts[numWordsSoFar], t);
         SuggestionHint generatedHint =  new SuggestionHint(new String[]{firstWord},
                 context.getInputSubsequence(),
                 new SyntaxTerm[]{this});
@@ -112,22 +116,22 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         	String nextWord = "";
     		String nextSubseq = (numLeftToGenerate > 1) ? subseqParts[numWordsSoFar + 1] : "";
         	
-        	if (monthNamesSet.contains(firstWord)) {
+        	if (MONTHNAMES_SET.contains(firstWord)) {
         		int daysThisMonth = 31; // MAGIC
         		Set<String> dayNumbersSet = new HashSet<String>();
         		for (int i = 1; i <= daysThisMonth; i++) {
         			dayNumbersSet.add(Integer.toString(i));
         		}
         		nextWord = generateSuggestionWord(dayNumbersSet, nextSubseq, t);
-            } else if (relativeDayWordsSet.contains(firstWord)) {
+            } else if (RELATIVEDAYS_SET.contains(firstWord)) {
                 // yesterday|today|tomorrow
         		return generatedHint;
-        	} else if (daysOfWeekSet.contains(firstWord)) {
+        	} else if (DAYSOFWEEK_SET.contains(firstWord)) {
                 // Monday|...
         		return generatedHint;
-        	} else if (relativeModifierWordsSet.contains(firstWord)) {
+        	} else if (RELATIVEMODIFIERS_SET.contains(firstWord)) {
                 // prev|this|next Monday|Tues...
-        		nextWord = generateSuggestionWord(daysOfWeekSet, nextSubseq, t);
+        		nextWord = generateSuggestionWord(DAYSOFWEEK_SET, nextSubseq, t);
         	} else {
         		return generatedHint;
         	}
