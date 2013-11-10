@@ -14,6 +14,11 @@ public class JournalManager {
 	private static final int NO_COMMAND_EXECUTED_YET = -1;
 	private static final int SAME_TIME = 0;
 	
+	private static final String COMMAND_ADD = "add";
+	private static final String COMMAND_EDIT = "edit";
+	private static final String COMMAND_REMOVE = "remove";
+	private static final String COMMAND_COMPLETE = "complete";
+	private static final String COMMAND_UNCOMPLETE = "uncomplete";
 	private static final String DESCRIPTION_UPCOMING_TASKS = "Upcoming Events: \n";
 	private static final String MESSAGE_DONE = "[DONE] ";
 	private static final String MESSAGE_COMPLETED_TASK = "Completed Task: %s";
@@ -32,7 +37,7 @@ public class JournalManager {
     private boolean newTrueCommand = true;
     
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
-    private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
+    private ArrayList<CommandTaskPair> historyOfCommand = new ArrayList<CommandTaskPair>();
     private ArrayList<TimedTask> upcomingTimedTask;
     private ArrayList<DeadlineTask> upcomingDeadlineTask;
     private ArrayList<FloatingTask> upcomingFloatingTask;
@@ -181,25 +186,25 @@ public class JournalManager {
         }
     }
 
-    public void editTask(Task old_task, Task new_task) throws Exception {
-    	if (old_task.toString().equals(new_task.toString())){
+    public void editTask(Task oldTask, Task newTask) throws Exception {
+    	if (oldTask.toString().equals(newTask.toString())){
     	    return;
-    	}else{
+    	} else {
     	    clearPastCmds();
     	    getAllTasks();
-    	    storeAllTasks.remove(old_task);
-    	    storeAllTasks.add(new_task);
+    	    storeAllTasks.remove(oldTask);
+    	    storeAllTasks.add(newTask);
     	    saveToStorage();
     	}
     }
     
     public String getPreviousCommand(){
-        return historyOfCommand.get(historyOfCommand.size()-1).getCommand();
+        return historyOfCommand.get(historyOfCommand.size() - 1).getCommand();
     }
     //only certain command need to push.
     //add, edit, complete, remove.
     public void addCommandHistory(String cmd, Task someTask, Task editTask){
-    	Command_Task command = new Command_Task(cmd, someTask, editTask);
+    	CommandTaskPair command = new CommandTaskPair(cmd, someTask, editTask);
     	historyIndex++;
     	historyOfCommand.add(historyIndex, command);
     }
@@ -212,17 +217,17 @@ public class JournalManager {
     	// get the last command in historyOfCommand
     	if (historyIndex > NO_COMMAND_EXECUTED_YET) {
         	newTrueCommand = false;
-    		Command_Task LastCommand = historyOfCommand.get(historyIndex--);
+    		CommandTaskPair LastCommand = historyOfCommand.get(historyIndex--);
 		    //add, edit, remove, complete
-		    if (LastCommand.getCommand().equals("add")){
+		    if (LastCommand.getCommand().equals(COMMAND_ADD)){
 		    	removeTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("edit")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_EDIT)){
 		    	editTask(LastCommand.getSomeTask(), LastCommand.getEditTask());
-		    } else if (LastCommand.getCommand().equals("remove")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_REMOVE)){
 		    	addTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("complete")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_COMPLETE)){
 		    	uncompleteTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("uncomplete")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_UNCOMPLETE)){
 		    	completeTask(LastCommand.getSomeTask());
 		    }
 		    return true;
@@ -234,17 +239,17 @@ public class JournalManager {
     public boolean redoUndoCommand() throws Exception{
     	if (historyOfCommand.size() >= 0 && historyIndex < historyOfCommand.size() - 1) {
     		newTrueCommand = false;
-    		Command_Task LastCommand = historyOfCommand.get(++historyIndex);
+    		CommandTaskPair LastCommand = historyOfCommand.get(++historyIndex);
 		    //add, edit, remove, complete
-		    if (LastCommand.getCommand().equals("add")){
+		    if (LastCommand.getCommand().equals(COMMAND_ADD)){
 		    	addTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("edit")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_EDIT)){
 		    	editTask(LastCommand.getEditTask(), LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("remove")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_REMOVE)){
 		    	removeTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("complete")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_COMPLETE)){
 		    	completeTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("uncomplete")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_UNCOMPLETE)){
 		    	uncompleteTask(LastCommand.getSomeTask());
 		    }
 		    return true;
@@ -267,17 +272,17 @@ public class JournalManager {
     	}
     }
     
-	class Command_Task {
+	class CommandTaskPair {
 		String cmd;
 		Task someTask, editTask;
 		
-		public Command_Task(String cmd, Task someTask, Task editTask) {
+		public CommandTaskPair(String cmd, Task someTask, Task editTask) {
 			this.cmd = cmd;
 			this.someTask = someTask;
 			this.editTask = editTask;
 		}
 	
-		public Command_Task(String cmd, Task someTask) {
+		public CommandTaskPair(String cmd, Task someTask) {
 			this(cmd, someTask, null);
 		}
 	

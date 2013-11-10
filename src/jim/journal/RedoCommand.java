@@ -3,7 +3,12 @@ package jim.journal;
 
 public class RedoCommand extends Command{
     private static final String FILE_ERROR = "FILE_ERROR";
+    private static final String EXECUTION_STATUS_SUCCESS = "Success";
+    private static final String EXECUTION_STATUS_FAIL = "Failure";
     private static final String MESSAGE_SUCCESS_REDO = "Redo Successful";
+    private static final String MESSAGE_FAIL_REDO = "Redo Unsuccessful";
+    private static final String MESSAGE_REDO = "Redo";
+    
     public RedoCommand() {
     }
     @Override
@@ -12,14 +17,14 @@ public class RedoCommand extends Command{
         try {
             if (journalManager.redoUndoCommand()){
             	outputln(MESSAGE_SUCCESS_REDO);
-            	return "Success";
+            	return EXECUTION_STATUS_SUCCESS;
             } else {
-            	outputln("Redo Unsuccessful");
+            	outputln(MESSAGE_FAIL_REDO);
             	return "Failure";
             }
         } catch (Exception e) {
             outputln(FILE_ERROR);
-            return "Failure";
+            return EXECUTION_STATUS_FAIL;
         }
     }
     @Override
@@ -34,7 +39,7 @@ public class RedoCommand extends Command{
     }
     
     public String toString() {
-        return "Redo";
+        return MESSAGE_REDO;
     }
 
 }
