@@ -15,7 +15,7 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
             										 " [%02d" + TIME_SEPARATOR + "%02d]"+  " - " +
             										 "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
             										 " [%02d" + TIME_SEPARATOR + "%02d]" + " %s"; 
-    private static final String DATE_TIME_OF_TASKS_FOR_EDIT_COMMAND = "%02d/%02d/%02d %02d:%02d to %02d/%02d/%02d %02d:%02d %s";
+    private static final String DATE_TIME_OF_TASKS_FOR_EDIT_COMMAND = "%02d/%02d/%02d %02d:%02d %02d/%02d/%02d %02d:%02d %s";
     
     private static final int CURRENT_MIILLENIUM = 2000;
     private MutableDateTime startTime;
