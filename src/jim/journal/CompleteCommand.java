@@ -50,17 +50,17 @@ public class CompleteCommand extends Command {
         }
         if (description != null){
             matchingTasks = searchTool.searchByNonStrictDescription(description);
-        }else if (EndDate !=null){
+        } else if (EndDate != null){
             matchingTasks = searchTool.searchByDate(EndDate);
         }
         if (matchingTasks.size() == NUMOFTASK_NOMATCH){
             outputln(INFO_NOMATCH);
             return EXECUTION_STATUS_SUCCESS;
-        }else if (matchingTasks.size() == NUMOFTASK_ONEMATCH){
+        } else if (matchingTasks.size() == NUMOFTASK_ONEMATCH){
             taskToComplete.add(matchingTasks.get(FIRST_TASK_INDEX));
             executeHelper();
             return EXECUTION_STATUS_SUCCESS;
-        }else{
+        } else {
             outputln( String.format(INFO_CHOOSE_ONE_TASK, INFO_SEPERATER));
             for (int i = 0; i < matchingTasks.size(); i++){
                 Task task = matchingTasks.get(i);

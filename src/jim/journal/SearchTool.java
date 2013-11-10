@@ -7,7 +7,6 @@ import java.util.Collections;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 
-
 public class SearchTool {
 	private static final int CURRENT_TIME_WITHIN_TIMEFRAME = 0;
 	private static final int SAME_TIME = 0;
