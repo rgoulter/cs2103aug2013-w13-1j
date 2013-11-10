@@ -1,4 +1,4 @@
-
+//@author A0097081B, QW
 package jim.journal;
 
 import java.io.IOException;
@@ -14,20 +14,32 @@ import jim.Configuration;
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
-
 public class JournalManager {
 	private static final int NO_COMMAND_EXECUTED_YET = -1;
+	private static final int SAME_TIME = 0;
+	
+	private static final String DESCRIPTION_UPCOMING_TASKS = "Upcoming Events: \n";
+	private static final String MESSAGE_DONE = "[DONE] ";
+	private static final String DESCRIPTION_TODO = "\n\nTodo:\n";
+	private static final String APPEND_TIMED_DEADLINE_TASK = "%s%s%s";
+	private static final String APPEND_FLOATING_TASK_WITH_DONE = "%s%s%s%s";
+	private static final String APPEND_FLOATING_TASK_WITHOUT_DONE = "%s%s%s";
+	
 	private static Configuration configManager = Configuration.getConfiguration();
 	
-    private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
-    TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
+	private static Logger Logger = java.util.logging.Logger.getLogger("JournalManager");
+    
     private int historyIndex = NO_COMMAND_EXECUTED_YET; 
     
-    private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
     private boolean newTrueCommand = true;
     
-    private static Logger Logger = java.util.logging.Logger.getLogger("JournalManager");
-     
+    private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
+    private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
+    private ArrayList<TimedTask> upcomingTimedTask;
+    private ArrayList<DeadlineTask> upcomingDeadlineTask;
+    private ArrayList<FloatingTask> upcomingFloatingTask;
+    
+    TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
     /**
      * Returns a String representation of the current Journal state.
      * 
@@ -48,55 +60,19 @@ public class JournalManager {
     }
     
     public boolean compareDate(MutableDateTime taskTime, MutableDateTime current) {
-    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == 0) {
+    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == SAME_TIME) {
     		return true;
-    	} else return false;
+    	} else 
+    		return false;
     }
-    
-    /*public String getDisplayString() {
 
-        List<Task> upcomingTasks = this.getAllTasks();
-        String timedTasks = "", floatingTasks = "", deadlineTasks = "";
-        String output = "Upcoming Events:\n";
-
+    public void sortAllTasks() {
+    	ArrayList<Task> upcomingTasks = this.getAllTasks();
+    	upcomingTimedTask = new ArrayList<TimedTask> ();
+    	upcomingDeadlineTask = new ArrayList<DeadlineTask> ();
+    	upcomingFloatingTask = new ArrayList<FloatingTask> ();
         MutableDateTime today = new MutableDateTime();
-
-        for (Task current : upcomingTasks) {
-            if (current instanceof TimedTask) {
-            	MutableDateTime taskTime = ((TimedTask) current).getStartTime();    
-                if (compareDate(taskTime, today)) {
-     				   timedTasks = timedTasks + current.toString() + "\n";
-     			   }
-            } else if (current instanceof FloatingTask) {
-                if (current.isCompleted()){
-                    floatingTasks = floatingTasks + "[DONE] "+ current.toString() +"\n";
-                }else{
-                    floatingTasks = floatingTasks + current.toString() + "\n";
-                }
-            } else if (current instanceof DeadlineTask) {
-            	MutableDateTime taskTime = ((DeadlineTask) current).getEndDate();    
-                if (compareDate(taskTime, today)) {
-                	deadlineTasks = deadlineTasks + current.toString() + "\n";
-     			   }
-            }
-
-        }
-
-        output = output + deadlineTasks + timedTasks + "\n\nTodo:\n" + floatingTasks;
-        return output;
-    }*/
-    public String getDisplayString() {
-
-        ArrayList<Task> upcomingTasks = this.getAllTasks();
-        ArrayList<TimedTask> upcomingTimedTask = new ArrayList<TimedTask>();
-        ArrayList<DeadlineTask> upcomingDeadlineTask = new ArrayList<DeadlineTask>();
-        ArrayList<FloatingTask> upcomingFloatingTask = new ArrayList<FloatingTask>();
         
-        String timedTasks = "", floatingTasks = "", deadlineTasks = "";
-        String output = "Upcoming Events:\n";
-
-        MutableDateTime today = new MutableDateTime();
-
         for (Task current : upcomingTasks) {
             if (current instanceof TimedTask) {
                 MutableDateTime taskTime = ((TimedTask) current).getStartTime();    
@@ -111,25 +87,46 @@ public class JournalManager {
                     upcomingDeadlineTask.add((DeadlineTask)current);
                    }
             }
-
         }
         sortTimedTask(upcomingTimedTask);
         sortDeadlineTask(upcomingDeadlineTask);
         sortFloatingTask(upcomingFloatingTask);
-        for (TimedTask task : upcomingTimedTask){
-            timedTasks = timedTasks + task.toString() + "\n";
+    }
+    
+    /* Note: Use sortAllTasks() before calling getTimedTaskString()*/
+    public String getTimedTaskString() {
+    	String timedTasks = "";
+    	for (TimedTask task : upcomingTimedTask){
+            timedTasks =  String.format(APPEND_TIMED_DEADLINE_TASK, timedTasks, task.toString(),"\n");
         }
-        for (DeadlineTask task : upcomingDeadlineTask){
-            deadlineTasks = deadlineTasks + task.toString() + "\n";
+    	return timedTasks;
+    }
+    
+    /* Note: Use sortAllTasks() before calling getDeadlineTaskString()*/
+    public String getDeadlineTaskString() {
+    	String deadlineTasks = "";
+    	for (DeadlineTask task : upcomingDeadlineTask){
+    		deadlineTasks =  String.format(APPEND_TIMED_DEADLINE_TASK, deadlineTasks, task.toString(),"\n");
         }
-        for (FloatingTask task : upcomingFloatingTask){
-            if (task.isCompleted()){
-                floatingTasks = floatingTasks + "[DONE] "+ task.toString() +"\n";
-            }else{
-                floatingTasks = task.toString() + "\n" + floatingTasks;
-            }
-        }
-        output = output + deadlineTasks + timedTasks + "\n\nTodo:\n" + floatingTasks;
+    	return deadlineTasks;
+    }
+    
+    /* Note: Use sortAllTasks() before calling getFloatingString()*/
+    public String getFloatingString() {
+    	String floatingTasks = "";
+    	 for (FloatingTask task : upcomingFloatingTask){
+             if (task.isCompleted()){
+                 floatingTasks = String.format(APPEND_FLOATING_TASK_WITH_DONE, floatingTasks, MESSAGE_DONE, task.toString(),"\n");
+             } else {
+                 floatingTasks = String.format(APPEND_FLOATING_TASK_WITHOUT_DONE, task.toString(),"\n", floatingTasks);
+             }
+         }
+    	return floatingTasks;
+    }
+    
+    public String getDisplayString() {
+    	sortAllTasks();
+        String output = DESCRIPTION_UPCOMING_TASKS + getDeadlineTaskString() + getTimedTaskString() + DESCRIPTION_TODO + getFloatingString();
         return output;
     }
 
@@ -351,6 +348,5 @@ public class JournalManager {
         Collections.sort(deadlineTasks);
     }
     public void sortFloatingTask(ArrayList<FloatingTask> floatingTasks){
-        
     }
 }

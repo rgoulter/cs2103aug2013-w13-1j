@@ -27,7 +27,7 @@ public abstract class Command {
     
     public abstract String thirdExecute(Task task);
     
-    protected void output(String outputStr) {
+    public void output(String outputStr) {
         outputStringBuilder.append(outputStr);
     }
     
