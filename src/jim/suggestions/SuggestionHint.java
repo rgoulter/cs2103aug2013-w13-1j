@@ -14,6 +14,7 @@ import java.util.List;
  * 
  * API VOLATILE as the suggestion system hasn't been implemented yet.
  */
+//@author A0088816N
 public class SuggestionHint implements Comparable<SuggestionHint> {
 	private String[] words;
 	private boolean[][] matchingMask;

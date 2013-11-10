@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import static jim.util.StringUtils.filterMatchBySubseq;
 import static jim.util.StringUtils.filterSmartCaseMatchBySubseq;
 
+//@author A0088816N
 class SyntaxClassSyntaxTerm extends SyntaxTerm {
     private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName()); 
     

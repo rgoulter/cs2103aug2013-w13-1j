@@ -9,6 +9,7 @@ import jim.journal.Task;
 /**
  * Placeholder helper class for when algorithm is more complicated.
  */
+//@author A0088816N
 class GenerationContext {
 	private SuggestionHint currentGeneratedHint;
 	private String inputSubsequence;

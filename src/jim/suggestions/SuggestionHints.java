@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+//@author A0088816N
 public class SuggestionHints {
     // HTML Coloration Constants
     private static final String BLACK_COLOR = "black";
