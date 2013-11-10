@@ -1,4 +1,4 @@
-//@author A0105572L
+//@author A0105572L, A0097081B
 package jim.journal;
 import org.joda.time.MutableDateTime;
 
@@ -14,6 +14,9 @@ public class DisplayCommand extends Command {
     private static final String INFO_FILE_ERROR = "FILE_ERROR";
     private static final String INFO_TASK_TITLE = "-------------------- Tasks ----------------------";
     private static final String INFO_COMPLETED_TASK_TITLE = "\n--------------- Completed Tasks -----------------";
+    private static final String CATEGORY_TIMED_TASKS = "Timed Tasks: ";
+    private static final String CATEGORY_DEADLINE_TASKS = "\nDeadline Tasks: ";
+    private static final String CATEGORY_FLOATING_TASKS = "\nTodo: ";
     
     MutableDateTime date;
     JournalManager MyJournalManager;
@@ -51,14 +54,14 @@ public class DisplayCommand extends Command {
         }
         if (date != null){
             matchingTasks = searchTool.searchByDate(date);
-        }else{
+        } else {
             matchingTasks = searchTool.getAllTasks();
         }
         if (uncompletedOnly){
             this.generateUnCompletedTaskOutput();
-        }else if (completedOnly){
+        } else if (completedOnly){
             this.generateCompletedTaskOutput();
-        }else{
+        } else {
             this.generateUnCompletedTaskOutput();
             this.generateCompletedTaskOutput();
         }
@@ -103,12 +106,15 @@ public class DisplayCommand extends Command {
         DeadlineTasksToDisplay = searchTool.sortDeadlineTasks(DeadlineTasksToDisplay);
         FloatingTasksToDisplay = searchTool.sortFloatingTasks(FloatingTasksToDisplay);
         
+        outputln(CATEGORY_TIMED_TASKS);
         for (TimedTask current : TimedTasksToDisplay){
             outputln(current.toString());
         }
+        outputln(CATEGORY_DEADLINE_TASKS);
         for (DeadlineTask current : DeadlineTasksToDisplay){
             outputln(current.toString());
         }
+        outputln(CATEGORY_FLOATING_TASKS);
         for (FloatingTask current : FloatingTasksToDisplay){
             outputln(current.toString());
         }

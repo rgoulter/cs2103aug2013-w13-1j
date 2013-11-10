@@ -1,9 +1,9 @@
+//@author A0097081B
 package jim.journal;
-
-
 
 public class RedoCommand extends Command{
     private static final String FILE_ERROR = "FILE_ERROR";
+    private static final String MESSAGE_SUCCESS_REDO = "Redo Successful";
     public RedoCommand() {
     }
     @Override
@@ -11,7 +11,7 @@ public class RedoCommand extends Command{
         // TODO Auto-generated method stub
         try {
             if (journalManager.redoUndoCommand()){
-            	outputln("Redo Successful");
+            	outputln(MESSAGE_SUCCESS_REDO);
             	return "Success";
             } else {
             	outputln("Redo Unsuccessful");
