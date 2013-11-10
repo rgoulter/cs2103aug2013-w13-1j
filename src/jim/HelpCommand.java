@@ -73,6 +73,11 @@ public class HelpCommand extends Command {
                                               "<b>Aliases: </b>find, query, ?<br>" +
                                               "Use the <b>search</b> command to search existing tasks<br>" +
                                               "<b>search (description)</b> - Displays a list of items that match the search term";
+    private static final String HELP_UNCOMPLETE = "<b><u>Uncomplete Command</u></b><br>" +
+                                                  "<b>Aliases: </b>undone, unfinish, **<br><br>" +
+                                                  "Use the <b>uncomplete</b> command to reverse marking a task as 'complete': <br>" +
+                                                  "<b>uncomplete (description)</b> - Selects an item to mark as complete<br><br>" +
+                                                  String.format(HELP_MULTIPART, "uncomplete");
     private static final String HELP_UNDO = "<b><u>Undo Command</u></b><br>" +
                                             "Use the <b>undo</b> command to reverse the last executed action<br>" +
                                             "Multiple steps of undo is possible for all actions in a session.<br><br>" +
@@ -105,6 +110,7 @@ public class HelpCommand extends Command {
         else if (command.equals("help")) { outputln(HELP_HELP); }
         else if (command.equals("redo")) { outputln(HELP_REDO); }
         else if (command.equals("remove")) { outputln(HELP_REMOVE); }
+        else if (command.equals("uncomplete")) { outputln(HELP_UNCOMPLETE); }
         else if (command.equals("undo")) { outputln(HELP_UNDO); }
         else if (command.equals("search")) { outputln(HELP_SEARCH); } 
         else if (command.equals("keys")) { outputln(HELP_KEYS); }
@@ -118,17 +124,9 @@ public class HelpCommand extends Command {
         return "Success";
     }
 
-    @Override
-    public String secondExecute(String secondInput) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String thirdExecute(Task task) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    // The following functions will never be called, and are only present to correctly extend Command.class
+    public String secondExecute(String secondInput) { return null; }
+    public String thirdExecute(Task task) { return null; }
     
     public String toString() {
         return "Help";

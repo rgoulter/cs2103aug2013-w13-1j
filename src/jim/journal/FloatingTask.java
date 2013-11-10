@@ -1,7 +1,5 @@
-
+//@author A0097081B
 package jim.journal;
-
-
 
 public class FloatingTask extends Task implements Comparable<FloatingTask>{
 
@@ -9,13 +7,9 @@ public class FloatingTask extends Task implements Comparable<FloatingTask>{
         description = desc;
     }
 
-
-
     public String getDescription() {
         return description;
     }
-
-
 
     public boolean equals(Object o) {
         if (o instanceof FloatingTask) {
