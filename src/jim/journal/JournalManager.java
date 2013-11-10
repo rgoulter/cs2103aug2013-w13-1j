@@ -1,70 +1,78 @@
-
+//@author A0097081B, QW
 package jim.journal;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jim.Configuration;
 
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
-
 public class JournalManager {
-
-    private static Configuration configManager = Configuration.getConfiguration();
-    private TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
-    private ArrayList<Task> allTasksInStorage = new ArrayList<Task>();
-    private static final int NO_COMMAND_EXECUTED_YET = -1;
-    private static final String FILE_ERROR = "FILE ERROR";
-    private int historyIndex = NO_COMMAND_EXECUTED_YET;
-    private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
-    private boolean newTrueCommand = true;
-    private int ZERO_FOR_COMPARE = 0;
+	private static final int NO_COMMAND_EXECUTED_YET = -1;
+	private static final int SAME_TIME = 0;
+	
+	private static final String DESCRIPTION_UPCOMING_TASKS = "Upcoming Events: \n";
+	private static final String MESSAGE_DONE = "[DONE] ";
+	private static final String DESCRIPTION_TODO = "\n\nTodo:\n";
+	private static final String APPEND_TIMED_DEADLINE_TASK = "%s%s%s";
+	private static final String APPEND_FLOATING_TASK_WITH_DONE = "%s%s%s%s";
+	private static final String APPEND_FLOATING_TASK_WITHOUT_DONE = "%s%s%s";
+	
+	private static Configuration configManager = Configuration.getConfiguration();
+	
+	private static Logger Logger = java.util.logging.Logger.getLogger("JournalManager");
     
-    //For display to user
-    private String TASKTITILE_ONE = "Upcoming Events:\n";
-    private String TASKTITILE_TWO = "\n\nTodo:\n";
-    private String STRING_INITIAL = "";
-    private String END_OF_LINE = "\n";
-    private String SIGN_FOR_COMPLETED_TASK = "[DONE] ";
-    private String TASK_ALREADY_COMPLETED = "Task %s has already been marked as completed.";
-    private String TASK_COMPLETED = "Completed Task: %s";
-    private String TASK_NOT_COMPLETED_YET = "Task %S has not been completed.";
-    private String TASK_UNCOMPLETED = "Uncompleted Task: %s";
-
-
-     
+    private int historyIndex = NO_COMMAND_EXECUTED_YET; 
+    
+    private boolean newTrueCommand = true;
+    
+    private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
+    private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
+    private ArrayList<TimedTask> upcomingTimedTask;
+    private ArrayList<DeadlineTask> upcomingDeadlineTask;
+    private ArrayList<FloatingTask> upcomingFloatingTask;
+    
+    TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
     /**
      * Returns a String representation of the current Journal state.
+     * 
+     * @return
      */
-
-    public boolean compareDate(MutableDateTime taskTime, MutableDateTime currentTime) {
-    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, currentTime) == ZERO_FOR_COMPARE) {
-    		return true;
-    	} else {
-    	    return false;
-    	}
-    }
-    //@author A0105572L
-    public String getDisplayString() {
-
-        ArrayList<Task> upcomingTasks;
+    /*  This method is to reduce the time of read through the storage file every time when want to change the content.
+     *  However, if we choose to use this method, the storeAllTasks will only be written to file when exit.
+     */
+   
+    public void initializeJournalManager(){
+        
         try {
-            upcomingTasks = this.getAllTasks();
+            storeAllTasks = taskStorage.getAllTasks();
         } catch (Exception e) {
-            return FILE_ERROR;
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        ArrayList<TimedTask> upcomingTimedTask = new ArrayList<TimedTask>();
-        ArrayList<DeadlineTask> upcomingDeadlineTask = new ArrayList<DeadlineTask>();
-        ArrayList<FloatingTask> upcomingFloatingTask = new ArrayList<FloatingTask>();
-        String timedTasks = STRING_INITIAL;
-        String floatingTasks = STRING_INITIAL;
-        String deadlineTasks = STRING_INITIAL;
-        String output = TASKTITILE_ONE;
-        MutableDateTime today = new MutableDateTime();
+    }
+    
+    public boolean compareDate(MutableDateTime taskTime, MutableDateTime current) {
+    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == SAME_TIME) {
+    		return true;
+    	} else 
+    		return false;
+    }
 
+    public void sortAllTasks() {
+    	ArrayList<Task> upcomingTasks = this.getAllTasks();
+    	upcomingTimedTask = new ArrayList<TimedTask> ();
+    	upcomingDeadlineTask = new ArrayList<DeadlineTask> ();
+    	upcomingFloatingTask = new ArrayList<FloatingTask> ();
+        MutableDateTime today = new MutableDateTime();
+        
         for (Task current : upcomingTasks) {
             if (current instanceof TimedTask) {
                 MutableDateTime taskTime = ((TimedTask) current).getStartTime();    
@@ -79,113 +87,155 @@ public class JournalManager {
                     upcomingDeadlineTask.add((DeadlineTask)current);
                    }
             }
-
         }
         sortTimedTask(upcomingTimedTask);
         sortDeadlineTask(upcomingDeadlineTask);
-      
-        for (TimedTask task : upcomingTimedTask){
-            timedTasks = timedTasks + task.toString() + END_OF_LINE;
+        sortFloatingTask(upcomingFloatingTask);
+    }
+    
+    /* Note: Use sortAllTasks() before calling getTimedTaskString()*/
+    public String getTimedTaskString() {
+    	String timedTasks = "";
+    	for (TimedTask task : upcomingTimedTask){
+            timedTasks =  String.format(APPEND_TIMED_DEADLINE_TASK, timedTasks, task.toString(),"\n");
         }
-        for (DeadlineTask task : upcomingDeadlineTask){
-            deadlineTasks = deadlineTasks + task.toString() + END_OF_LINE;
+    	return timedTasks;
+    }
+    
+    /* Note: Use sortAllTasks() before calling getDeadlineTaskString()*/
+    public String getDeadlineTaskString() {
+    	String deadlineTasks = "";
+    	for (DeadlineTask task : upcomingDeadlineTask){
+    		deadlineTasks =  String.format(APPEND_TIMED_DEADLINE_TASK, deadlineTasks, task.toString(),"\n");
         }
-        for (FloatingTask task : upcomingFloatingTask){
-            if (task.isCompleted()){
-                floatingTasks = floatingTasks + SIGN_FOR_COMPLETED_TASK+ task.toString() +END_OF_LINE;
-            }else{
-                floatingTasks = task.toString() + END_OF_LINE + floatingTasks;
-            }
-        }
-        output = output + deadlineTasks + timedTasks + TASKTITILE_TWO + floatingTasks;
+    	return deadlineTasks;
+    }
+    
+    /* Note: Use sortAllTasks() before calling getFloatingString()*/
+    public String getFloatingString() {
+    	String floatingTasks = "";
+    	 for (FloatingTask task : upcomingFloatingTask){
+             if (task.isCompleted()){
+                 floatingTasks = String.format(APPEND_FLOATING_TASK_WITH_DONE, floatingTasks, MESSAGE_DONE, task.toString(),"\n");
+             } else {
+                 floatingTasks = String.format(APPEND_FLOATING_TASK_WITHOUT_DONE, task.toString(),"\n", floatingTasks);
+             }
+         }
+    	return floatingTasks;
+    }
+    
+    public String getDisplayString() {
+    	sortAllTasks();
+        String output = DESCRIPTION_UPCOMING_TASKS + getDeadlineTaskString() + getTimedTaskString() + DESCRIPTION_TODO + getFloatingString();
         return output;
     }
-    //@author A0105572L
-    public void saveToStorage() throws IOException{
-            this.taskStorage.writeToFile(allTasksInStorage);
+
+    public void saveToStorage(){
+        Logger.log(Level.INFO, "going to save to storage");
+        try {
+            this.taskStorage.writeToFile(storeAllTasks);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            Logger.log(Level.WARNING, "file error");
+        }
+        Logger.log(Level.INFO, "end of processing");
     }
-    //@author A0105572L
-    public ArrayList<Task> getAllTasks() throws Exception {
-        allTasksInStorage = taskStorage.getAllTasks();
-        return allTasksInStorage; 
+
+    public ArrayList<Task> getAllTasks() {
+        try {
+            storeAllTasks = taskStorage.getAllTasks();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return storeAllTasks; 
     }
     
     /*
-     * Following methods update the storeAllTasks and save it to the storage file each time it is executed.
+     * Following methods update the storeAllTasks, uncompletedTasks,
+     * completedTasks.
      */
-    public void addTask(Task task) throws IOException {
+    public void addTask(Task task) {
     	clearPastCmds();
-        allTasksInStorage.add(task);
-        taskStorage.recordNewTask(task);
-     // System.out.println("history Index = " + historyIndex);
+        storeAllTasks.add(task);
+        try {
+            taskStorage.recordNewTask(task);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+     //   System.out.println("history Index = " + historyIndex);
     }
-    
-    //@author A0105572L
-    public boolean removeTask(Task task) throws Exception {
+
+    public boolean removeTask(Task task) {
     	clearPastCmds();
         boolean result = false;
         getAllTasks();
-        if (allTasksInStorage.remove(task)){
+        if (storeAllTasks.remove(task)){
             result = true;
             saveToStorage();
         }
+        // System.out.println("DEBUG: history Index = " + historyIndex);
         return result;
     }
-    //@author A0105572L
-    public String completeTask(Task task) throws IOException {
+
+    public String completeTask(Task task) {
     	clearPastCmds();
         if (task.isCompleted()) {
-            return String.format(TASK_ALREADY_COMPLETED,task.toString());
+            return "Task " +
+                   task.toString() +
+                   " has already been marked as completed.";
         } else {
-            allTasksInStorage.remove(task);
+            storeAllTasks.remove(task);
             task.markAsCompleted();
-            allTasksInStorage.add(task);
+            storeAllTasks.add(task);
             saveToStorage();
-            return String.format(TASK_COMPLETED, task.toString());
+            return "Completed Task: " + task.toString();
         }
     }
     
-    public String uncompleteTask(Task task) throws IOException {
+    public String uncompleteTask(Task task) {
     	clearPastCmds();
         if (!task.isCompleted()) {
-            return String.format(TASK_NOT_COMPLETED_YET, task.toString());
+            return "Task " +
+                   task.toString() +
+                  " has not been completed.";
         } else {
-            allTasksInStorage.remove(task);
+            storeAllTasks.remove(task);
             task.markAsIncompleted();
-            allTasksInStorage.add(task);
+            storeAllTasks.add(task);
             saveToStorage();
-            return String.format(TASK_UNCOMPLETED,task.toString());
+            return "Uncompleted Task: " + task.toString();
         }
     }
     
-    public void incompleteTask(Task task) throws IOException {
+    public void incompleteTask(Task task) {
     	clearPastCmds();
-    	for (Task current: allTasksInStorage) {
+    	for (Task current: storeAllTasks) {
     		if (task.equals(current)){
 		        if (!task.isCompleted()) {
 		            System.out.println( "Task " +
 		                   task.toString() +
 		                   " is currently incomplete.");
 		        } else {
-		            allTasksInStorage.remove(task);
+		            storeAllTasks.remove(task);
 		            task.markAsIncompleted();
-		            allTasksInStorage.add(task);
+		            storeAllTasks.add(task);
 		            saveToStorage();
 		            System.out.println(  "Incompleted Task: " + task.toString());
 		        }
 	    	}
     	}
     }
-    
-    //@author A0105572L
-    public void editTask(Task old_task, Task new_task) throws Exception {
+
+    public void editTask(Task old_task, Task new_task) {
     	if (old_task.toString().equals(new_task.toString())){
     	    return;
     	}else{
     	    clearPastCmds();
     	    getAllTasks();
-    	    allTasksInStorage.remove(old_task);
-    	    allTasksInStorage.add(new_task);
+    	    storeAllTasks.remove(old_task);
+    	    storeAllTasks.add(new_task);
     	    saveToStorage();
     	}
     }
@@ -206,7 +256,7 @@ public class JournalManager {
     	addCommandHistory(cmd, someTask, null);
     }
 
-    public boolean undoLastCommand() throws Exception{
+    public boolean undoLastCommand(){
     	// get the last command in historyOfCommand
     	if (historyIndex > NO_COMMAND_EXECUTED_YET) {
         	newTrueCommand = false;
@@ -233,7 +283,7 @@ public class JournalManager {
     	}
     }
     
-    public boolean redoUndoCommand() throws Exception{
+    public boolean redoUndoCommand(){
     	if (historyOfCommand.size() >= 0 && historyIndex < historyOfCommand.size() - 1) {
     		newTrueCommand = false;
     		Command_Task LastCommand = historyOfCommand.get(++historyIndex);
@@ -291,15 +341,12 @@ public class JournalManager {
 		Task getSomeTask() { return someTask; }
 		Task getEditTask() { return editTask; }
 	}
-	
-	//@author A0105572L
     public void sortTimedTask(ArrayList<TimedTask> timedTasks){
         Collections.sort(timedTasks);
     }
-    
-    //@author A0105572L
     public void sortDeadlineTask(ArrayList<DeadlineTask> deadlineTasks){
         Collections.sort(deadlineTasks);
     }
-    
+    public void sortFloatingTask(ArrayList<FloatingTask> floatingTasks){
+    }
 }

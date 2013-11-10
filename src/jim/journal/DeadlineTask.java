@@ -1,3 +1,4 @@
+//@author A0097081B, QW
 package jim.journal;
 import jim.Configuration;
 
@@ -12,16 +13,19 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
     private static Configuration configManager = Configuration.getConfiguration();
     private static final String DATE_SEPARATOR = configManager.getDateSeparator();
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
-
+    private static final String TASK_NAME_DEADLINE = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d] " + "[%02d" + TIME_SEPARATOR + "%02d] %s";
+    private static final String EDIT_TASK_NAME_DEADLINE = "%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d %s";
+    
     public DeadlineTask(MutableDateTime endDate, String desc) {
         this.endDate = endDate;
         this.description = desc;
     }
-    
-    //For taking task from the storage file
-    //@author A0105572L
     public DeadlineTask(String endDate, String desc){
-        this.endDate = MutableDateTime.parse(endDate);
+        if (endDate.isEmpty()){
+            System.out.println("deadline task must have time! error exists in storage.");
+        } else{
+            this.endDate = MutableDateTime.parse(endDate);
+        }
         this.description = desc;
     }
     
@@ -34,18 +38,13 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
     }
 
     public String toString() {
-       
-        String taskNameDeadline = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d] " + 
-                                  "[%02d" + TIME_SEPARATOR + "%02d] %s";
-    	return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear(),endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
-    }
-    
-    //@author A0105572L
-    public String toStringForEditCommand() {
-        String taskNameDeadline = "%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d %s";
-        return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear()-2000,getDescription());
+    	return String.format(TASK_NAME_DEADLINE, endDate.getDayOfMonth(), endDate.getMonthOfYear(), endDate.getYear(),
+    						endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
     }
 
+    public String toStringForEditCommand() {
+        return String.format(EDIT_TASK_NAME_DEADLINE, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear()-2000,getDescription());
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -59,15 +58,13 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
         return false;
     }
 
-
-
     @Override
     public int hashCode() {
         return endDate.hashCode() *
                31 + description.hashCode();
     }
+    
     @Override
-    //@author A0105572L
     public int compareTo(DeadlineTask arg0) {
         return DateTimeComparator.getInstance().compare(this.getEndDate(), arg0.getEndDate());
     }
