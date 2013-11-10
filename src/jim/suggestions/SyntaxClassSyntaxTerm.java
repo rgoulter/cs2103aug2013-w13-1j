@@ -72,7 +72,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 
     @Override
     public boolean isDisplayable() {
-        return "date time description".contains(syntaxClassName);
+        return "date time description word".contains(syntaxClassName);
     }
 
     @Override
@@ -95,6 +95,8 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 
         if ("description".equals(syntaxClassName)) {
             return generateDescriptionSuggestionHint(context, t);
+        } else if ("word".equals(syntaxClassName)) {
+            return generateSearchSuggestionHint(context, t);
         } else if ("date".equals(syntaxClassName)) {
             return generateDateSuggestionHint(context, t);
         } else if ("time".equals(syntaxClassName)) {
@@ -102,6 +104,11 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         } else {
             return generateSuggesionHintFromRandomFormat(context, t);
         }
+    }
+
+    private SuggestionHint generateSearchSuggestionHint(GenerationContext context, double t) {
+        Set<String> wordsFromCurrentTasks = context.getAllWordsFromCurrentTasks();
+        return generateSuggestionHintFromSetOfWords(context, t, wordsFromCurrentTasks, 1);
     }
 
     private SuggestionHint generateDateSuggestionHint(GenerationContext context, double t) {
@@ -188,8 +195,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     
     private SuggestionHint generateDescriptionSuggestionHint(GenerationContext context, double t) {
         // Delegate to other methods, if we can.
-        if (isSearchCmd(context, t) ||
-            isCompleteCmd(context, t) ||
+        if (isCompleteCmd(context, t) ||
             isUncompleteCmd(context, t) ||
             isEditCmd(context, t) ||
             isRemoveCmd(context, t)) {
@@ -227,8 +233,13 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
                                   context.getInputSubsequence(),
                                   new SyntaxTerm[]{this});
     }
+    
+    private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom){
+        String[] subseqParts = context.getInputSubsequence().split(" ");
+        return generateSuggestionHintFromSetOfWords(context, t, wordsToGenFrom, subseqParts.length + 1);
+    }
 
-    private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom) {
+    private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom, int limit) {
         // Here we generate as little or as much of a description as we need to.
         // This may be one word, or it may be many.
         
@@ -246,6 +257,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         int numWordsGenerated = 1;
         
         while (numWordsSoFar + numWordsGenerated < subseqParts.length &&
+        	   numWordsGenerated < limit &&
                (!isAddCmd(context, t) || numWordsSoFar >= 2)) { // REALLY Dirty hack.
             numWordsGenerated++;
             int subseqPartIdx = numWordsSoFar + numWordsGenerated;
