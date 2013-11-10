@@ -1,14 +1,18 @@
+//@author A0097081B, QW
 package jim.journal;
-
-
 
 import org.joda.time.MutableDateTime;
 import java.util.ArrayList;
 
-
-
 public class DisplayCommand extends Command {
-
+	private static final String MESSAGE_SUCCESS = "Success";
+	private static final String MESSAGE_DISPLAY = "Display";
+	private static final String DIVIDER_TASKS = "-------------------- Tasks ----------------------";
+	private static final String DIVIDER_COMPLETED_TASKS = "--------------- Completed Tasks -----------------";
+	private static final String CATEGORY_TIMED_TASKS = "Timed Tasks: ";
+	private static final String CATEGORY_DEADLINE_TASKS = "\nDeadline Tasks: ";
+	private static final String CATEGORY_FLOATING_TASKS = "\nFloating Tasks: ";
+	
     MutableDateTime date;
     JournalManager JM;
     ArrayList<Task> matchingTasks = new ArrayList<Task>();
@@ -17,29 +21,32 @@ public class DisplayCommand extends Command {
     public DisplayCommand(MutableDateTime d) {
         date = d;
     }
+    
     public DisplayCommand() {
         this(null);
     }
+    
     @Override
     public String execute(JournalManager journalManager) {
         JM = journalManager;
-        boolean uncompletedOnly = false;
-        boolean completedOnly = false;
+        boolean uncompletedOnly = false ;
+        boolean completedOnly = false ;
         searchTool = new SearchTool(JM);
         if (date != null){
             matchingTasks = searchTool.searchByDate(date);
-        }else{
+        } else {
             matchingTasks = searchTool.getAllTasks();
         }
         if (uncompletedOnly){
             this.generateUnCompletedTaskOutput();
-        }else if (completedOnly){
+        } else if (completedOnly){
             this.generateCompletedTaskOutput();
-        }else{
+        } else {
             this.generateUnCompletedTaskOutput();
             this.generateCompletedTaskOutput();
         }
-        return "Success";        
+        
+        return MESSAGE_SUCCESS;        
     }
     
     @Override
@@ -55,17 +62,18 @@ public class DisplayCommand extends Command {
     }
     
     public String toString() {
-        return "Display";
+        return MESSAGE_DISPLAY;
     }
     
     private void generateUnCompletedTaskOutput(){
         ArrayList<Task> unCompletedTasks = searchTool.getuncompletedTasks(matchingTasks);
-        outputln("-------------------- Tasks ----------------------");
+        outputln(DIVIDER_TASKS);
         this.generateTaskOutput(unCompletedTasks);
     }
     private void generateCompletedTaskOutput(){
         ArrayList<Task> completedTasks = searchTool.getcompletedTasks(matchingTasks);
-        outputln("\n--------------- Completed Tasks -----------------");
+        System.out.println();
+        outputln(DIVIDER_COMPLETED_TASKS);
         this.generateTaskOutput(completedTasks);
     }
     private void generateTaskOutput(ArrayList<Task> Tasks){
@@ -79,12 +87,15 @@ public class DisplayCommand extends Command {
         DeadlineTasksToDisplay = searchTool.sortDeadlineTasks(DeadlineTasksToDisplay);
         FloatingTasksToDisplay = searchTool.sortFloatingTasks(FloatingTasksToDisplay);
         
+        outputln(CATEGORY_TIMED_TASKS);
         for (TimedTask current : TimedTasksToDisplay){
             outputln(current.toString());
         }
+        outputln(CATEGORY_DEADLINE_TASKS);
         for (DeadlineTask current : DeadlineTasksToDisplay){
             outputln(current.toString());
         }
+        outputln(CATEGORY_FLOATING_TASKS);
         for (FloatingTask current : FloatingTasksToDisplay){
             outputln(current.toString());
         }
