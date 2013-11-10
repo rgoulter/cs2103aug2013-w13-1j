@@ -622,7 +622,7 @@ public class SyntaxParsers {
         
         
         registerSyntaxParser(p,
-                          "searchcmd => <searchword> <description>",
+                          "searchcmd => <searchword> <word>",
                           new SimpleSyntaxParser() {
                               @Override
                               public Object parse(String[] input) {
