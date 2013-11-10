@@ -8,6 +8,7 @@ import jim.JimView;
 
 
 
+//@author A0096790N
 public class SuggestionView extends JimView {
     
     private static final String OUTPUT_HTML_STRING = "<html><font face=Tahoma>%s</font></html>"; 
