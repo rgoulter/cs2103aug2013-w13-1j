@@ -16,7 +16,22 @@ import static jim.util.StringUtils.filterSmartCaseMatchBySubseq;
 class SyntaxClassSyntaxTerm extends SyntaxTerm {
     private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName());
 
-    private static Set<String> timeSuggestions = new HashSet<String>();
+    private static final Set<String> TIME_HHMM_SET = new HashSet<String>();
+    
+    {
+    	// Add to TIME_HHMM_SET, all strings from 00:00 to 23:59
+    	for (int hh = 0; hh < 24; hh++) {
+    		for (int mm = 0; mm < 60; mm++) {
+    			TIME_HHMM_SET.add(String.format("%02d:%02d", hh, mm));
+    		}
+    	}
+    }
+    
+    private static final Set<String> TIME_FIRSTWORDS_SET = new HashSet<String>();
+    
+    {
+    	TIME_FIRSTWORDS_SET.addAll(TIME_HHMM_SET);
+    }
     
 	private static final String[] MONTH_WORDS =
     	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
@@ -146,12 +161,28 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     }
     
     private SuggestionHint generateTimeSuggestionHint(GenerationContext context, double t) {
-        List<String> wordList = Arrays.asList(new String[]{"0800", "1200", "2359"}); // Temporary MAGIC
-        String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
+        SuggestionHint currentHint = context.getCurrentGeneratedHint();
+        int numWordsSoFar = currentHint.getWords().length;
         
-        return new SuggestionHint(new String[]{suggestedWord},
-                                  context.getInputSubsequence(),
-                                  new SyntaxTerm[]{this});
+        // LIMITATION: We must assume that the input subsequence has spaces between things matched.
+        String[] subseqParts = context.getInputSubsequence().split(" ");
+        int numLeftToGenerate = subseqParts.length - numWordsSoFar;
+
+        // This happens 
+        if (numLeftToGenerate < 1) {
+        	return new SuggestionHint(new String[]{""},
+                                      context.getInputSubsequence(),
+                                      new SyntaxTerm[]{this});
+        }
+        
+        // Generate a first-word for the time
+        String firstWord = generateSuggestionWord(TIME_FIRSTWORDS_SET, subseqParts[numWordsSoFar], t);
+        SuggestionHint generatedHint =  new SuggestionHint(new String[]{firstWord},
+                context.getInputSubsequence(),
+                new SyntaxTerm[]{this});
+        
+        
+        return generatedHint;
     }
     
     private SuggestionHint generateDescriptionSuggestionHint(GenerationContext context, double t) {
