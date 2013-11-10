@@ -9,13 +9,34 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import jim.ConfigCommand;
 import static jim.util.StringUtils.filterMatchBySubseq;
 import static jim.util.StringUtils.filterSmartCaseMatchBySubseq;
 
 //@author A0088816N
 class SyntaxClassSyntaxTerm extends SyntaxTerm {
-    private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName()); 
+    private final static Logger LOGGER = Logger.getLogger(SyntaxClassSyntaxTerm.class .getName());
+
+    private static final Set<String> TIME_HHMM_SET = new HashSet<String>();
     
+    private static final Set<String> TIME_FIRSTWORDS_SET = new HashSet<String>();
+    
+	private static final String[] MONTH_WORDS =
+    	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
+	private static final String[] DAYSOFWEEK_WORDS =
+    	    new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}; // MAGIC
+	private static final String[] RELATIVEDAYS_WORDS =
+    	    new String[]{"yesterday", "today", "tomorrow"}; // MAGIC
+	private static final String[] RELATIVEMODIFIERS_WORDS = new String[]{"next", "this", "last"};
+
+	private static final Set<String> MONTHNAMES_SET = new HashSet<String>(Arrays.asList(MONTH_WORDS));
+	private static final Set<String> DAYSOFWEEK_SET = new HashSet<String>(Arrays.asList(DAYSOFWEEK_WORDS));
+	private static final Set<String> RELATIVEDAYS_SET = new HashSet<String>(Arrays.asList(RELATIVEDAYS_WORDS));
+	private static final Set<String> RELATIVEMODIFIERS_SET = new HashSet<String>(Arrays.asList(RELATIVEMODIFIERS_WORDS));
+	
+	private static final Set<String> DATE_FIRSTWORDS_SET = new HashSet<String>();
+	
+	private static Map<String, String[]> xWordsMap = new HashMap<String, String[]>();
     private static Map<String, List<SyntaxFormat>> syntaxClassesMap = null;
     
     private String syntaxClassName;
@@ -31,7 +52,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 
     @Override
     public boolean isDisplayable() {
-        return "date time description".contains(syntaxClassName);
+        return "date time description word".contains(syntaxClassName);
     }
 
     @Override
@@ -46,7 +67,6 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         // For hints beyond the # of subsequences,
         // SuggestionHints assumes we give a blank string for the value.
         if (numWordsSoFar >= subseqParts.length) {
-        	System.out.println("<<Gen Blank>>");
     		SuggestionHint blankHint =  new SuggestionHint(new String[]{""},
                                                            context.getInputSubsequence(),
                                                            new SyntaxTerm[]{this});
@@ -55,6 +75,8 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 
         if ("description".equals(syntaxClassName)) {
             return generateDescriptionSuggestionHint(context, t);
+        } else if ("word".equals(syntaxClassName)) {
+            return generateSearchSuggestionHint(context, t);
         } else if ("date".equals(syntaxClassName)) {
             return generateDateSuggestionHint(context, t);
         } else if ("time".equals(syntaxClassName)) {
@@ -64,27 +86,25 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         }
     }
 
+    private SuggestionHint generateSearchSuggestionHint(GenerationContext context, double t) {
+        Set<String> wordsFromCurrentTasks = context.getAllWordsFromCurrentTasks();
+        return generateSuggestionHintFromSetOfWords(context, t, wordsFromCurrentTasks, 1);
+    }
+    
+    private static void ensureDateSuggestionSetPopulated() {
+    	if (!DATE_FIRSTWORDS_SET.isEmpty()) {
+    		return;
+    	}
+
+		DATE_FIRSTWORDS_SET.addAll(MONTHNAMES_SET);
+		DATE_FIRSTWORDS_SET.addAll(DAYSOFWEEK_SET);
+		DATE_FIRSTWORDS_SET.addAll(RELATIVEDAYS_SET);
+		DATE_FIRSTWORDS_SET.addAll(RELATIVEMODIFIERS_SET);
+    }
+
     private SuggestionHint generateDateSuggestionHint(GenerationContext context, double t) {
-    	String[] monthNames =
-        	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
-    	String[] daysOfWeekNames =
-        	    new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}; // MAGIC
-    	String[] relativeDayWords =
-        	    new String[]{"yesterday", "today", "tomorrow"}; // MAGIC
-    	String[] relativeModifierWords = new String[]{"next", "this", "last"};
-
-    	Set<String> monthNamesSet = new HashSet<String>(Arrays.asList(monthNames));
-    	Set<String> daysOfWeekSet = new HashSet<String>(Arrays.asList(daysOfWeekNames));
-    	Set<String> relativeDayWordsSet = new HashSet<String>(Arrays.asList(relativeDayWords));
-    	Set<String> relativeModifierWordsSet = new HashSet<String>(Arrays.asList(relativeModifierWords));
+    	ensureDateSuggestionSetPopulated();
     	
-    	Set<String> dateFirstWordsSet = new HashSet<String>();
-    	dateFirstWordsSet.addAll(monthNamesSet);
-    	dateFirstWordsSet.addAll(daysOfWeekSet);
-    	dateFirstWordsSet.addAll(relativeDayWordsSet);
-    	dateFirstWordsSet.addAll(relativeModifierWordsSet);
-
-
         SuggestionHint currentHint = context.getCurrentGeneratedHint();
         int numWordsSoFar = currentHint.getWords().length;
         
@@ -100,7 +120,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         }
         
         // Generate a first-word for the date
-        String firstWord = generateSuggestionWord(dateFirstWordsSet, subseqParts[numWordsSoFar], t);
+        String firstWord = generateSuggestionWord(DATE_FIRSTWORDS_SET, subseqParts[numWordsSoFar], t);
         SuggestionHint generatedHint =  new SuggestionHint(new String[]{firstWord},
                 context.getInputSubsequence(),
                 new SyntaxTerm[]{this});
@@ -112,22 +132,22 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         	String nextWord = "";
     		String nextSubseq = (numLeftToGenerate > 1) ? subseqParts[numWordsSoFar + 1] : "";
         	
-        	if (monthNamesSet.contains(firstWord)) {
+        	if (MONTHNAMES_SET.contains(firstWord)) {
         		int daysThisMonth = 31; // MAGIC
         		Set<String> dayNumbersSet = new HashSet<String>();
         		for (int i = 1; i <= daysThisMonth; i++) {
         			dayNumbersSet.add(Integer.toString(i));
         		}
         		nextWord = generateSuggestionWord(dayNumbersSet, nextSubseq, t);
-            } else if (relativeDayWordsSet.contains(firstWord)) {
+            } else if (RELATIVEDAYS_SET.contains(firstWord)) {
                 // yesterday|today|tomorrow
         		return generatedHint;
-        	} else if (daysOfWeekSet.contains(firstWord)) {
+        	} else if (DAYSOFWEEK_SET.contains(firstWord)) {
                 // Monday|...
         		return generatedHint;
-        	} else if (relativeModifierWordsSet.contains(firstWord)) {
+        	} else if (RELATIVEMODIFIERS_SET.contains(firstWord)) {
                 // prev|this|next Monday|Tues...
-        		nextWord = generateSuggestionWord(daysOfWeekSet, nextSubseq, t);
+        		nextWord = generateSuggestionWord(DAYSOFWEEK_SET, nextSubseq, t);
         	} else {
         		return generatedHint;
         	}
@@ -141,19 +161,51 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         return generatedHint;
     }
     
+    private static void ensureTimeSuggestionSetPopulated() {
+    	if(!TIME_FIRSTWORDS_SET.isEmpty()){
+    		return;
+    	}
+    	
+    	// Add to TIME_HHMM_SET, all strings from 00:00 to 23:59
+    	for (int hh = 0; hh < 24; hh++) {
+    		for (int mm = 0; mm < 60; mm++) {
+    			TIME_HHMM_SET.add(String.format("%02d:%02d", hh, mm));
+    		}
+    	}
+    
+    	TIME_FIRSTWORDS_SET.addAll(TIME_HHMM_SET);
+    }
+    
     private SuggestionHint generateTimeSuggestionHint(GenerationContext context, double t) {
-        List<String> wordList = Arrays.asList(new String[]{"0800", "1200", "2359"}); // Temporary MAGIC
-        String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
+    	ensureTimeSuggestionSetPopulated();
+    	
+        SuggestionHint currentHint = context.getCurrentGeneratedHint();
+        int numWordsSoFar = currentHint.getWords().length;
         
-        return new SuggestionHint(new String[]{suggestedWord},
-                                  context.getInputSubsequence(),
-                                  new SyntaxTerm[]{this});
+        // LIMITATION: We must assume that the input subsequence has spaces between things matched.
+        String[] subseqParts = context.getInputSubsequence().split(" ");
+        int numLeftToGenerate = subseqParts.length - numWordsSoFar;
+
+        // This happens 
+        if (numLeftToGenerate < 1) {
+        	return new SuggestionHint(new String[]{""},
+                                      context.getInputSubsequence(),
+                                      new SyntaxTerm[]{this});
+        }
+        
+        // Generate a first-word for the time
+        String firstWord = generateSuggestionWord(TIME_FIRSTWORDS_SET, subseqParts[numWordsSoFar], t);
+        SuggestionHint generatedHint =  new SuggestionHint(new String[]{firstWord},
+                context.getInputSubsequence(),
+                new SyntaxTerm[]{this});
+        
+        
+        return generatedHint;
     }
     
     private SuggestionHint generateDescriptionSuggestionHint(GenerationContext context, double t) {
         // Delegate to other methods, if we can.
-        if (isSearchCmd(context, t) ||
-            isCompleteCmd(context, t) ||
+        if (isCompleteCmd(context, t) ||
             isUncompleteCmd(context, t) ||
             isEditCmd(context, t) ||
             isRemoveCmd(context, t)) {
@@ -164,16 +216,9 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         	return generateSuggestionHintForConfiguration(context, t);
         }
         
-        // These magic values are for Config. This is not very elegant.
-        List<String> wordList = Arrays.asList(new String[]{"outputfilename",
-        		                                           "dateseparator",
-        		                                           "timeseparator",
-        		                                           "reset"}); // Temporary MAGIC
-        String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
-        
-        return new SuggestionHint(new String[]{suggestedWord},
-                                  context.getInputSubsequence(),
-                                  new SyntaxTerm[]{this});
+        // It's unclear what behaviour should occur here,
+        // so let's just generate from the words from current tasks.
+        return generateSuggestionHintFromWordsInCurrentTasks(context, t);
     }
     
     private SuggestionHint generateSuggestionHintFromWordsInCurrentTasks(GenerationContext context, double t) {
@@ -189,10 +234,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         int numWordsSoFar = currentHint.getWords().length;
         
         Set<String> configurationWords = new HashSet<String>();
-        configurationWords.addAll(Arrays.asList(new String[]{"outputfilename",
-                                                             "dateseparator",
-                                                             "timeseparator",
-                                                             "reset"}));
+        configurationWords.addAll(Arrays.asList(ConfigCommand.getValidArguments()));
 
         String suggestedWord = numWordsSoFar == 1 ?
                                generateSuggestionWord(configurationWords, subseqParts[numWordsSoFar], t) :
@@ -201,8 +243,13 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
                                   context.getInputSubsequence(),
                                   new SyntaxTerm[]{this});
     }
+    
+    private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom){
+        String[] subseqParts = context.getInputSubsequence().split(" ");
+        return generateSuggestionHintFromSetOfWords(context, t, wordsToGenFrom, subseqParts.length + 1);
+    }
 
-    private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom) {
+    private SuggestionHint generateSuggestionHintFromSetOfWords(GenerationContext context, double t, Set<String> wordsToGenFrom, int limit) {
         // Here we generate as little or as much of a description as we need to.
         // This may be one word, or it may be many.
         
@@ -220,6 +267,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         int numWordsGenerated = 1;
         
         while (numWordsSoFar + numWordsGenerated < subseqParts.length &&
+        	   numWordsGenerated < limit &&
                (!isAddCmd(context, t) || numWordsSoFar >= 2)) { // REALLY Dirty hack.
             numWordsGenerated++;
             int subseqPartIdx = numWordsSoFar + numWordsGenerated;
@@ -251,38 +299,60 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     // There has to be a better way to do the following...
     
     private boolean isAddCmd(GenerationContext context, double t) {
-    	String[] addCmdWords = new String[]{"add", "create", "new", "+"};
-        return isCurrentHintFirstWordOneOf(context, t, addCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("add"));
     }
 
     private boolean isCompleteCmd(GenerationContext context, double t) {
-    	String[] completeCmdWords = new String[]{"complete", "done", "finish", "*"}; 
-        return isCurrentHintFirstWordOneOf(context, t, completeCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("complete"));
     }
 
     private boolean isUncompleteCmd(GenerationContext context, double t) {
-    	String[] uncompleteCmdWords = new String[]{"uncomplete", "undone", "unfinish", "**"}; 
-        return isCurrentHintFirstWordOneOf(context, t, uncompleteCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("uncomplete"));
     }
     
     private boolean isSearchCmd(GenerationContext context, double t) {
-    	String[] searchCmdWords = new String[]{"search", "find", "query", "?"}; 
-        return isCurrentHintFirstWordOneOf(context, t, searchCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("search"));
     }
 
     private boolean isRemoveCmd(GenerationContext context, double t) {
-    	String[] removeCmdWords = new String[]{"remove", "delete", "cancel", "-"};
-        return isCurrentHintFirstWordOneOf(context, t, removeCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("remove"));
     }
 
     private boolean isEditCmd(GenerationContext context, double t) {
-    	String[] editCmdWords = new String[]{"edit", "modify", "change", "update", ":"};
-        return isCurrentHintFirstWordOneOf(context, t, editCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("edit"));
     }
 
     private boolean isConfigureCmd(GenerationContext context, double t) {
-    	String[] configCmdWords = new String[]{"config", "configuration", "configure"};
-        return isCurrentHintFirstWordOneOf(context, t, configCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("config"));
+    }
+    
+    /*
+     * This is a bit of a hack, but is less magic than what we had.
+     * 
+     * Assumes grammar definition like:
+     * <Xword> := 'a' | 'b' | 'c'...
+     * For some X, classname is "Xword",
+     * and its definitions are only literal Strings. 
+     */
+    private String[] getXWords(String x) {
+    	if (xWordsMap.containsKey(x)) {
+    		return xWordsMap.get(x);
+    	}
+    	
+    	assert syntaxClassesMap.containsKey(x + "word");
+    	
+    	List<SyntaxFormat> formats = getDefinitionsForSyntaxClassName(x + "word");
+    	String[] words = new String[formats.size()];
+    	
+    	for (int i = 0; i < words.length; i++) {
+    		assert formats.get(i).getSyntaxTerms().length == 1;
+    		assert formats.get(i).getSyntaxTerms()[0] instanceof LiteralSyntaxTerm;
+    		
+    		words[i] = ((LiteralSyntaxTerm) formats.get(i).getSyntaxTerms()[0]).getLiteralValue(); 
+    	}
+    	
+    	xWordsMap.put(x, words);
+    	return words;
     }
     
     private boolean isCurrentHintFirstWordOneOf(GenerationContext context, double t, String[] stringArray) {

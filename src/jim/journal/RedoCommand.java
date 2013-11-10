@@ -7,7 +7,7 @@ public class RedoCommand extends Command{
     private static final String EXECUTION_STATUS_FAIL = "Failure";
     private static final String MESSAGE_SUCCESS_REDO = "Redo Successful";
     private static final String MESSAGE_FAIL_REDO = "Redo Unsuccessful";
-    private static final String MESSAGE_REDO = "Redo";
+    private static final String COMMAND_REDO = "Redo";
     
     public RedoCommand() {
     }
@@ -20,7 +20,7 @@ public class RedoCommand extends Command{
             	return EXECUTION_STATUS_SUCCESS;
             } else {
             	outputln(MESSAGE_FAIL_REDO);
-            	return "Failure";
+            	return EXECUTION_STATUS_FAIL;
             }
         } catch (Exception e) {
             outputln(FILE_ERROR);
@@ -37,7 +37,7 @@ public class RedoCommand extends Command{
     }
     
     public String toString() {
-        return MESSAGE_REDO;
+        return COMMAND_REDO;
     }
 
 }
