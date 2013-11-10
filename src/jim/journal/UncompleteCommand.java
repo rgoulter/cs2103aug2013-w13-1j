@@ -1,8 +1,5 @@
 package jim.journal;
 
-
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.joda.time.MutableDateTime;
@@ -86,7 +83,7 @@ public class UncompleteCommand extends Command {
             String feedback;
             try {
                 feedback = JM.uncompleteTask(t);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 outputln(FILE_ERROR);
                 return ;
             }

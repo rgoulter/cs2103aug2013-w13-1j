@@ -1,7 +1,6 @@
 //@author A0105572L
 package jim.journal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import org.joda.time.MutableDateTime;
 
@@ -97,7 +96,7 @@ public class CompleteCommand extends Command {
             String feedback;
             try {
                 feedback = MyJournalManager.completeTask(task);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 feedback = INFO_FILE_ERROR;
                 outputln(feedback);
                 return;

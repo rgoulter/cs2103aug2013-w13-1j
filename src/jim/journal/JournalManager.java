@@ -1,13 +1,9 @@
-//@author A0097081B, QW
+//@author A0097081B, A0105572L
 package jim.journal;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jim.Configuration;
 
@@ -24,11 +20,9 @@ public class JournalManager {
 	private static final String APPEND_TIMED_DEADLINE_TASK = "%s%s%s";
 	private static final String APPEND_FLOATING_TASK_WITH_DONE = "%s%s%s%s";
 	private static final String APPEND_FLOATING_TASK_WITHOUT_DONE = "%s%s%s";
+    private static final String FILE_ERROR = "FILE ERROR";
 	
-	private static Configuration configManager = Configuration.getConfiguration();
-	
-	private static Logger Logger = java.util.logging.Logger.getLogger("JournalManager");
-    
+	private static Configuration configManager = Configuration.getConfiguration();    
     private int historyIndex = NO_COMMAND_EXECUTED_YET; 
     
     private boolean newTrueCommand = true;
@@ -43,21 +37,7 @@ public class JournalManager {
     /**
      * Returns a String representation of the current Journal state.
      * 
-     * @return
      */
-    /*  This method is to reduce the time of read through the storage file every time when want to change the content.
-     *  However, if we choose to use this method, the storeAllTasks will only be written to file when exit.
-     */
-   
-    public void initializeJournalManager(){
-        
-        try {
-            storeAllTasks = taskStorage.getAllTasks();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
     
     public boolean compareDate(MutableDateTime taskTime, MutableDateTime current) {
     	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == SAME_TIME) {
@@ -66,7 +46,7 @@ public class JournalManager {
     		return false;
     }
 
-    public void sortAllTasks() {
+    public void sortAllTasks() throws Exception {
     	ArrayList<Task> upcomingTasks = this.getAllTasks();
     	upcomingTimedTask = new ArrayList<TimedTask> ();
     	upcomingDeadlineTask = new ArrayList<DeadlineTask> ();
@@ -125,29 +105,21 @@ public class JournalManager {
     }
     
     public String getDisplayString() {
-    	sortAllTasks();
+    	try {
+            sortAllTasks();
+        } catch (Exception e) {
+            return FILE_ERROR;
+        }
         String output = DESCRIPTION_UPCOMING_TASKS + getDeadlineTaskString() + getTimedTaskString() + DESCRIPTION_TODO + getFloatingString();
         return output;
     }
 
-    public void saveToStorage(){
-        Logger.log(Level.INFO, "going to save to storage");
-        try {
+    public void saveToStorage() throws IOException{
             this.taskStorage.writeToFile(storeAllTasks);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            Logger.log(Level.WARNING, "file error");
-        }
-        Logger.log(Level.INFO, "end of processing");
     }
 
-    public ArrayList<Task> getAllTasks() {
-        try {
-            storeAllTasks = taskStorage.getAllTasks();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public ArrayList<Task> getAllTasks() throws Exception {
+        storeAllTasks = taskStorage.getAllTasks();
         return storeAllTasks; 
     }
     
@@ -167,7 +139,7 @@ public class JournalManager {
      //   System.out.println("history Index = " + historyIndex);
     }
 
-    public boolean removeTask(Task task) {
+    public boolean removeTask(Task task) throws Exception {
     	clearPastCmds();
         boolean result = false;
         getAllTasks();
@@ -179,7 +151,7 @@ public class JournalManager {
         return result;
     }
 
-    public String completeTask(Task task) {
+    public String completeTask(Task task) throws IOException {
     	clearPastCmds();
         if (task.isCompleted()) {
             return "Task " +
@@ -194,7 +166,7 @@ public class JournalManager {
         }
     }
     
-    public String uncompleteTask(Task task) {
+    public String uncompleteTask(Task task) throws IOException {
     	clearPastCmds();
         if (!task.isCompleted()) {
             return "Task " +
@@ -209,7 +181,7 @@ public class JournalManager {
         }
     }
     
-    public void incompleteTask(Task task) {
+    public void incompleteTask(Task task) throws IOException {
     	clearPastCmds();
     	for (Task current: storeAllTasks) {
     		if (task.equals(current)){
@@ -228,7 +200,7 @@ public class JournalManager {
     	}
     }
 
-    public void editTask(Task old_task, Task new_task) {
+    public void editTask(Task old_task, Task new_task) throws Exception {
     	if (old_task.toString().equals(new_task.toString())){
     	    return;
     	}else{
@@ -256,7 +228,7 @@ public class JournalManager {
     	addCommandHistory(cmd, someTask, null);
     }
 
-    public boolean undoLastCommand(){
+    public boolean undoLastCommand() throws Exception{
     	// get the last command in historyOfCommand
     	if (historyIndex > NO_COMMAND_EXECUTED_YET) {
         	newTrueCommand = false;
@@ -283,7 +255,7 @@ public class JournalManager {
     	}
     }
     
-    public boolean redoUndoCommand(){
+    public boolean redoUndoCommand() throws Exception{
     	if (historyOfCommand.size() >= 0 && historyIndex < historyOfCommand.size() - 1) {
     		newTrueCommand = false;
     		Command_Task LastCommand = historyOfCommand.get(++historyIndex);

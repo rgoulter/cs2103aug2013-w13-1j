@@ -91,7 +91,7 @@ public class EditUnitTests {
                                                               // TASKS.
         try {
             journalManager.addTask(myOldTimedTask);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -141,7 +141,7 @@ public class EditUnitTests {
                                                                        // TASKS.
         try {
             journalManager.addTask(myOldTimedTask);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -194,12 +194,12 @@ public class EditUnitTests {
         JournalManager jManager = new TemporaryJournalManager();
         try {
             jManager.addTask(new FloatingTask("Testing Item"));
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         try {
             jManager.addTask(new FloatingTask("Placeholder Item"));
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         

@@ -1,4 +1,4 @@
-//@author A0097081B, QW
+//@author A0097081B, A0105572L
 package jim.journal;
 import jim.Configuration;
 
