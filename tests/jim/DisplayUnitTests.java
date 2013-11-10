@@ -47,10 +47,18 @@ public class DisplayUnitTests {
 
        
 
-        assertEquals("-------------------- Tasks ----------------------\n" +
-                     "CS2103 Lecture\n" +
-                     "\n--------------- Completed Tasks -----------------\n",
-                     output);
+        assertEquals("-------------------- Tasks ----------------------\n" + 
+                "Timed Tasks: \n" +
+                "\n" +
+                "Deadline Tasks: \n" +
+                "\n" + 
+                "Todo: \n" +
+                "CS2103 Lecture\n" +
+                "\n--------------- Completed Tasks -----------------\n"+
+                "Timed Tasks: \n\n" +
+                "Deadline Tasks: \n\n" +
+                "Todo: \n",
+                output);
     }
 
     @Test
@@ -74,9 +82,18 @@ public class DisplayUnitTests {
     	
         assertEquals("Display of Timed Task failed",
                      "-------------------- Tasks ----------------------\n" + 
-                     "[08" + dSeparator + "11" + dSeparator + "2013] " + 
+                     "Timed Tasks: \n" +
+                     "[08" + dSeparator + "11" + dSeparator + "2013] " +
                      "[00" + tSeparator + "00 - 00" + tSeparator + "00] Birthday Party\n"+
-                     "\n--------------- Completed Tasks -----------------\n",
+                     "\n" +
+                     "Deadline Tasks: \n" +
+                     "\n" + 
+                     "Todo: \n" +
+                     "\n--------------- Completed Tasks -----------------\n"+
+                     "Timed Tasks: \n\n" +
+                     "Deadline Tasks: \n" +
+                     "\n" + 
+                     "Todo: \n",
                      output);
     }
 
@@ -98,10 +115,21 @@ public class DisplayUnitTests {
         dispCmd.execute(jManager);
 
         String output = dispCmd.getOutput();
-        assertEquals("-------------------- Tasks ----------------------\n" +
-                     "[10" + dSeparator + "10" + dSeparator + "2013] " + 
-                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
-                     "\n--------------- Completed Tasks -----------------\n", output);
+        assertEquals("-------------------- Tasks ----------------------\n" + 
+                "Timed Tasks: \n" +
+                "[10" + dSeparator + "10" + dSeparator + "2013] " + 
+                "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
+                "\n" +
+                "Deadline Tasks: \n" +
+                "\n" + 
+                "Todo: \n" +
+                "\n--------------- Completed Tasks -----------------\n"+
+                "Timed Tasks: \n\n" +
+                "Deadline Tasks: \n" +
+                "\n" + 
+                "Todo: \n",
+                output);
+                     
     }
     
     @Test
@@ -129,11 +157,20 @@ public class DisplayUnitTests {
         
         String output = dispCmd.getOutput();
         assertEquals("Display command test on multiple items failed",
-                     "-------------------- Tasks ----------------------\n" +
-                     "[10" + dSeparator + "10" + dSeparator + "2013] " + 
-                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
-                     "\n--------------- Completed Tasks -----------------\n",
-                     output);
+                             "-------------------- Tasks ----------------------\n" +
+                             "Timed Tasks: \n" +
+                             "[10" + dSeparator + "10" + dSeparator + "2013] " + 
+                             "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
+                             "\n" +
+                             "Deadline Tasks: \n" +
+                             "\n" + 
+                             "Todo: \n" +
+                             "\n--------------- Completed Tasks -----------------\n"+
+                             "Timed Tasks: \n\n" +
+                             "Deadline Tasks: \n\n" +
+                             "Todo: \n",
+                             output);
+                     
     }
 
 }

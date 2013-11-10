@@ -34,9 +34,17 @@ public class IntegrationTests {
         command.execute(jManager);
         String feedback = command.getOutput();
         
-        assertEquals("-------------------- Tasks ----------------------\n" +
-                     "hello\nworld\n" +
-                     "\n--------------- Completed Tasks -----------------\n" , feedback);
+        assertEquals("-------------------- Tasks ----------------------\n" + 
+                "Timed Tasks: \n" +
+                "\n" +
+                "Deadline Tasks: \n" +
+                "\n" + 
+                "Todo: \n" +
+                "hello\nworld\n" +
+                "\n--------------- Completed Tasks -----------------\n"+
+                "Timed Tasks: \n\n" +
+                "Deadline Tasks: \n\n" +
+                "Todo: \n" , feedback);
     }
     
     
@@ -59,9 +67,17 @@ public class IntegrationTests {
         command.execute(jManager);
         String feedback = command.getOutput();
         
-        assertEquals("-------------------- Tasks ----------------------\n" +
+        assertEquals("-------------------- Tasks ----------------------\n" + 
+                "Timed Tasks: \n" +
+                "\n" +
+                "Deadline Tasks: \n" +
+                "\n" + 
+                "Todo: \n" +
                 "hello\n" +
-                "\n--------------- Completed Tasks -----------------\n" , feedback);
+                "\n--------------- Completed Tasks -----------------\n"+
+                "Timed Tasks: \n\n" +
+                "Deadline Tasks: \n\n" +
+                "Todo: \n" , feedback);
     }
     
     
@@ -92,9 +108,17 @@ public class IntegrationTests {
         dispCmd.execute(jManager);
         
         String displayOutput = dispCmd.getOutput();
-        assertEquals("-------------------- Tasks ----------------------\n" +
-                     "\n--------------- Completed Tasks -----------------\n" +
-                     "The Second!\n", displayOutput);
+        assertEquals("-------------------- Tasks ----------------------\n" + 
+                "Timed Tasks: \n" +
+                "\n" +
+                "Deadline Tasks: \n" +
+                "\n" + 
+                "Todo: \n" +
+                "\n--------------- Completed Tasks -----------------\n"+
+                "Timed Tasks: \n\n" +
+                "Deadline Tasks: \n\n" +
+                "Todo: \n" +
+                "The Second!\n", displayOutput);
     }
 
 }
