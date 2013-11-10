@@ -73,7 +73,7 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
         						 endTime.getHourOfDay(), endTime.getMinuteOfHour(), getDescription());
     	} else {
         	return String.format(DATE_TIME_OF_TASKS_WITH_START_END_TIME, 
-        						startTime.getDayOfMonth(), startTime.getMonthOfYear(), startTime.getYear(),
+        						startTime.getDayOfMonth(), startTime.getMonthOfYear(), startTime.getYear() - CURRENT_MIILLENIUM,
 			        			startTime.getHourOfDay(), startTime.getMinuteOfHour(),
 			        			endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear() - CURRENT_MIILLENIUM,	
 								endTime.getHourOfDay(), endTime.getMinuteOfHour(),
