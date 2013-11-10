@@ -112,7 +112,7 @@ public class TemporaryJournalManager extends JournalManager {
 		    	addTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("complete")){
 		    	try {
-                    incompleteTask(LastCommand.getSomeTask());
+                    uncompleteTask(LastCommand.getSomeTask());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
