@@ -56,6 +56,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 		DATE_FIRSTWORDS_SET.addAll(RELATIVEMODIFIERS_SET);
 	}
 	
+	private static Map<String, String[]> xWordsMap = new HashMap<String, String[]>();
     private static Map<String, List<SyntaxFormat>> syntaxClassesMap = null;
     
     private String syntaxClassName;
@@ -276,38 +277,60 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     // There has to be a better way to do the following...
     
     private boolean isAddCmd(GenerationContext context, double t) {
-    	String[] addCmdWords = new String[]{"add", "create", "new", "+"};
-        return isCurrentHintFirstWordOneOf(context, t, addCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("add"));
     }
 
     private boolean isCompleteCmd(GenerationContext context, double t) {
-    	String[] completeCmdWords = new String[]{"complete", "done", "finish", "*"}; 
-        return isCurrentHintFirstWordOneOf(context, t, completeCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("complete"));
     }
 
     private boolean isUncompleteCmd(GenerationContext context, double t) {
-    	String[] uncompleteCmdWords = new String[]{"uncomplete", "undone", "unfinish", "**"}; 
-        return isCurrentHintFirstWordOneOf(context, t, uncompleteCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("uncomplete"));
     }
     
     private boolean isSearchCmd(GenerationContext context, double t) {
-    	String[] searchCmdWords = new String[]{"search", "find", "query", "?"}; 
-        return isCurrentHintFirstWordOneOf(context, t, searchCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("search"));
     }
 
     private boolean isRemoveCmd(GenerationContext context, double t) {
-    	String[] removeCmdWords = new String[]{"remove", "delete", "cancel", "-"};
-        return isCurrentHintFirstWordOneOf(context, t, removeCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("remove"));
     }
 
     private boolean isEditCmd(GenerationContext context, double t) {
-    	String[] editCmdWords = new String[]{"edit", "modify", "change", "update", ":"};
-        return isCurrentHintFirstWordOneOf(context, t, editCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("edit"));
     }
 
     private boolean isConfigureCmd(GenerationContext context, double t) {
-    	String[] configCmdWords = new String[]{"config", "configuration", "configure"};
-        return isCurrentHintFirstWordOneOf(context, t, configCmdWords); // MAGIC
+        return isCurrentHintFirstWordOneOf(context, t, getXWords("config"));
+    }
+    
+    /*
+     * This is a bit of a hack, but is less magic than what we had.
+     * 
+     * Assumes grammar definition like:
+     * <Xword> := 'a' | 'b' | 'c'...
+     * For some X, classname is "Xword",
+     * and its definitions are only literal Strings. 
+     */
+    private String[] getXWords(String x) {
+    	if (xWordsMap.containsKey(x)) {
+    		return xWordsMap.get(x);
+    	}
+    	
+    	assert syntaxClassesMap.containsKey(x + "word");
+    	
+    	List<SyntaxFormat> formats = getDefinitionsForSyntaxClassName(x + "word");
+    	String[] words = new String[formats.size()];
+    	
+    	for (int i = 0; i < words.length; i++) {
+    		assert formats.get(i).getSyntaxTerms().length == 1;
+    		assert formats.get(i).getSyntaxTerms()[0] instanceof LiteralSyntaxTerm;
+    		
+    		words[i] = ((LiteralSyntaxTerm) formats.get(i).getSyntaxTerms()[0]).getLiteralValue(); 
+    	}
+    	
+    	xWordsMap.put(x, words);
+    	return words;
     }
     
     private boolean isCurrentHintFirstWordOneOf(GenerationContext context, double t, String[] stringArray) {
