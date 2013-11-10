@@ -13,6 +13,7 @@ import org.joda.time.DateTimeComparator;
 public class JournalManager {
 	private static final int NO_COMMAND_EXECUTED_YET = -1;
 	private static final int SAME_TIME = 0;
+	private static final int CURRENT_TIME_WITHIN_TIMEFRAME = 0;
 	
 	private static final String COMMAND_ADD = "add";
 	private static final String COMMAND_EDIT = "edit";
@@ -54,6 +55,15 @@ public class JournalManager {
     	} else 
     		return false;
     }
+    
+    public boolean checkWithInTimeFrame(MutableDateTime taskStartTime, MutableDateTime taskEndTime, MutableDateTime current) {
+    	int currentTimeAfterStartDate = DateTimeComparator.getDateOnlyInstance().compare(taskStartTime,current);
+    	int currentTimeBeforeEndDate = DateTimeComparator.getDateOnlyInstance().compare(current, taskEndTime);
+    	if (currentTimeAfterStartDate < CURRENT_TIME_WITHIN_TIMEFRAME && currentTimeBeforeEndDate <= CURRENT_TIME_WITHIN_TIMEFRAME) {
+    		return true;
+    	} else 
+    		return false;
+    }
 
     public void sortAllTasks() throws Exception {
     	ArrayList<Task> upcomingTasks = this.getAllTasks();
@@ -64,10 +74,13 @@ public class JournalManager {
         
         for (Task current : upcomingTasks) {
             if (current instanceof TimedTask) {
-                MutableDateTime taskTime = ((TimedTask) current).getStartTime();    
-                if (compareDate(taskTime, today)) {
+                MutableDateTime taskStartTime = ((TimedTask) current).getStartTime();  
+                MutableDateTime taskEndTime = ((TimedTask) current).getEndTime();  
+                if (compareDate(taskStartTime, today)) {
                        upcomingTimedTask.add((TimedTask)current);
-                   }
+                } else if (checkWithInTimeFrame(taskStartTime, taskEndTime, today)) {
+                	   upcomingTimedTask.add((TimedTask)current);
+                }
             } else if (current instanceof FloatingTask) {
                 upcomingFloatingTask.add((FloatingTask)current);
             } else if (current instanceof DeadlineTask) {
@@ -119,7 +132,7 @@ public class JournalManager {
         } catch (Exception e) {
             return FILE_ERROR;
         }
-        String output = DESCRIPTION_UPCOMING_TASKS + getDeadlineTaskString() + getTimedTaskString() + DESCRIPTION_TODO + getFloatingString();
+        String output = DESCRIPTION_UPCOMING_TASKS + getTimedTaskString() + getDeadlineTaskString() + DESCRIPTION_TODO + getFloatingString();
         return output;
     }
 

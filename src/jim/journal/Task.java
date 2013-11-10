@@ -1,4 +1,4 @@
-
+// All members have edited this class
 package jim.journal;
 
 public abstract class Task {

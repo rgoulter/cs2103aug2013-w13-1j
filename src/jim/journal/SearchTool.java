@@ -9,6 +9,9 @@ import org.joda.time.MutableDateTime;
 
 
 public class SearchTool {
+	private static final int CURRENT_TIME_WITHIN_TIMEFRAME = 0;
+	private static final int SAME_TIME = 0;
+	
     ArrayList<Task> AllTasks = new ArrayList<Task>();
     JournalManager JManager;
     SearchTool theOne;
@@ -31,6 +34,7 @@ public class SearchTool {
        }
        return matchingTasks;
    }
+   
    public ArrayList<Task> searchByNonStrictDescription(String KeyWord, ArrayList<Task> tasks){
        ArrayList<Task> matchingTasks = new ArrayList<Task>();
        for (Task task : tasks) {  
@@ -62,12 +66,50 @@ public class SearchTool {
     }
     
     //return task whoever has a date that matches the given date.
-    public Task  compareDate(MutableDateTime taskTime, Task current, MutableDateTime dateLimit) {
+    public Task compareDate(MutableDateTime taskTime, Task current, MutableDateTime dateLimit) {
         if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0) {
             return current;
         }else{
             return null;
         }
+    }
+    
+    //@author A0097081B
+    public boolean checkWithInTimeFrame(MutableDateTime taskStartTime, MutableDateTime taskEndTime, MutableDateTime current) {
+    	int currentTimeAfterStartDate = DateTimeComparator.getDateOnlyInstance().compare(taskStartTime,current);
+    	int currentTimeBeforeEndDate = DateTimeComparator.getDateOnlyInstance().compare(current, taskEndTime);
+    	if (currentTimeAfterStartDate < CURRENT_TIME_WITHIN_TIMEFRAME && currentTimeBeforeEndDate <= CURRENT_TIME_WITHIN_TIMEFRAME) {
+    		return true;
+    	} else 
+    		return false;
+    }
+   
+    //@author A0097081B
+    public boolean compareDate(MutableDateTime taskTime, MutableDateTime current) {
+    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == SAME_TIME) {
+    		return true;
+    	} else 
+    		return false;
+    }
+    
+    //@author A0097081B
+    public ArrayList<Task> searchByDateWithinTimeFrame (MutableDateTime dateLimit){
+        ArrayList<Task> matchingTasks = new ArrayList<Task>();
+        for (Task current : AllTasks) {
+                if (current instanceof TimedTask) {
+                    MutableDateTime taskStartTime =((TimedTask) current).getStartTime();
+                    MutableDateTime taskEndTime =((TimedTask) current).getEndTime();
+                    if (checkWithInTimeFrame(taskStartTime, taskEndTime, dateLimit)){
+                    	matchingTasks.add(current);
+                    }
+                } else if (current instanceof DeadlineTask){ 
+                    MutableDateTime taskTime =((DeadlineTask) current).getEndDate();
+                    if (compareDate(taskTime, dateLimit)){
+                        matchingTasks.add(current);
+                    }
+                }
+        }
+        return matchingTasks;
     }
     
     public ArrayList<Task> searchByDate(MutableDateTime dateLimit){
@@ -89,6 +131,7 @@ public class SearchTool {
         }
         return matchingTasks;
     }
+    
     public ArrayList<Task> searchByDate(MutableDateTime dateLimit, ArrayList<Task> tasks){
         ArrayList<Task> matchingTasks = new ArrayList<Task>();
         for (Task current : tasks) {
