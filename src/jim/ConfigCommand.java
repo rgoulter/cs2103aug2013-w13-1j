@@ -42,6 +42,18 @@ public class ConfigCommand extends jim.journal.Command {
         this(null, null);
     }
     
+    public static String[] getValidArguments() {
+    	// This is a bit magic, but not much more than 
+    	// the way Configuration and ConfigCommand have
+    	// already been implemented.
+    	
+    	// see execute() for why these values are these.
+    	return new String[]{"reset",
+	                        "outputfilename",
+	                        "dateseparator",
+	                        "timeseparator"};
+    }
+    
     @Override
     public String execute(JournalManager journalManager) {        
         if (selectedConfiguration == null) {

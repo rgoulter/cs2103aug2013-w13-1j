@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import jim.ConfigCommand;
 import static jim.util.StringUtils.filterMatchBySubseq;
 import static jim.util.StringUtils.filterSmartCaseMatchBySubseq;
 
@@ -223,10 +224,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         int numWordsSoFar = currentHint.getWords().length;
         
         Set<String> configurationWords = new HashSet<String>();
-        configurationWords.addAll(Arrays.asList(new String[]{"outputfilename",
-                                                             "dateseparator",
-                                                             "timeseparator",
-                                                             "reset"}));
+        configurationWords.addAll(Arrays.asList(ConfigCommand.getValidArguments()));
 
         String suggestedWord = numWordsSoFar == 1 ?
                                generateSuggestionWord(configurationWords, subseqParts[numWordsSoFar], t) :
