@@ -39,12 +39,12 @@ public class IntegrationTests {
                 "\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
-                "Todo: \n" +
+                "To-Do Tasks: \n" +
                 "hello\nworld\n" +
                 "\n--------------- Completed Tasks -----------------\n"+
                 "Timed Tasks: \n\n" +
                 "Deadline Tasks: \n\n" +
-                "Todo: \n" , feedback);
+                "To-Do Tasks: \n" , feedback);
     }
     
     
@@ -72,12 +72,12 @@ public class IntegrationTests {
                 "\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
-                "Todo: \n" +
+                "To-Do Tasks: \n" +
                 "hello\n" +
                 "\n--------------- Completed Tasks -----------------\n"+
                 "Timed Tasks: \n\n" +
                 "Deadline Tasks: \n\n" +
-                "Todo: \n" , feedback);
+                "To-Do Tasks: \n" , feedback);
     }
     
     
@@ -113,11 +113,11 @@ public class IntegrationTests {
                 "\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
-                "Todo: \n" +
+                "To-Do Tasks: \n" +
                 "\n--------------- Completed Tasks -----------------\n"+
                 "Timed Tasks: \n\n" +
                 "Deadline Tasks: \n\n" +
-                "Todo: \n" +
+                "To-Do Tasks: \n" +
                 "The Second!\n", displayOutput);
     }
 

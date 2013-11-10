@@ -16,7 +16,7 @@ public class DisplayCommand extends Command {
     private static final String INFO_COMPLETED_TASK_TITLE = "\n--------------- Completed Tasks -----------------";
     private static final String CATEGORY_TIMED_TASKS = "Timed Tasks: ";
     private static final String CATEGORY_DEADLINE_TASKS = "\nDeadline Tasks: ";
-    private static final String CATEGORY_FLOATING_TASKS = "\nTodo: ";
+    private static final String CATEGORY_FLOATING_TASKS = "\nTo-Do Tasks: ";
     
     MutableDateTime date;
     JournalManager MyJournalManager;

@@ -52,12 +52,12 @@ public class DisplayUnitTests {
                 "\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
-                "Todo: \n" +
+                "To-Do Tasks: \n" +
                 "CS2103 Lecture\n" +
                 "\n--------------- Completed Tasks -----------------\n"+
                 "Timed Tasks: \n\n" +
                 "Deadline Tasks: \n\n" +
-                "Todo: \n",
+                "To-Do Tasks: \n",
                 output);
     }
 
@@ -88,12 +88,12 @@ public class DisplayUnitTests {
                      "\n" +
                      "Deadline Tasks: \n" +
                      "\n" + 
-                     "Todo: \n" +
+                     "To-Do Tasks: \n" +
                      "\n--------------- Completed Tasks -----------------\n"+
                      "Timed Tasks: \n\n" +
                      "Deadline Tasks: \n" +
                      "\n" + 
-                     "Todo: \n",
+                     "To-Do Tasks: \n",
                      output);
     }
 
@@ -122,12 +122,12 @@ public class DisplayUnitTests {
                 "\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
-                "Todo: \n" +
+                "To-Do Tasks: \n" +
                 "\n--------------- Completed Tasks -----------------\n"+
                 "Timed Tasks: \n\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
-                "Todo: \n",
+                "To-Do Tasks: \n",
                 output);
                      
     }
@@ -164,11 +164,11 @@ public class DisplayUnitTests {
                              "\n" +
                              "Deadline Tasks: \n" +
                              "\n" + 
-                             "Todo: \n" +
+                             "To-Do Tasks: \n" +
                              "\n--------------- Completed Tasks -----------------\n"+
                              "Timed Tasks: \n\n" +
                              "Deadline Tasks: \n\n" +
-                             "Todo: \n",
+                             "To-Do Tasks: \n",
                              output);
                      
     }
