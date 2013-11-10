@@ -1,9 +1,14 @@
+//@author A0097081B
 package jim.journal;
-
-
 
 public class UndoCommand extends Command{
     private static final String FILE_ERROR = "FILE_ERROR";
+    private static final String COMMAND_UNDO = "Undo";
+    private static final String MESSAGE_SUCCESSFUL = "Undo Successful";
+    private static final String MESSAGE_UNSUCCESSFUL = "Undo Unsuccessful";
+    private static final String EXECUTION_STATUS_SUCCESS = "Success";
+    private static final String EXECUTION_STATUS_FAIL = "Failure";
+    
     public UndoCommand() {
     }
     @Override
@@ -11,15 +16,15 @@ public class UndoCommand extends Command{
         // TODO Auto-generated method stub
         try {
             if (journalManager.undoLastCommand()) {
-              outputln("Undo Successful");
-              return "Success";
+              outputln(MESSAGE_SUCCESSFUL);
+              return EXECUTION_STATUS_SUCCESS;
             } else {
-              outputln("Undo Unsuccessful");
-              return "Failure";
+              outputln(MESSAGE_UNSUCCESSFUL);
+              return EXECUTION_STATUS_FAIL;
             }
         } catch (Exception e) {
             outputln(FILE_ERROR);
-            return "Failure";
+            return EXECUTION_STATUS_FAIL;
         }
       
     }
@@ -35,7 +40,7 @@ public class UndoCommand extends Command{
     }
     
     public String toString() {
-        return "Undo";
+        return COMMAND_UNDO;
     }
 
 }

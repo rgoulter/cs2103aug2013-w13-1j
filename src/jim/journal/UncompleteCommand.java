@@ -1,19 +1,26 @@
+//@author A0097081B
 package jim.journal;
 
 import java.util.ArrayList;
 
 import org.joda.time.MutableDateTime;
 
-
-
 public class UncompleteCommand extends Command {
     private static final String FILE_ERROR = "FILE_ERROR";
+    private static final String COMMAND_UNCOMPLETE = "Uncomplete";
+    private static final String MESSAGE_DESCRIPTION_MISMATCH = "Description was not matched.";
+    private static final String MESSAGE_INDEX_SELECTION = "Type in just the index of tasks you wish to process. Please seperate them by ','";
+    private static final String MESSAGE_INDEX_FOUND_ITEM = "%d, %s";
+    private static final String EXECUTION_STATUS_SUCCESS = "Success";
+    private static final String EXECUTION_STATUS_PENDING = "Pending";
+    private static final String EXECUTION_STATUS_FAILURE = "Failure";
     
     String description;
     MutableDateTime EndDate;
     JournalManager JM;
     ArrayList<Task> taskToUncomplete = new ArrayList<Task>();
     ArrayList<Task> matchingTasks = new ArrayList<Task>();
+    
     public UncompleteCommand(String des) {
         description = des;
     }
@@ -29,29 +36,29 @@ public class UncompleteCommand extends Command {
             searchTool = new SearchTool(JM);
         } catch (Exception e) {
             outputln(FILE_ERROR);
-            return "Failure";
+            return EXECUTION_STATUS_FAILURE;
         }
         
-        if (description != null){
+        if (description != null ){
             matchingTasks = searchTool.searchByNonStrictDescription(description);
-        } else if (EndDate != null){
+        } else if (EndDate != null ){
             matchingTasks = searchTool.searchByDate(EndDate);
         }
           
         if (matchingTasks.size() == 0){
-            outputln("Description was not matched.");
-            return "Success";
+            outputln(MESSAGE_DESCRIPTION_MISMATCH);
+            return EXECUTION_STATUS_SUCCESS;
         } else if (matchingTasks.size() == 1){
         	taskToUncomplete.add(matchingTasks.get(0));
             executeHelper();
-            return "Success";
+            return EXECUTION_STATUS_SUCCESS;
         } else {
-            outputln( "Type in just the index of tasks you wish to process. Please seperate them by ','");
+            outputln(MESSAGE_INDEX_SELECTION);
             for (int i = 0; i < matchingTasks.size(); i++){
                 Task task = matchingTasks.get(i);
-                outputln(i + ", " + task.toString());
+                outputln(String.format(MESSAGE_INDEX_FOUND_ITEM, i, task.toString()));
             }
-            return "Pending";
+            return EXECUTION_STATUS_PENDING;
         }
     }
             
@@ -65,11 +72,11 @@ public class UncompleteCommand extends Command {
                int j = Integer.parseInt(IndexesOfTasks[i]);
                taskToUncomplete.add(matchingTasks.get(j));
             } catch (NumberFormatException e){
-                return "Pending";
+                return EXECUTION_STATUS_PENDING;
             }
         }
         executeHelper();
-        return "Success";
+        return EXECUTION_STATUS_SUCCESS;
     }
     
     @Override
@@ -87,13 +94,13 @@ public class UncompleteCommand extends Command {
                 outputln(FILE_ERROR);
                 return ;
             }
-            JM.addCommandHistory("uncomplete", t);
+            JM.addCommandHistory(COMMAND_UNCOMPLETE, t);
             outputln(feedback);
         }
     }
     
     public String toString() {
-        return "uncomplete";
+        return COMMAND_UNCOMPLETE;
     }
 
 }
