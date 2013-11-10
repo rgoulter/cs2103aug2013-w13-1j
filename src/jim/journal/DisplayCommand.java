@@ -54,6 +54,7 @@ public class DisplayCommand extends Command {
         }
         if (date != null){
             matchingTasks = searchTool.searchByDate(date);
+            matchingTasks.addAll(searchTool.searchByDateWithinTimeFrame(date));
         } else {
             matchingTasks = searchTool.getAllTasks();
         }

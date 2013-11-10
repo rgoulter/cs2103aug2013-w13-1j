@@ -15,7 +15,7 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
     private static final String TASK_NAME_DEADLINE = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d] " + "[%02d" + TIME_SEPARATOR + "%02d] %s";
     private static final String EDIT_TASK_NAME_DEADLINE = "%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d" + " %02d" + TIME_SEPARATOR + "%02d %s";
-    private static final int YearHelper = 2000;
+    private static final int CURRENT_MIILLENIUM = 2000;
 
     private static final int DEFAULT_HOUR = 23;
 
@@ -47,12 +47,13 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
     }
 
     public String toString() {
-    	return String.format(TASK_NAME_DEADLINE, endDate.getDayOfMonth(), endDate.getMonthOfYear(), endDate.getYear(),
-    						endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
+    	return String.format(TASK_NAME_DEADLINE, endDate.getDayOfMonth(), endDate.getMonthOfYear(), endDate.getYear() - CURRENT_MIILLENIUM,
+    						endDate.getHourOfDay(), endDate.getMinuteOfHour(), getDescription());
     }
 
     public String toStringForEditCommand() {
-        return String.format(EDIT_TASK_NAME_DEADLINE, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear()-YearHelper, endDate.getHourOfDay(), endDate.getMinuteOfHour(), getDescription());
+        return String.format(EDIT_TASK_NAME_DEADLINE, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear() - CURRENT_MIILLENIUM, 
+        					 endDate.getHourOfDay(), endDate.getMinuteOfHour(), getDescription());
     }
 
     @Override

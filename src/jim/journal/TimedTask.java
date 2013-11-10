@@ -1,11 +1,10 @@
-
+//@author A0097081B
 package jim.journal;
 import jim.Configuration;
 
 import org.joda.time.DateTimeComparator;
 import org.joda.time.MutableDateTime;
 import org.joda.time.chrono.ISOChronology;
-
 
 public class TimedTask extends Task implements Comparable<TimedTask>{
 
@@ -15,8 +14,14 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
     private static Configuration configManager = Configuration.getConfiguration();
     private static final String DATE_SEPARATOR = configManager.getDateSeparator();
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
-
-
+    private static final String DATE_TIME_OF_TASKS_WITH_START_END_TIME = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
+            															 " [%02d" + TIME_SEPARATOR + "%02d]"+  " - " +
+            															 "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
+            															 " [%02d" + TIME_SEPARATOR + "%02d]" + " %s";
+    private static final String DATE_TIME_OF_TASKS_WITHOUT_START_TIME = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
+            														  " [%02d" + TIME_SEPARATOR + "%02d] %s";
+    
+    private static final int CURRENT_MIILLENIUM = 2000;
     public TimedTask(MutableDateTime startTime, MutableDateTime endTime, String desc) {
         // Tasks with both start and end date and time.
         this.startTime = startTime;
@@ -61,26 +66,25 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
 
 
     public String toString() {
-    	String taskName = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
-    	                  " [%02d" + TIME_SEPARATOR + "%02d - %02d" + TIME_SEPARATOR + "%02d] %s";
-    	String taskNameNoStartTime = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
-                                     " [%02d" + TIME_SEPARATOR + "%02d] %s";
+    	
     	if (this.startTime == null) {
-        	return String.format(taskNameNoStartTime, 
-        						 endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
+        	return String.format(DATE_TIME_OF_TASKS_WITHOUT_START_TIME, 
+        						 endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear() - CURRENT_MIILLENIUM,
         						 endTime.getHourOfDay(), endTime.getMinuteOfHour(), getDescription());
     	} else {
-        	return String.format(taskName, endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
-					startTime.getHourOfDay(), startTime.getMinuteOfHour(),
-					endTime.getHourOfDay(), endTime.getMinuteOfHour(),
-					getDescription());
+        	return String.format(DATE_TIME_OF_TASKS_WITH_START_END_TIME, 
+        						startTime.getDayOfMonth(), startTime.getMonthOfYear(), startTime.getYear(),
+			        			startTime.getHourOfDay(), startTime.getMinuteOfHour(),
+			        			endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear() - CURRENT_MIILLENIUM,	
+								endTime.getHourOfDay(), endTime.getMinuteOfHour(),
+								getDescription());
     	}
     }
     
     //@author A0105572L
     public String toStringForEditCommand(){
         String taskName = "%02d/%02d/%02d %02d:%02d to %02d:%02d %s";
-        return String.format(taskName, endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear()-2000,
+        return String.format(taskName, endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear() - CURRENT_MIILLENIUM,
                     startTime.getHourOfDay(), startTime.getMinuteOfHour(),
                     endTime.getHourOfDay(), endTime.getMinuteOfHour(),
                     getDescription());
@@ -104,9 +108,7 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
         }
         return false;
     }
-
-
-
+    
     @Override
     public int hashCode() {
         return startTime.hashCode() *
