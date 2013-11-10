@@ -19,20 +19,7 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 
     private static final Set<String> TIME_HHMM_SET = new HashSet<String>();
     
-    {
-    	// Add to TIME_HHMM_SET, all strings from 00:00 to 23:59
-    	for (int hh = 0; hh < 24; hh++) {
-    		for (int mm = 0; mm < 60; mm++) {
-    			TIME_HHMM_SET.add(String.format("%02d:%02d", hh, mm));
-    		}
-    	}
-    }
-    
     private static final Set<String> TIME_FIRSTWORDS_SET = new HashSet<String>();
-    
-    {
-    	TIME_FIRSTWORDS_SET.addAll(TIME_HHMM_SET);
-    }
     
 	private static final String[] MONTH_WORDS =
     	    new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}; // MAGIC
@@ -48,13 +35,6 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
 	private static final Set<String> RELATIVEMODIFIERS_SET = new HashSet<String>(Arrays.asList(RELATIVEMODIFIERS_WORDS));
 	
 	private static final Set<String> DATE_FIRSTWORDS_SET = new HashSet<String>();
-	
-	{
-		DATE_FIRSTWORDS_SET.addAll(MONTHNAMES_SET);
-		DATE_FIRSTWORDS_SET.addAll(DAYSOFWEEK_SET);
-		DATE_FIRSTWORDS_SET.addAll(RELATIVEDAYS_SET);
-		DATE_FIRSTWORDS_SET.addAll(RELATIVEMODIFIERS_SET);
-	}
 	
 	private static Map<String, String[]> xWordsMap = new HashMap<String, String[]>();
     private static Map<String, List<SyntaxFormat>> syntaxClassesMap = null;
@@ -110,8 +90,21 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         Set<String> wordsFromCurrentTasks = context.getAllWordsFromCurrentTasks();
         return generateSuggestionHintFromSetOfWords(context, t, wordsFromCurrentTasks, 1);
     }
+    
+    private static void ensureDateSuggestionSetPopulated() {
+    	if (!DATE_FIRSTWORDS_SET.isEmpty()) {
+    		return;
+    	}
+
+		DATE_FIRSTWORDS_SET.addAll(MONTHNAMES_SET);
+		DATE_FIRSTWORDS_SET.addAll(DAYSOFWEEK_SET);
+		DATE_FIRSTWORDS_SET.addAll(RELATIVEDAYS_SET);
+		DATE_FIRSTWORDS_SET.addAll(RELATIVEMODIFIERS_SET);
+    }
 
     private SuggestionHint generateDateSuggestionHint(GenerationContext context, double t) {
+    	ensureDateSuggestionSetPopulated();
+    	
         SuggestionHint currentHint = context.getCurrentGeneratedHint();
         int numWordsSoFar = currentHint.getWords().length;
         
@@ -168,7 +161,24 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         return generatedHint;
     }
     
+    private static void ensureTimeSuggestionSetPopulated() {
+    	if(!TIME_FIRSTWORDS_SET.isEmpty()){
+    		return;
+    	}
+    	
+    	// Add to TIME_HHMM_SET, all strings from 00:00 to 23:59
+    	for (int hh = 0; hh < 24; hh++) {
+    		for (int mm = 0; mm < 60; mm++) {
+    			TIME_HHMM_SET.add(String.format("%02d:%02d", hh, mm));
+    		}
+    	}
+    
+    	TIME_FIRSTWORDS_SET.addAll(TIME_HHMM_SET);
+    }
+    
     private SuggestionHint generateTimeSuggestionHint(GenerationContext context, double t) {
+    	ensureTimeSuggestionSetPopulated();
+    	
         SuggestionHint currentHint = context.getCurrentGeneratedHint();
         int numWordsSoFar = currentHint.getWords().length;
         
