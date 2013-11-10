@@ -3,6 +3,7 @@ package jim.suggestions;
 import static jim.util.StringUtils.isStringSurroundedBy;
 import static jim.util.StringUtils.stripStringPrefixSuffix;
 
+//@author A0088816N
 abstract class SyntaxTerm {
     public abstract boolean matches(String s);
 

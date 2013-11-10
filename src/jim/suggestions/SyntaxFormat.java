@@ -9,6 +9,7 @@ import static jim.util.StringUtils.join;
  * e.g. Strings like:
  * "'add' <date> <time> <description>"
  */
+//@author A0088816N
 class SyntaxFormat {
 	private SyntaxTerm[] syntaxTerms;
 	

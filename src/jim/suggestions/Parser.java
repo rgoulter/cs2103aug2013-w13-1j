@@ -21,6 +21,7 @@ import static jim.suggestions.SyntaxParsers.SyntaxParserKey;
 import static jim.suggestions.SyntaxParsers.SyntaxParser;
 import static jim.suggestions.SyntaxParsers.initSyntaxParsers;
 
+//@author A0088816N
 public class Parser {
     
     private final static Logger LOGGER = Logger.getLogger(Parser.class .getName()); 

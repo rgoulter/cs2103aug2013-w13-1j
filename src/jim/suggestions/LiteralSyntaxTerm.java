@@ -1,5 +1,6 @@
 package jim.suggestions;
 
+//@author A0088816N
 class LiteralSyntaxTerm extends SyntaxTerm {
     private String literalValue;
 

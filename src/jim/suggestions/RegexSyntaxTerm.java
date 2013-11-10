@@ -3,6 +3,7 @@ package jim.suggestions;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//@author A0088816N
 class RegexSyntaxTerm extends SyntaxTerm {
     private Pattern regexPattern;
 

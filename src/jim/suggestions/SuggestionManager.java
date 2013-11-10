@@ -39,6 +39,7 @@ import static jim.util.StringUtils.isSubsequenceMatch;
 
 
 
+//@author A0088816N
 public class SuggestionManager {
     private int highlightedLine = 0;
     private String filteringSubsequence = "";
