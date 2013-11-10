@@ -2,89 +2,42 @@
 package jim.journal;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import jim.Configuration;
-
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
 
 public class JournalManager {
-	private static final int NO_COMMAND_EXECUTED_YET = -1;
-	private static Configuration configManager = Configuration.getConfiguration();
-	
+
+    private static Configuration configManager = Configuration.getConfiguration();
+    private TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
-    TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
-    private int historyIndex = NO_COMMAND_EXECUTED_YET; 
-    
+    private static final int NO_COMMAND_EXECUTED_YET = -1;
+    private int historyIndex = NO_COMMAND_EXECUTED_YET;
     private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
     private boolean newTrueCommand = true;
-    
-    private static Logger Logger = java.util.logging.Logger.getLogger("JournalManager");
+    private String TASKTITILE_ONE = "Upcoming Events:\n";
+    private String TASKTITILE_TWO = "\n\nTodo:\n";
+    private String STRING_INITIAL = "";
+    private String END_OF_LINE = "\n";
+    private String SIGN_FOR_COMPLETED_TASK = "[DONE] ";
+    private int ZERO_FOR_COMPARE = 0;
      
     /**
      * Returns a String representation of the current Journal state.
      * 
-     * @return
      */
-    /*  This method is to reduce the time of read through the storage file every time when want to change the content.
-     *  However, if we choose to use this method, the storeAllTasks will only be written to file when exit.
-     */
-   
-    public void initializeJournalManager(){
-        
-        try {
-            storeAllTasks = taskStorage.getAllTasks();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    
-    public boolean compareDate(MutableDateTime taskTime, MutableDateTime current) {
-    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == 0) {
+
+    public boolean compareDate(MutableDateTime taskTime, MutableDateTime currentTime) {
+    	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, currentTime) == ZERO_FOR_COMPARE) {
     		return true;
-    	} else return false;
+    	} else {
+    	    return false;
+    	}
     }
     
-    /*public String getDisplayString() {
-
-        List<Task> upcomingTasks = this.getAllTasks();
-        String timedTasks = "", floatingTasks = "", deadlineTasks = "";
-        String output = "Upcoming Events:\n";
-
-        MutableDateTime today = new MutableDateTime();
-
-        for (Task current : upcomingTasks) {
-            if (current instanceof TimedTask) {
-            	MutableDateTime taskTime = ((TimedTask) current).getStartTime();    
-                if (compareDate(taskTime, today)) {
-     				   timedTasks = timedTasks + current.toString() + "\n";
-     			   }
-            } else if (current instanceof FloatingTask) {
-                if (current.isCompleted()){
-                    floatingTasks = floatingTasks + "[DONE] "+ current.toString() +"\n";
-                }else{
-                    floatingTasks = floatingTasks + current.toString() + "\n";
-                }
-            } else if (current instanceof DeadlineTask) {
-            	MutableDateTime taskTime = ((DeadlineTask) current).getEndDate();    
-                if (compareDate(taskTime, today)) {
-                	deadlineTasks = deadlineTasks + current.toString() + "\n";
-     			   }
-            }
-
-        }
-
-        output = output + deadlineTasks + timedTasks + "\n\nTodo:\n" + floatingTasks;
-        return output;
-    }*/
     public String getDisplayString() {
 
         ArrayList<Task> upcomingTasks = this.getAllTasks();
@@ -92,8 +45,8 @@ public class JournalManager {
         ArrayList<DeadlineTask> upcomingDeadlineTask = new ArrayList<DeadlineTask>();
         ArrayList<FloatingTask> upcomingFloatingTask = new ArrayList<FloatingTask>();
         
-        String timedTasks = "", floatingTasks = "", deadlineTasks = "";
-        String output = "Upcoming Events:\n";
+        String timedTasks = STRING_INITIAL, floatingTasks = STRING_INITIAL, deadlineTasks = STRING_INITIAL;
+        String output = TASKTITILE_ONE;
 
         MutableDateTime today = new MutableDateTime();
 
@@ -115,33 +68,31 @@ public class JournalManager {
         }
         sortTimedTask(upcomingTimedTask);
         sortDeadlineTask(upcomingDeadlineTask);
-        sortFloatingTask(upcomingFloatingTask);
+      
         for (TimedTask task : upcomingTimedTask){
-            timedTasks = timedTasks + task.toString() + "\n";
+            timedTasks = timedTasks + task.toString() + END_OF_LINE;
         }
         for (DeadlineTask task : upcomingDeadlineTask){
-            deadlineTasks = deadlineTasks + task.toString() + "\n";
+            deadlineTasks = deadlineTasks + task.toString() + END_OF_LINE;
         }
         for (FloatingTask task : upcomingFloatingTask){
             if (task.isCompleted()){
-                floatingTasks = floatingTasks + "[DONE] "+ task.toString() +"\n";
+                floatingTasks = floatingTasks + SIGN_FOR_COMPLETED_TASK+ task.toString() +END_OF_LINE;
             }else{
-                floatingTasks = task.toString() + "\n" + floatingTasks;
+                floatingTasks = task.toString() + END_OF_LINE + floatingTasks;
             }
         }
-        output = output + deadlineTasks + timedTasks + "\n\nTodo:\n" + floatingTasks;
+        output = output + deadlineTasks + timedTasks + TASKTITILE_TWO + floatingTasks;
         return output;
     }
 
     public void saveToStorage(){
-        Logger.log(Level.INFO, "going to save to storage");
+        
         try {
             this.taskStorage.writeToFile(storeAllTasks);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            Logger.log(Level.WARNING, "file error");
+            e.printStackTrace();
         }
-        Logger.log(Level.INFO, "end of processing");
     }
 
     public ArrayList<Task> getAllTasks() {
@@ -350,7 +301,5 @@ public class JournalManager {
     public void sortDeadlineTask(ArrayList<DeadlineTask> deadlineTasks){
         Collections.sort(deadlineTasks);
     }
-    public void sortFloatingTask(ArrayList<FloatingTask> floatingTasks){
-        
-    }
+    
 }

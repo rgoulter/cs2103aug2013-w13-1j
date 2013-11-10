@@ -13,13 +13,8 @@ public class SearchTool {
     SearchTool theOne;
     public SearchTool(JournalManager journal){
         JManager = journal;
-        
         AllTasks = JManager.getAllTasks();
-        
     }
-   public void setJournalManager(JournalManager JM){
-       this.JManager = JM;
-   }
     
     /*
      * SearchTool methods which are supposed to be used by Command class and SuggestionManager.
