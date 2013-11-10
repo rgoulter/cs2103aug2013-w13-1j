@@ -12,15 +12,6 @@ public abstract class Command {
         outputStringBuilder = new StringBuilder();
     }
     
-    public String getCommandState(){
-        return ExecutionState;
-    }
-    
-    //Can only be "Pending", "Failure" or "Success". 
-    public void changeCommandState(String d){
-        ExecutionState = d;
-    }
-    
     public abstract String execute(JournalManager journalManager);
     
     public abstract String secondExecute(String secondInput);
