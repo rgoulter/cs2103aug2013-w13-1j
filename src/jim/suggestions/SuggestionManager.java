@@ -206,7 +206,7 @@ public class SuggestionManager {
 	    			generatedSuggestionHintsSet.add(hint);
 	    			added = true;
 	    		} else {
-	    			LOGGER.info("Filtering out Hint: " + hint +
+	    			LOGGER.finer("Filtering out Hint: " + hint +
                                 " match '" + filteringSubsequence + "'? " + matchesSubseq + " uniq? " + !isDuplicate);
 	    		}
     		}
@@ -249,8 +249,8 @@ public class SuggestionManager {
         
     	GenerationContext genCtx = getGenerationContext();
     	SuggestionHint hint = syntaxFormats.get(i).generate(genCtx, rnd);
-    	LOGGER.info("Generating for format: " + syntaxFormats.get(i).toString());
-		LOGGER.info("Generating Hint: " + hint);
+    	LOGGER.finer("Generating for format: " + syntaxFormats.get(i).toString());
+		LOGGER.finer("Generating Hint: " + hint);
     	return hint;
     }
     
