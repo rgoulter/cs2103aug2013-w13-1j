@@ -1,4 +1,4 @@
-
+//@author A0105572L
 package jim;
 
 import static org.junit.Assert.*;
@@ -44,12 +44,8 @@ public class SearchUnitTests {
         searchCmd.execute(jManager);
 
         String output = searchCmd.getOutput();
-        boolean result = false;
-
-        if (output.equals("Search term 'Tutorial' was not found.\n")) {
-            result = true;
-        }
-        assertTrue("Search for absent item has failed", result);
+        
+        assertEquals("Search term 'Tutorial' was not found.\n", output);
     }
 
 

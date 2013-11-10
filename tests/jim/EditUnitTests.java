@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -88,15 +89,23 @@ public class EditUnitTests {
 
         JournalManager journalManager = new TemporaryJournalManager(); // Empty; NO
                                                               // TASKS.
-        journalManager.addTask(myOldTimedTask);
+        try {
+            journalManager.addTask(myOldTimedTask);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         EditCommand editCmd = new EditCommand("MyOldTask", expectedNewTimedTask);
         String commandStatus = editCmd.execute(journalManager);
 
         // This works since, if we have only one Task, then this will be at 0.
         // And if the EditCommand worked, it will replace the task..
-        assertEquals("The task was not changed correctly in the JournalManager",
-                     "MyNewTask", journalManager.getAllTasks().get(0).getDescription());
+        try {
+            assertEquals("The task was not changed correctly in the JournalManager",
+                         "MyNewTask", journalManager.getAllTasks().get(0).getDescription());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
         // Check to see that the correct output is given to the user
         assertEquals("Output produced does not match expected output",
@@ -130,7 +139,11 @@ public class EditUnitTests {
 
         JournalManager journalManager = new TemporaryJournalManager(); // Empty; NO
                                                                        // TASKS.
-        journalManager.addTask(myOldTimedTask);
+        try {
+            journalManager.addTask(myOldTimedTask);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         EditCommand editCmd = new EditCommand("MyOldTask");
         String executionStatus = editCmd.execute(journalManager);
@@ -165,8 +178,12 @@ public class EditUnitTests {
                      "[00" + tSeparator + "00 - 23" + tSeparator + "59] MyNewTask\n",
                      feedback);
         
-        assertEquals("The task was not changed correctly in the JournalManager",
-                     "MyNewTask", journalManager.getAllTasks().get(0).getDescription());
+        try {
+            assertEquals("The task was not changed correctly in the JournalManager",
+                         "MyNewTask", journalManager.getAllTasks().get(0).getDescription());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
     }
 
@@ -175,8 +192,16 @@ public class EditUnitTests {
     @Test
     public void testStrictSyntaxEditCommandThreePartsCanExecute() {
         JournalManager jManager = new TemporaryJournalManager();
-        jManager.addTask(new FloatingTask("Testing Item"));
-        jManager.addTask(new FloatingTask("Placeholder Item"));
+        try {
+            jManager.addTask(new FloatingTask("Testing Item"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            jManager.addTask(new FloatingTask("Placeholder Item"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
         EditCommand editCmd = new EditCommand("Item");
         String executionStatus = editCmd.execute(jManager);
@@ -209,8 +234,12 @@ public class EditUnitTests {
         assertEquals("Edit Command did not return expected output",
                      "The following task is edited\n" + 
                      "Testing Item\nTo\nTesting Edit\n", commandOutput);
-        assertEquals("The task was not changed correctly in the JournalManager",
-                     "Testing Edit", jManager.getAllTasks().get(1).getDescription());
+        try {
+            assertEquals("The task was not changed correctly in the JournalManager",
+                         "Testing Edit", jManager.getAllTasks().get(1).getDescription());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
     }
     @Test

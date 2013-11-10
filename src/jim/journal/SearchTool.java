@@ -1,3 +1,4 @@
+//@author A0105572L
 package jim.journal;
 
 import java.util.ArrayList;
@@ -11,18 +12,16 @@ public class SearchTool {
     ArrayList<Task> AllTasks = new ArrayList<Task>();
     JournalManager JManager;
     SearchTool theOne;
-    public SearchTool(JournalManager journal){
+    public SearchTool(JournalManager journal) throws Exception{
         JManager = journal;
         AllTasks = JManager.getAllTasks();
     }
     
     /*
-     * SearchTool methods which are supposed to be used by Command class and SuggestionManager.
-     * 
-     * TODO: Welcome to add new search method when needed.
-     * 
+     * SearchTool methods which are supposed to be used by Command class
      */
- //return all the tasks that contains the key word.
+    
+   //return all the tasks that contains the key word.
    public ArrayList<Task> searchByNonStrictDescription(String KeyWord){
        ArrayList<Task> matchingTasks = new ArrayList<Task>();
        for (Task task : AllTasks) {  
@@ -61,6 +60,7 @@ public class SearchTool {
         }
         return matchingTasks;
     }
+    
     //return task whoever has a date that matches the given date.
     public Task  compareDate(MutableDateTime taskTime, Task current, MutableDateTime dateLimit) {
         if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, dateLimit) == 0) {
@@ -232,6 +232,8 @@ public class SearchTool {
         }
         return completedTasks;
     }
+    
+    //methods to sort the tasks
     public ArrayList<TimedTask> sortTimedTasks(ArrayList<TimedTask> tasks){
         Collections.sort(tasks);
         return tasks;

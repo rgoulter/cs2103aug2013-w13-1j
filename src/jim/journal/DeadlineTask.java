@@ -17,12 +17,11 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
         this.endDate = endDate;
         this.description = desc;
     }
+    
+    //For taking task from the storage file
+    //@author A0105572L
     public DeadlineTask(String endDate, String desc){
-        if (endDate.isEmpty()){
-            System.out.println("deadline task must have time! error exists in storage.");
-        } else{
-            this.endDate = MutableDateTime.parse(endDate);
-        }
+        this.endDate = MutableDateTime.parse(endDate);
         this.description = desc;
     }
     
@@ -40,9 +39,9 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
                                   "[%02d" + TIME_SEPARATOR + "%02d] %s";
     	return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear(),endDate.getHourOfDay(), endDate.getMinuteOfHour(),getDescription());
     }
-
+    
+    //@author A0105572L
     public String toStringForEditCommand() {
-        
         String taskNameDeadline = "%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d %s";
         return String.format(taskNameDeadline, endDate.getDayOfMonth(), endDate.getMonthOfYear() , endDate.getYear()-2000,getDescription());
     }
@@ -68,6 +67,7 @@ public class DeadlineTask extends Task implements Comparable<DeadlineTask>{
                31 + description.hashCode();
     }
     @Override
+    //@author A0105572L
     public int compareTo(DeadlineTask arg0) {
         return DateTimeComparator.getInstance().compare(this.getEndDate(), arg0.getEndDate());
     }

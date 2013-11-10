@@ -42,7 +42,11 @@ public class UndoUnitTests {
 	        undoCmd.execute(journalManager);
 	        expectedList.remove(expectedTask);
 	        
-	        assertEquals(expectedList,journalManager.getAllTasks());
+	        try {
+                assertEquals(expectedList,journalManager.getAllTasks());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 	    }
 
 }

@@ -17,9 +17,6 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
 
 
-
-    // private String description;
-
     public TimedTask(MutableDateTime startTime, MutableDateTime endTime, String desc) {
         // Tasks with both start and end date and time.
         this.startTime = startTime;
@@ -27,17 +24,12 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
         description = desc;
     }
     
-    //
+    //For taking task from storage.
+    //@author A0105572L
     public TimedTask(String startTime, String endTime, String desc) {
-        if (startTime.isEmpty() || endTime.isEmpty()){
-            
-               System.out.println("timed task must have time! error exists in storage.");
-            
-        }
         this.startTime = MutableDateTime.parse(startTime);
         this.endTime = MutableDateTime.parse(endTime);
         description = desc;
-        
     }
     
     
@@ -73,8 +65,6 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
     	                  " [%02d" + TIME_SEPARATOR + "%02d - %02d" + TIME_SEPARATOR + "%02d] %s";
     	String taskNameNoStartTime = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
                                      " [%02d" + TIME_SEPARATOR + "%02d] %s";
-    	
-    	//TODO: Do we still need to check startTime != null?? Isn't it DeadlineTask?
     	if (this.startTime == null) {
         	return String.format(taskNameNoStartTime, 
         						 endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear(),
@@ -85,25 +75,15 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
 					endTime.getHourOfDay(), endTime.getMinuteOfHour(),
 					getDescription());
     	}
-
-    	//return getDescription() +"  "+ startTime.toString() +" to " + endTime.toString();
     }
-
+    
+    //@author A0105572L
     public String toStringForEditCommand(){
         String taskName = "%02d/%02d/%02d %02d:%02d to %02d:%02d %s";
-        String taskNameNoStartTime = "%02d/%02d/%02d %02d:%02d %s";
-        //TODO: Do we still need to check startTime != null?? Isn't it DeadlineTask?
-        if (this.startTime == null) {
-            return String.format(taskNameNoStartTime, 
-                                 endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear()-2000,
-                                 endTime.getHourOfDay(), endTime.getMinuteOfHour(), getDescription());
-        } else {
-            return String.format(taskName, endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear()-2000,
+        return String.format(taskName, endTime.getDayOfMonth(), endTime.getMonthOfYear() , endTime.getYear()-2000,
                     startTime.getHourOfDay(), startTime.getMinuteOfHour(),
                     endTime.getHourOfDay(), endTime.getMinuteOfHour(),
                     getDescription());
-        }
-
     }
 
     @Override
@@ -137,6 +117,7 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
     }
 
     @Override
+    //@author A0105572L
     public int compareTo(TimedTask arg0) {
         return DateTimeComparator.getInstance().compare(this.getStartTime(), arg0.getStartTime());
     }

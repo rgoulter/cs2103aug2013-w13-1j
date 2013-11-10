@@ -2,6 +2,7 @@ package jim.journal;
 
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.joda.time.MutableDateTime;
@@ -9,7 +10,8 @@ import org.joda.time.MutableDateTime;
 
 
 public class UncompleteCommand extends Command {
-
+    private static final String FILE_ERROR = "FILE_ERROR";
+    
     String description;
     MutableDateTime EndDate;
     JournalManager JM;
@@ -25,7 +27,13 @@ public class UncompleteCommand extends Command {
     @Override
     public String execute(JournalManager journalManager) {
         JM = journalManager;
-        SearchTool searchTool = new SearchTool(JM);
+        SearchTool searchTool;
+        try {
+            searchTool = new SearchTool(JM);
+        } catch (Exception e) {
+            outputln(FILE_ERROR);
+            return "Failure";
+        }
         
         if (description != null){
             matchingTasks = searchTool.searchByNonStrictDescription(description);
@@ -75,7 +83,13 @@ public class UncompleteCommand extends Command {
     
     private void executeHelper(){
         for (Task t : taskToUncomplete) {
-            String feedback = JM.uncompleteTask(t);
+            String feedback;
+            try {
+                feedback = JM.uncompleteTask(t);
+            } catch (IOException e) {
+                outputln(FILE_ERROR);
+                return ;
+            }
             JM.addCommandHistory("uncomplete", t);
             outputln(feedback);
         }

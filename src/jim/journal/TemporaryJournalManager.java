@@ -1,40 +1,34 @@
 
 package jim.journal;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-
-import jim.journal.JournalManager.Command_Task;
-
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
-
+/*
+ * This TemporaryJournalManager is just a rough copy of the JournalManager to aid the Unit Test
+ * Because we don't want to involve the storage file when doing the unit test.
+ */
 public class TemporaryJournalManager extends JournalManager {
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
-
     private List<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
     private int historyIndex = -1; 
 
     /**
      * Returns a String representation of the current Journal state.
-     * 
-     * @return
      */
     public String getDisplayString() {
         List<Task> upcomingTasks = this.getAllTasks();
         String timedTasks = "";
         String floatingTasks = "";
         String output = "Upcoming Events:\n";
-
         MutableDateTime today = new MutableDateTime();
-
         for (Task current : upcomingTasks) {
             if (current instanceof TimedTask) {
             	MutableDateTime taskTime = ((TimedTask) current).getStartTime();                
-                if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, today) == 0
-        				/*taskTime.year() == today.year() &&
-     		           taskTime.dayOfYear()  == today.dayOfYear() */) {
+                if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, today) == 0) {
      				   timedTasks = timedTasks + current.toString() + "\n";
      			   }
             } else if (current instanceof FloatingTask) {
@@ -50,22 +44,8 @@ public class TemporaryJournalManager extends JournalManager {
 
     @Override
     public ArrayList<Task> getAllTasks() {
-        // TODO: Not cheat on this.
-        /*
-         * Calendar startTime = new GregorianCalendar(2013, 10, 10, 14, 0);
-         * Calendar endTime = new GregorianCalendar(2013, 10, 10, 15, 0); String
-         * description = "CS2103 Lecture";
-         * 
-         * Task expectedTask = new TimedTask(startTime, endTime, description);
-         * List<Task> allTasks = new ArrayList<Task>();
-         * allTasks.add(expectedTask);
-         */
-
-        return storeAllTasks; // Added this change here! 1.
+        return storeAllTasks;
     }
-
-
-
     public ArrayList<Task> getuncompletedTasks() {
         ArrayList<Task> uncompletedTasks = new ArrayList<Task>();
         for (Task t : storeAllTasks) {
@@ -75,9 +55,6 @@ public class TemporaryJournalManager extends JournalManager {
         }
         return uncompletedTasks;
     }
-
-
-
     public ArrayList<Task> getcompletedTasks() {
         ArrayList<Task> completedTasks = new ArrayList<Task>();
         for (Task t : storeAllTasks) {
@@ -88,25 +65,18 @@ public class TemporaryJournalManager extends JournalManager {
         return completedTasks;
     }
 
-
-
     /*
      * Following methods update the storeAllTasks, uncompletedTasks,
      * completedTasks.
      */
     public void addTask(Task task) {
-
         storeAllTasks.add(task);
         addCommandHistory("add", task);
     }
 
-
-
     public boolean removeTask(Task task) {
         return storeAllTasks.remove(task);
     }
-
-
 
     public String completeTask(Task task) {
         if (task.isCompleted()) {
@@ -118,7 +88,6 @@ public class TemporaryJournalManager extends JournalManager {
             return "Completed Task: " + task.toString();
         }
     }
-
 
     public void editTask(Task old_task, Task new_task) {
         storeAllTasks.remove(old_task);
@@ -142,7 +111,11 @@ public class TemporaryJournalManager extends JournalManager {
 		    } else if (LastCommand.getCommand().equals("remove")){
 		    	addTask(LastCommand.getSomeTask());
 		    } else if (LastCommand.getCommand().equals("complete")){
-		    	incompleteTask(LastCommand.getSomeTask());
+		    	try {
+                    incompleteTask(LastCommand.getSomeTask());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 		    } else {
 		        //error
 		    }

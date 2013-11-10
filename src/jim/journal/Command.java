@@ -1,8 +1,4 @@
-
 package jim.journal;
-
-
-
 
 public abstract class Command {
 
@@ -13,29 +9,20 @@ public abstract class Command {
     public Command() {
         outputStringBuilder = new StringBuilder();
     }
-
-    public String getCommandState(){
-        return ExecutionState;
-    }
-    
-    //Can only be "Pending", "Failure" or "Success". 
-    public void changeCommandState(String d){
-        ExecutionState = d;
-    }
-    
-    
-    
+    //First Execution for all command
     public abstract String execute(JournalManager journalManager);
     
+    //Used when the command needs confirmation from user. e.g remove, complete, uncomplete, edit command.
+    //@author A0105572L
     public abstract String secondExecute(String secondInput);
+    
+    //Used when the command needs a new task from user. e.g edit command.
+    //@author A0105572L
     public abstract String thirdExecute(Task task);
-
 
     protected void output(String outputStr) {
         outputStringBuilder.append(outputStr);
     }
-
-
 
     protected void outputln(String line) {
         output(line);
@@ -46,7 +33,6 @@ public abstract class Command {
         int stringLength = outputStringBuilder.length();
         outputStringBuilder.delete(0, stringLength);
     }
-
 
     public String getOutput() {
         return outputStringBuilder.toString();

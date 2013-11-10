@@ -66,7 +66,11 @@ public class AddUnitTests {
         List<Task> expectedList = new ArrayList<Task>();
         expectedList.add(expectedTask);
 
-        assertEquals(expectedList, journalManager.getAllTasks());
+        try {
+            assertEquals(expectedList, journalManager.getAllTasks());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

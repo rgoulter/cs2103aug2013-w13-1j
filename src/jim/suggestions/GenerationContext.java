@@ -46,14 +46,18 @@ class GenerationContext {
 		
 		allWordsFromCurrentTasks = new HashSet<String>();
 		
-		for (Task t : journalManager.getAllTasks()) {
-			String description = t.getDescription();
-			
-			String words[] = description.split(" ");
-			for (String word : words) {
-				allWordsFromCurrentTasks.add(word);
-			}
-		}
+		try {
+            for (Task t : journalManager.getAllTasks()) {
+            	String description = t.getDescription();
+            	
+            	String words[] = description.split(" ");
+            	for (String word : words) {
+            		allWordsFromCurrentTasks.add(word);
+            	}
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 		
 		return allWordsFromCurrentTasks;
 	}

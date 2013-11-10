@@ -10,11 +10,6 @@ import jim.journal.TimedTask;
 
 import org.junit.Test;
 
-
-
-
-
-
 public class CompleteUnitTests {
 
     @Test

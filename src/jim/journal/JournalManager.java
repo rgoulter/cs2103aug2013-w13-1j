@@ -4,7 +4,9 @@ package jim.journal;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.ArrayList;
+
 import jim.Configuration;
+
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
@@ -13,21 +15,29 @@ public class JournalManager {
 
     private static Configuration configManager = Configuration.getConfiguration();
     private TaskStorage taskStorage = new TaskStorage(configManager.getOutputFileName());
-    private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
+    private ArrayList<Task> allTasksInStorage = new ArrayList<Task>();
     private static final int NO_COMMAND_EXECUTED_YET = -1;
+    private static final String FILE_ERROR = "FILE ERROR";
     private int historyIndex = NO_COMMAND_EXECUTED_YET;
     private ArrayList<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
     private boolean newTrueCommand = true;
+    private int ZERO_FOR_COMPARE = 0;
+    
+    //For display to user
     private String TASKTITILE_ONE = "Upcoming Events:\n";
     private String TASKTITILE_TWO = "\n\nTodo:\n";
     private String STRING_INITIAL = "";
     private String END_OF_LINE = "\n";
     private String SIGN_FOR_COMPLETED_TASK = "[DONE] ";
-    private int ZERO_FOR_COMPARE = 0;
+    private String TASK_ALREADY_COMPLETED = "Task %s has already been marked as completed.";
+    private String TASK_COMPLETED = "Completed Task: %s";
+    private String TASK_NOT_COMPLETED_YET = "Task %S has not been completed.";
+    private String TASK_UNCOMPLETED = "Uncompleted Task: %s";
+
+
      
     /**
      * Returns a String representation of the current Journal state.
-     * 
      */
 
     public boolean compareDate(MutableDateTime taskTime, MutableDateTime currentTime) {
@@ -37,17 +47,22 @@ public class JournalManager {
     	    return false;
     	}
     }
-    
+    //@author A0105572L
     public String getDisplayString() {
 
-        ArrayList<Task> upcomingTasks = this.getAllTasks();
+        ArrayList<Task> upcomingTasks;
+        try {
+            upcomingTasks = this.getAllTasks();
+        } catch (Exception e) {
+            return FILE_ERROR;
+        }
         ArrayList<TimedTask> upcomingTimedTask = new ArrayList<TimedTask>();
         ArrayList<DeadlineTask> upcomingDeadlineTask = new ArrayList<DeadlineTask>();
         ArrayList<FloatingTask> upcomingFloatingTask = new ArrayList<FloatingTask>();
-        
-        String timedTasks = STRING_INITIAL, floatingTasks = STRING_INITIAL, deadlineTasks = STRING_INITIAL;
+        String timedTasks = STRING_INITIAL;
+        String floatingTasks = STRING_INITIAL;
+        String deadlineTasks = STRING_INITIAL;
         String output = TASKTITILE_ONE;
-
         MutableDateTime today = new MutableDateTime();
 
         for (Task current : upcomingTasks) {
@@ -85,111 +100,92 @@ public class JournalManager {
         output = output + deadlineTasks + timedTasks + TASKTITILE_TWO + floatingTasks;
         return output;
     }
-
-    public void saveToStorage(){
-        
-        try {
-            this.taskStorage.writeToFile(storeAllTasks);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    //@author A0105572L
+    public void saveToStorage() throws IOException{
+            this.taskStorage.writeToFile(allTasksInStorage);
     }
-
-    public ArrayList<Task> getAllTasks() {
-        try {
-            storeAllTasks = taskStorage.getAllTasks();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return storeAllTasks; 
+    //@author A0105572L
+    public ArrayList<Task> getAllTasks() throws Exception {
+        allTasksInStorage = taskStorage.getAllTasks();
+        return allTasksInStorage; 
     }
     
     /*
-     * Following methods update the storeAllTasks, uncompletedTasks,
-     * completedTasks.
+     * Following methods update the storeAllTasks and save it to the storage file each time it is executed.
      */
-    public void addTask(Task task) {
+    public void addTask(Task task) throws IOException {
     	clearPastCmds();
-        storeAllTasks.add(task);
-        try {
-            taskStorage.recordNewTask(task);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-     //   System.out.println("history Index = " + historyIndex);
+        allTasksInStorage.add(task);
+        taskStorage.recordNewTask(task);
+     // System.out.println("history Index = " + historyIndex);
     }
-
-    public boolean removeTask(Task task) {
+    
+    //@author A0105572L
+    public boolean removeTask(Task task) throws Exception {
     	clearPastCmds();
         boolean result = false;
         getAllTasks();
-        if (storeAllTasks.remove(task)){
+        if (allTasksInStorage.remove(task)){
             result = true;
             saveToStorage();
         }
-        // System.out.println("DEBUG: history Index = " + historyIndex);
         return result;
     }
-
-    public String completeTask(Task task) {
+    //@author A0105572L
+    public String completeTask(Task task) throws IOException {
     	clearPastCmds();
         if (task.isCompleted()) {
-            return "Task " +
-                   task.toString() +
-                   " has already been marked as completed.";
+            return String.format(TASK_ALREADY_COMPLETED,task.toString());
         } else {
-            storeAllTasks.remove(task);
+            allTasksInStorage.remove(task);
             task.markAsCompleted();
-            storeAllTasks.add(task);
+            allTasksInStorage.add(task);
             saveToStorage();
-            return "Completed Task: " + task.toString();
+            return String.format(TASK_COMPLETED, task.toString());
         }
     }
     
-    public String uncompleteTask(Task task) {
+    public String uncompleteTask(Task task) throws IOException {
     	clearPastCmds();
         if (!task.isCompleted()) {
-            return "Task " +
-                   task.toString() +
-                  " has not been completed.";
+            return String.format(TASK_NOT_COMPLETED_YET, task.toString());
         } else {
-            storeAllTasks.remove(task);
+            allTasksInStorage.remove(task);
             task.markAsIncompleted();
-            storeAllTasks.add(task);
+            allTasksInStorage.add(task);
             saveToStorage();
-            return "Uncompleted Task: " + task.toString();
+            return String.format(TASK_UNCOMPLETED,task.toString());
         }
     }
     
-    public void incompleteTask(Task task) {
+    public void incompleteTask(Task task) throws IOException {
     	clearPastCmds();
-    	for (Task current: storeAllTasks) {
+    	for (Task current: allTasksInStorage) {
     		if (task.equals(current)){
 		        if (!task.isCompleted()) {
 		            System.out.println( "Task " +
 		                   task.toString() +
 		                   " is currently incomplete.");
 		        } else {
-		            storeAllTasks.remove(task);
+		            allTasksInStorage.remove(task);
 		            task.markAsIncompleted();
-		            storeAllTasks.add(task);
+		            allTasksInStorage.add(task);
 		            saveToStorage();
 		            System.out.println(  "Incompleted Task: " + task.toString());
 		        }
 	    	}
     	}
     }
-
-    public void editTask(Task old_task, Task new_task) {
+    
+    //@author A0105572L
+    public void editTask(Task old_task, Task new_task) throws Exception {
     	if (old_task.toString().equals(new_task.toString())){
     	    return;
     	}else{
     	    clearPastCmds();
     	    getAllTasks();
-    	    storeAllTasks.remove(old_task);
-    	    storeAllTasks.add(new_task);
+    	    allTasksInStorage.remove(old_task);
+    	    allTasksInStorage.add(new_task);
     	    saveToStorage();
     	}
     }
@@ -210,7 +206,7 @@ public class JournalManager {
     	addCommandHistory(cmd, someTask, null);
     }
 
-    public boolean undoLastCommand(){
+    public boolean undoLastCommand() throws Exception{
     	// get the last command in historyOfCommand
     	if (historyIndex > NO_COMMAND_EXECUTED_YET) {
         	newTrueCommand = false;
@@ -237,7 +233,7 @@ public class JournalManager {
     	}
     }
     
-    public boolean redoUndoCommand(){
+    public boolean redoUndoCommand() throws Exception{
     	if (historyOfCommand.size() >= 0 && historyIndex < historyOfCommand.size() - 1) {
     		newTrueCommand = false;
     		Command_Task LastCommand = historyOfCommand.get(++historyIndex);
@@ -295,9 +291,13 @@ public class JournalManager {
 		Task getSomeTask() { return someTask; }
 		Task getEditTask() { return editTask; }
 	}
+	
+	//@author A0105572L
     public void sortTimedTask(ArrayList<TimedTask> timedTasks){
         Collections.sort(timedTasks);
     }
+    
+    //@author A0105572L
     public void sortDeadlineTask(ArrayList<DeadlineTask> deadlineTasks){
         Collections.sort(deadlineTasks);
     }

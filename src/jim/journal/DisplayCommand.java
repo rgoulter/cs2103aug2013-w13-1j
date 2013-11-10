@@ -1,31 +1,54 @@
+//@author A0105572L
 package jim.journal;
-
-
-
 import org.joda.time.MutableDateTime;
+
 import java.util.ArrayList;
 
-
-
 public class DisplayCommand extends Command {
-
+    //For system purpose
+    private static final String COMMANDTYPE = "display";
+    private static final String EXECUTION_STATUS_SUCCESS = "Success";
+    private static final String EXECUTION_STATUS_FAILURE = "Failure";
+    
+    //For display to user
+    private static final String INFO_FILE_ERROR = "FILE_ERROR";
+    private static final String INFO_TASK_TITLE = "-------------------- Tasks ----------------------";
+    private static final String INFO_COMPLETED_TASK_TITLE = "\n--------------- Completed Tasks -----------------";
+    
     MutableDateTime date;
-    JournalManager JM;
+    JournalManager MyJournalManager;
     ArrayList<Task> matchingTasks = new ArrayList<Task>();
     SearchTool searchTool;
-
+    boolean uncompletedOnly = false;
+    boolean completedOnly = false;
+    
+    //Constructor for display with a specific date
     public DisplayCommand(MutableDateTime d) {
         date = d;
     }
+    
+    //Constructor for display all the tasks
     public DisplayCommand() {
         this(null);
     }
+    
+    //Constructor for display Only completed or Only uncompleted tasks
+    public DisplayCommand(MutableDateTime d, boolean uncomOnly){
+        date = d;
+        uncompletedOnly = uncomOnly;
+        completedOnly = true && uncomOnly;
+    }
+    
     @Override
     public String execute(JournalManager journalManager) {
-        JM = journalManager;
-        boolean uncompletedOnly = false;
-        boolean completedOnly = false;
-        searchTool = new SearchTool(JM);
+        MyJournalManager = journalManager;
+        
+        try {
+            searchTool = new SearchTool(MyJournalManager);
+        } catch (Exception e) {
+            outputln(INFO_FILE_ERROR);
+            return EXECUTION_STATUS_FAILURE;
+        }
         if (date != null){
             matchingTasks = searchTool.searchByDate(date);
         }else{
@@ -39,33 +62,34 @@ public class DisplayCommand extends Command {
             this.generateUnCompletedTaskOutput();
             this.generateCompletedTaskOutput();
         }
-        return "Success";        
+        return EXECUTION_STATUS_SUCCESS;        
     }
     
     @Override
     public String secondExecute(String secondInput) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String thirdExecute(Task task) {
-        // TODO Auto-generated method stub
         return null;
     }
     
     public String toString() {
-        return "Display";
+        return COMMANDTYPE;
     }
     
+    /*
+     * Private functions for generating the out put of display command.
+     */
     private void generateUnCompletedTaskOutput(){
         ArrayList<Task> unCompletedTasks = searchTool.getuncompletedTasks(matchingTasks);
-        outputln("-------------------- Tasks ----------------------");
+        outputln(INFO_TASK_TITLE);
         this.generateTaskOutput(unCompletedTasks);
     }
     private void generateCompletedTaskOutput(){
         ArrayList<Task> completedTasks = searchTool.getcompletedTasks(matchingTasks);
-        outputln("\n--------------- Completed Tasks -----------------");
+        outputln(INFO_COMPLETED_TASK_TITLE);
         this.generateTaskOutput(completedTasks);
     }
     private void generateTaskOutput(ArrayList<Task> Tasks){
@@ -74,7 +98,7 @@ public class DisplayCommand extends Command {
         ArrayList<DeadlineTask> DeadlineTasksToDisplay = searchTool.getAllDeadlineTasks(Tasks);
         ArrayList<FloatingTask> FloatingTasksToDisplay = searchTool.getAllFloatingTasks(Tasks);
         
-        //sort
+        //sort the tasks in order of timed tasks, deadline tasks and Floating Tasks.
         TimedTasksToDisplay = searchTool.sortTimedTasks(TimedTasksToDisplay);
         DeadlineTasksToDisplay = searchTool.sortDeadlineTasks(DeadlineTasksToDisplay);
         FloatingTasksToDisplay = searchTool.sortFloatingTasks(FloatingTasksToDisplay);

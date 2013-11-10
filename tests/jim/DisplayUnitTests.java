@@ -1,4 +1,4 @@
-
+//@author A0105572L
 package jim;
 
 import static org.junit.Assert.assertEquals;
@@ -17,19 +17,10 @@ import jim.suggestions.SuggestionManager;
 
 import org.joda.time.MutableDateTime;
 import org.junit.Test;
-
-
-
-
-
-
 public class DisplayUnitTests {
 
     @Test
     public void testStrictSyntaxDisplayCommandZeroArgsCanParse () {
-        // Strict syntax for "display" command (0 parameters edition):
-        // display
-
         String testCommand = "display";
         String[] testCommandWords = testCommand.split(" ");
 

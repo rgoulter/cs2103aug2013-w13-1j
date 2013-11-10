@@ -3,18 +3,23 @@ package jim.journal;
 
 
 public class RedoCommand extends Command{
-	
+    private static final String FILE_ERROR = "FILE_ERROR";
     public RedoCommand() {
     }
     @Override
     public String execute(JournalManager journalManager) {
         // TODO Auto-generated method stub
-        if (journalManager.redoUndoCommand()){
-        	outputln("Redo Successful");
-        	return "Success";
-        } else {
-        	outputln("Redo Unsuccessful");
-        	return "Failure";
+        try {
+            if (journalManager.redoUndoCommand()){
+            	outputln("Redo Successful");
+            	return "Success";
+            } else {
+            	outputln("Redo Unsuccessful");
+            	return "Failure";
+            }
+        } catch (Exception e) {
+            outputln(FILE_ERROR);
+            return "Failure";
         }
     }
     @Override
