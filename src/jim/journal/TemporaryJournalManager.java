@@ -13,7 +13,7 @@ import org.joda.time.DateTimeComparator;
  */
 public class TemporaryJournalManager extends JournalManager {
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
-    private List<Command_Task> historyOfCommand = new ArrayList<Command_Task>();
+    private List<CommandTaskPair> historyOfCommand = new ArrayList<CommandTaskPair>();
     private int historyIndex = -1; 
 
     /**
@@ -95,14 +95,14 @@ public class TemporaryJournalManager extends JournalManager {
     }
     
     public void addCommandHistory(String cmd, Task someTask){
-    	Command_Task command = new Command_Task(cmd, someTask);
+    	CommandTaskPair command = new CommandTaskPair(cmd, someTask);
     	historyIndex++;
     	historyOfCommand.add(historyIndex, command);
     }
     public boolean undoLastCommand(){
     	// get the last command in historyOfCommand
     	if (historyIndex > -1) {
-    		Command_Task LastCommand = historyOfCommand.get(historyIndex--);
+    		CommandTaskPair LastCommand = historyOfCommand.get(historyIndex--);
 		    //add, edit, remove, complete
 		    if (LastCommand.getCommand().equals("add")){
 		    	removeTask(LastCommand.getSomeTask());
