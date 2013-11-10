@@ -175,8 +175,9 @@ public class RemoveUnitTests {
         String output = removeCmd.getOutput();
 
         assertEquals("Removed task: " +
-                     "[12" + dSeparator + "10" + dSeparator + "2013] " + 
-                     "[12" + tSeparator + "00 - 13" + tSeparator + "00] do a TimedTask\n",
+                     "[12" + dSeparator + "10" + dSeparator + "13] " + 
+                     "[12" + tSeparator + "00] - " + "[12" + dSeparator + "10" + dSeparator + "13] " + 
+                     "[13" + tSeparator + "00] do a TimedTask\n",
                      output);
 
     }

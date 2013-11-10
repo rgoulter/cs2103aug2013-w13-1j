@@ -83,8 +83,9 @@ public class DisplayUnitTests {
         assertEquals("Display of Timed Task failed",
                      "-------------------- Tasks ----------------------\n" + 
                      "Timed Tasks: \n" +
-                     "[08" + dSeparator + "11" + dSeparator + "2013] " +
-                     "[00" + tSeparator + "00 - 00" + tSeparator + "00] Birthday Party\n"+
+                     "[07" + dSeparator + "11" + dSeparator + "13] " +
+                     "[00" + tSeparator + "00] - " +
+                     "[08" + dSeparator + "11" + dSeparator + "13] " + "[00" + tSeparator + "00] Birthday Party\n"+
                      "\n" +
                      "Deadline Tasks: \n" +
                      "\n" + 
@@ -117,8 +118,10 @@ public class DisplayUnitTests {
         String output = dispCmd.getOutput();
         assertEquals("-------------------- Tasks ----------------------\n" + 
                 "Timed Tasks: \n" +
-                "[10" + dSeparator + "10" + dSeparator + "2013] " + 
-                "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
+                "[10" + dSeparator + "10" + dSeparator + "13] " + 
+                "[00" + tSeparator + "00] - " +
+                "[10" + dSeparator + "10" + dSeparator + "13] " + 
+                "[00" + tSeparator + "00] CS2103 Lecture\n" +
                 "\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
@@ -159,8 +162,9 @@ public class DisplayUnitTests {
         assertEquals("Display command test on multiple items failed",
                              "-------------------- Tasks ----------------------\n" +
                              "Timed Tasks: \n" +
-                             "[10" + dSeparator + "10" + dSeparator + "2013] " + 
-                             "[00" + tSeparator + "00 - 00" + tSeparator + "00] CS2103 Lecture\n" +
+                             "[10" + dSeparator + "10" + dSeparator + "13] " + 
+                             "[00" + tSeparator + "00] - " + "[10" + dSeparator + "10" + dSeparator + "13] " + 
+                             "[00" + tSeparator + "00] CS2103 Lecture\n" +
                              "\n" +
                              "Deadline Tasks: \n" +
                              "\n" + 

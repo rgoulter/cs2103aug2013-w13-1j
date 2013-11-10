@@ -110,11 +110,13 @@ public class EditUnitTests {
         // Check to see that the correct output is given to the user
         assertEquals("Output produced does not match expected output",
                      "The following task is edited\n"+
-                     "[10" + dSeparator + "11" + dSeparator + "2013] " + 
-                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyOldTask\n" +
+                     "[10" + dSeparator + "11" + dSeparator + "13] " + 
+                     "[14" + tSeparator + "00] - " + "[10" + dSeparator + "11" + dSeparator + "13] " + 
+                     "[15" + tSeparator + "00] MyOldTask\n" +
                      "To\n"+
-                     "[31" + dSeparator + "12" + dSeparator + "2013] " + 
-                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyNewTask\n",
+                     "[31" + dSeparator + "12" + dSeparator + "13] " + 
+                     "[14" + tSeparator + "00] - " + "[31" + dSeparator + "12" + dSeparator + "13] " + 
+                     "[15" + tSeparator + "00] MyNewTask\n",
                      editCmd.getOutput());
     }
 
@@ -154,8 +156,9 @@ public class EditUnitTests {
         
         assertEquals("Returned feedback does not match expected feedback (Part 1)",
                      "The following Task will be edited.\n" +
-                     "[10" + dSeparator + "11" + dSeparator + "2013] " + 
-                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyOldTask\n"+
+                     "[10" + dSeparator + "11" + dSeparator + "13] " + 
+                     "[14" + tSeparator + "00] - " + 
+                     "[10" + dSeparator + "11" + dSeparator + "13] " + "[15" + tSeparator + "00] MyOldTask\n"+
                      "Please enter a new task.\n",
                      feedback);
         
@@ -171,11 +174,13 @@ public class EditUnitTests {
         
         assertEquals("Returned feedback does not match expected feedback (Part 2)",
                      "The following task is edited\n"+
-                     "[10" + dSeparator + "11" + dSeparator + "2013] " + 
-                     "[14" + tSeparator + "00 - 15" + tSeparator + "00] MyOldTask\n"+
+                     "[10" + dSeparator + "11" + dSeparator + "13] " + 
+                     "[14" + tSeparator + "00] - " + "[10" + dSeparator + "11" + dSeparator + "13] " + 
+                     "[15" + tSeparator + "00] MyOldTask\n"+
                      "To\n"+
-                     "[31" + dSeparator + "12" + dSeparator + "2013] " + 
-                     "[00" + tSeparator + "00 - 23" + tSeparator + "59] MyNewTask\n",
+                     "[31" + dSeparator + "12" + dSeparator + "13] " + 
+                     "[00" + tSeparator + "00] - " + "[31" + dSeparator + "12" + dSeparator + "13] " + 
+                     "[23" + tSeparator + "59] MyNewTask\n",
                      feedback);
         
         try {
@@ -262,8 +267,9 @@ public class EditUnitTests {
         String output = editCmd.getOutput();
 
         assertEquals("The following Task will be edited.\n" + 
-                     "[12" + dSeparator + "10" + dSeparator + "2013] " + 
-                     "[12" + tSeparator + "00 - 13" + tSeparator + "00] do a TimedTask\n" + 
+                     "[12" + dSeparator + "10" + dSeparator + "13] " + 
+                     "[12" + tSeparator + "00] - " + "[12" + dSeparator + "10" + dSeparator + "13] " + 
+                     "[13" + tSeparator + "00] do a TimedTask\n" + 
                      "Please enter a new task.\n",
                      output);
 
