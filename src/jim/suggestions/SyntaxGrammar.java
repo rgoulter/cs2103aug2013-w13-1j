@@ -19,7 +19,6 @@ public class SyntaxGrammar {
     protected static void initSyntax(Map<String, List<SyntaxFormat>> syntaxClassesMap) {
     	
         // Initialise our syntax classes dictionary.
-        // TODO: Would it be possible to have this in an external file? Or would that be more confusing?
         final String[] syntaxes = new String[]{
 			"<monthname> := " +
 			  "'January' | 'Jan' | 'Jan.' | " +

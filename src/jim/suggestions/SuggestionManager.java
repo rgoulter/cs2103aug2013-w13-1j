@@ -172,8 +172,6 @@ public class SuggestionManager {
     			SuggestionHint hintToRemove = generatedSuggestionHintsList.get(i);
     			generatedSuggestionHintsList.remove(hintToRemove);
     			generatedSuggestionHintsSet.remove(hintToRemove);
-    			
-    			//TODO: Preserve selected index here...
     		} else {
     			hint.setMatchingSubsequence(filteringSubsequence);
     		}
@@ -185,8 +183,6 @@ public class SuggestionManager {
     private void generateMoreSuggestionsIfNecessary() {
     	// Don't try too hard to generate unique suggestions
     	// at this stage.
-    	
-    	//TODO: Preserve selected index here...
     	
     	for (int i = generatedSuggestionHintsList.size(); i <= numberOfSuggestionsToKeep; i++) {
     		SuggestionHint hint;
@@ -218,7 +214,6 @@ public class SuggestionManager {
     
     
     private SuggestionHint generateSuggestion(double t) {
-    	// TODO: Get rid of this dependency on inputParser.
     	List<SyntaxFormat> syntaxFormats = inputParser.getDisplayableSyntaxTreeLeafNodes();
     	
     	// Assumption: First word is the operative command word.
@@ -303,12 +298,6 @@ public class SuggestionManager {
 
 
 
-    /**
-     * Takes an array of strings, e.g. {"add", "rom this.
-     * 
-     * TODO: Potentially throw some kind of "Poor format exception" as a better
-     * way of giving feedback than return-null.
-     */
     public Command parseCommand(String args[]) {
         return (Command) inputParser.doParse("<cmd>", args);
     }
