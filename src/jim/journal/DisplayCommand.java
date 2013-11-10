@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class DisplayCommand extends Command {
     //For system purpose
-    private static final String COMMANDTYPE = "display";
+    private static final String COMMANDTYPE = "Display";
     private static final String EXECUTION_STATUS_SUCCESS = "Success";
     private static final String EXECUTION_STATUS_FAILURE = "Failure";
     
