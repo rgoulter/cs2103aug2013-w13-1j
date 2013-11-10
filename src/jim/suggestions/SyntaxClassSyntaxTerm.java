@@ -199,16 +199,9 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
         	return generateSuggestionHintForConfiguration(context, t);
         }
         
-        // These magic values are for Config. This is not very elegant.
-        List<String> wordList = Arrays.asList(new String[]{"outputfilename",
-        		                                           "dateseparator",
-        		                                           "timeseparator",
-        		                                           "reset"}); // Temporary MAGIC
-        String suggestedWord = wordList.get((int) Math.floor(t * wordList.size()));
-        
-        return new SuggestionHint(new String[]{suggestedWord},
-                                  context.getInputSubsequence(),
-                                  new SyntaxTerm[]{this});
+        // It's unclear what behaviour should occur here,
+        // so let's just generate from the words from current tasks.
+        return generateSuggestionHintFromWordsInCurrentTasks(context, t);
     }
     
     private SuggestionHint generateSuggestionHintFromWordsInCurrentTasks(GenerationContext context, double t) {
