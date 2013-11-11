@@ -1,4 +1,3 @@
-//@author A0097081B, A0105572L
 package jim.journal;
 
 import java.io.IOException;
@@ -51,14 +50,14 @@ public class JournalManager {
      * Returns a String representation of the current Journal state.
      * 
      */
-    
+    //@author A0105572L
     public boolean compareDate(MutableDateTime taskTime, MutableDateTime current) {
     	if (DateTimeComparator.getDateOnlyInstance().compare(taskTime, current) == SAME_TIME) {
     		return true;
     	} else 
     		return false;
     }
-    
+  //@author A0097081B
     public boolean checkWithInTimeFrame(MutableDateTime taskStartTime, MutableDateTime taskEndTime, MutableDateTime current) {
     	int currentTimeAfterStartDate = DateTimeComparator.getDateOnlyInstance().compare(taskStartTime,current);
     	int currentTimeBeforeEndDate = DateTimeComparator.getDateOnlyInstance().compare(current, taskEndTime);
@@ -67,7 +66,7 @@ public class JournalManager {
     	} else 
     		return false;
     }
-
+  //@author A0097081B
     public void sortAllTasks() throws Exception {
     	ArrayList<Task> upcomingTasks = this.getAllTasks();
     	upcomingTimedTask = new ArrayList<TimedTask> ();
@@ -97,7 +96,7 @@ public class JournalManager {
         sortDeadlineTask(upcomingDeadlineTask);
         sortFloatingTask(upcomingFloatingTask);
     }
-    
+  //@author A0097081B
     /* Note: Use sortAllTasks() before calling getTimedTaskString()*/
     public String getTimedTaskString() {
     	String timedTasks = EMPTY_STRING;
@@ -106,7 +105,7 @@ public class JournalManager {
         }
     	return timedTasks;
     }
-    
+  //@author A0097081B
     /* Note: Use sortAllTasks() before calling getDeadlineTaskString()*/
     public String getDeadlineTaskString() {
     	String deadlineTasks = EMPTY_STRING;
@@ -115,7 +114,7 @@ public class JournalManager {
         }
     	return deadlineTasks;
     }
-    
+  //@author A0097081B
     /* Note: Use sortAllTasks() before calling getFloatingString()*/
     public String getFloatingString() {
     	String floatingTasks = EMPTY_STRING;
@@ -129,6 +128,7 @@ public class JournalManager {
     	return floatingTasks;
     }
     
+    //@author A0097081B
     public String getDisplayString() {
     	try {
             sortAllTasks();
@@ -145,11 +145,11 @@ public class JournalManager {
         String output = DESCRIPTION_UPCOMING_TASKS + getTimedTaskString() + getDeadlineTaskString() + DESCRIPTION_TODO + getFloatingString();
         return output;
     }
-
+  //@author A0105572L
     public void saveToStorage() throws IOException{
             this.taskStorage.writeToFile(storeAllTasks);
     }
-
+  //@author A0105572L
     public ArrayList<Task> getAllTasks() throws Exception {
         storeAllTasks = taskStorage.getAllTasks();
         return storeAllTasks; 
@@ -159,18 +159,13 @@ public class JournalManager {
      * Following methods update the storeAllTasks, uncompletedTasks,
      * completedTasks.
      */
-    public void addTask(Task task) {
+    //@author A0105572L
+    public void addTask(Task task) throws Exception {
     	clearPastCmds();
         storeAllTasks.add(task);
-        try {
-            taskStorage.recordNewTask(task);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-     //   System.out.println("history Index = " + historyIndex);
+        taskStorage.recordNewTask(task);
     }
-
+    //@author A0105572L
     public boolean removeTask(Task task) throws Exception {
     	clearPastCmds();
         boolean result = false;
@@ -179,10 +174,10 @@ public class JournalManager {
             result = true;
             saveToStorage();
         }
-        // System.out.println("DEBUG: history Index = " + historyIndex);
         return result;
     }
-
+    
+    //@author A0105572L
     public String completeTask(Task task) throws IOException {
     	clearPastCmds();
         if (task.isCompleted()) {
@@ -196,6 +191,7 @@ public class JournalManager {
         }
     }
     
+    //@author A0097081B
     public String uncompleteTask(Task task) throws IOException {
     	clearPastCmds();
         if (!task.isCompleted()) {
@@ -208,7 +204,8 @@ public class JournalManager {
             return String.format(MESSAGE_UNCOMPLETED_TASK, task.toString());
         }
     }
-
+    
+    //@author A0105572L
     public void editTask(Task oldTask, Task newTask) throws Exception {
     	if (oldTask.toString().equals(newTask.toString())){
     	    return;
@@ -220,22 +217,22 @@ public class JournalManager {
     	    saveToStorage();
     	}
     }
-    
+  //@author A0097081B
     public String getPreviousCommand(){
         return historyOfCommand.get(historyOfCommand.size() - 1).getCommand();
     }
-    //only certain command need to push.
     //add, edit, complete, remove.
+  //@author A0097081B
     public void addCommandHistory(String cmd, Task someTask, Task editTask){
     	CommandTaskPair command = new CommandTaskPair(cmd, someTask, editTask);
     	historyIndex++;
     	historyOfCommand.add(historyIndex, command);
     }
-    
+  //@author A0097081B
     public void addCommandHistory(String cmd, Task someTask){
     	addCommandHistory(cmd, someTask, null);
     }
-
+  //@author A0097081B
     public boolean undoLastCommand() throws Exception{
     	// get the last command in historyOfCommand
     	if (historyIndex > NO_COMMAND_EXECUTED_YET) {
@@ -258,7 +255,7 @@ public class JournalManager {
     		return false;
     	}
     }
-    
+  //@author A0097081B
     public boolean redoUndoCommand() throws Exception{
     	if (historyOfCommand.size() >= 0 && historyIndex < historyOfCommand.size() - 1) {
     		newTrueCommand = false;
@@ -280,7 +277,7 @@ public class JournalManager {
     		return false;
     	}
     }
-    
+  //@author A0097081B
     private void clearPastCmds(){
     	// if true, it means addTask() (or remove, edit, complete) is not called from undoLastCommand()
     	if (historyOfCommand.size() > 0 && historyIndex != historyOfCommand.size()-1) {
@@ -293,7 +290,7 @@ public class JournalManager {
     		newTrueCommand = true;
     	}
     }
-    
+  //@author A0097081B
 	class CommandTaskPair {
 		String cmd;
 		Task someTask, editTask;
@@ -312,12 +309,15 @@ public class JournalManager {
 		Task getSomeTask() { return someTask; }
 		Task getEditTask() { return editTask; }
 	}
+	//@author A0105572L
     public void sortTimedTask(ArrayList<TimedTask> timedTasks){
         Collections.sort(timedTasks);
     }
+    //@author A0105572L
     public void sortDeadlineTask(ArrayList<DeadlineTask> deadlineTasks){
         Collections.sort(deadlineTasks);
     }
+  //@author A0105572L
     public void sortFloatingTask(ArrayList<FloatingTask> floatingTasks){
     }
 }

@@ -1,4 +1,4 @@
-//@author A0105572L, A0097081B
+//@author A0105572L
 package jim.journal;
 import org.joda.time.MutableDateTime;
 
@@ -79,7 +79,7 @@ public class DisplayCommand extends Command {
     public String thirdExecute(Task task) {
         return null;
     }
-    
+    //@author A0097081B
     public String toString() {
         return COMMANDTYPE;
     }

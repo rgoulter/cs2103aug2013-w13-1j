@@ -6,6 +6,7 @@ import org.joda.time.MutableDateTime;
 public class AddCommand extends Command {
     private static final String COMMAND_ADD = "add";
     private static final String EXECUTION_STATUS_SUCCESS = "Success";
+    private static final String FILE_ERROR = "FILE ERROR";
 
     private Task taskToAdd;
     /**
@@ -36,9 +37,14 @@ public class AddCommand extends Command {
 
     @Override
     public String execute(JournalManager journalManager) {
-        journalManager.addTask(taskToAdd);
-        journalManager.addCommandHistory(COMMAND_ADD, taskToAdd);
-        return EXECUTION_STATUS_SUCCESS;     
+        try {
+            journalManager.addTask(taskToAdd);
+            journalManager.addCommandHistory(COMMAND_ADD, taskToAdd);
+            return EXECUTION_STATUS_SUCCESS; 
+        } catch (Exception e) {
+            outputln(FILE_ERROR);
+            return EXECUTION_STATUS_SUCCESS; 
+        }     
     }
 
     @Override
