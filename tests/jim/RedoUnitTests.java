@@ -18,14 +18,29 @@ import jim.journal.TemporaryJournalManager;
 import jim.journal.TimedTask;
 import jim.journal.UncompleteCommand;
 import jim.journal.UndoCommand;
+import jim.journal.RedoCommand;
 
 import org.joda.time.MutableDateTime;
 import org.junit.Test;
 
-public class UndoUnitTests {
+public class RedoUnitTests {
+	
+	 @Test
+	    public void testAddSingleFloatingTaskUnableToRedo () {
+	        // Strict syntax for "add" command:
+	        // add <words describing event>
+	
+	        String description = "CS2103 Lecture";
+	        AddCommand addCmd = new AddCommand(description);
+	        JournalManager journalManager = new TemporaryJournalManager();                                    
+	        addCmd.execute(journalManager);
+	        RedoCommand redoCmd = new RedoCommand();
+	        String output = redoCmd.execute(journalManager);  
+	        assertEquals("Failure", output);
+	    }
 
 	   @Test
-	    public void testAddSingleFloatingTaskUndoCommand () {
+	    public void testAddSingleFloatingTaskRedoCommand () {
 	        // Strict syntax for "add" command:
 	        // add <words describing event>
 	
@@ -38,8 +53,8 @@ public class UndoUnitTests {
 	        expectedList.add(expectedTask);
 	        UndoCommand undoCmd = new UndoCommand();
 	        undoCmd.execute(journalManager);
-	        expectedList.remove(expectedTask);
-	        
+	        RedoCommand redoCmd = new RedoCommand();
+	        redoCmd.execute(journalManager);  
 	        try {
 	            assertEquals(expectedList,journalManager.getAllTasks());
 	        } catch (Exception e) {
@@ -48,12 +63,11 @@ public class UndoUnitTests {
 	    }
 	   
 	   @Test
-	    public void testAddMultipleFloatingTaskUndoCommand () {
+	    public void testAddMultipleFloatingTaskRedoCommand () {
 	        // Strict syntax for "add" command:
 	        // add <words describing event>
 	
 	        String description = "CS2103 Lecture";
-	
 	        AddCommand addCmd = new AddCommand(description);
 	        JournalManager journalManager = new TemporaryJournalManager(); 	           
 	        for (int i = 0; i < 4; i++) {
@@ -68,7 +82,12 @@ public class UndoUnitTests {
 	        for (int i = 0; i < 2; i++) {
 	            undoCmd.execute(journalManager);
 	            expectedList.remove(expectedTask);
-	        }     
+	        }
+	        RedoCommand redoCmd = new RedoCommand();
+	        for (int i = 0; i < 2; i++) {
+	            redoCmd.execute(journalManager);
+	            expectedList.add(expectedTask);
+	        }
 	        try {
 	           assertEquals(expectedList,journalManager.getAllTasks());
 	       } catch (Exception e) {
@@ -84,7 +103,7 @@ public class UndoUnitTests {
 	    */
 	   
 	   @Test
-	   public void testStrictSyntaxUndoAfterEditCommand () {
+	   public void testStrictSyntaxRedoAfterEditCommand () {
 	       Configuration cManager = Configuration.getConfiguration();
 	       String dSeparator = cManager.getDateSeparator();
 	       String tSeparator = cManager.getTimeSeparator();
@@ -122,12 +141,14 @@ public class UndoUnitTests {
 	                    editCmd.getOutput());
 		   		
 	       UndoCommand undoCmd = new UndoCommand();
-	       commandStatus = undoCmd.execute(journalManager);
+	       RedoCommand redoCmd = new RedoCommand();
+	       undoCmd.execute(journalManager);
+	       commandStatus = redoCmd.execute(journalManager);
 	       assertEquals("Success", commandStatus);
 	   }
 
 	   @Test
-	   public void testRemoveSingleFloatingTaskAndUndo () {
+	   public void testRemoveSingleFloatingTaskUndoAndRedo () {
 		   // Strict syntax for "add" command:
 		   // add <words describing event>
 
@@ -140,8 +161,11 @@ public class UndoUnitTests {
 		   expectedList.add(expectedTask);
 		   RemoveCommand rmvCmd = new RemoveCommand(description);
 		   rmvCmd.execute(journalManager);
+		   expectedList.remove(expectedTask);
 		   UndoCommand undoCmd = new UndoCommand();
 		   undoCmd.execute(journalManager);
+		   RedoCommand redoCmd = new RedoCommand();
+		   redoCmd.execute(journalManager);
 		   try {
 			   assertEquals(expectedList,journalManager.getAllTasks());
 		   } catch (Exception e) {
@@ -158,8 +182,10 @@ public class UndoUnitTests {
 	        completeCmd1.execute(journalManager);
 	        UndoCommand undoCmd = new UndoCommand();
 	        undoCmd.execute(journalManager);
-	        String output = undoCmd.getOutput();
-	        assertEquals("Undo Successful\n", output);
+	        undoCmd.getOutput();
+	        RedoCommand redoCmd = new RedoCommand();
+	        String output = redoCmd.execute(journalManager);
+	        assertEquals("Success", output);
 	    }
 	    
 	    @Test
@@ -173,7 +199,9 @@ public class UndoUnitTests {
 	        uncompleteCmd1.execute(journalManager);
 	        UndoCommand undoCmd = new UndoCommand();
 	        undoCmd.execute(journalManager);
-	        String output = undoCmd.getOutput();
-	        assertEquals("Undo Successful\n", output);
+	        undoCmd.getOutput();
+	        RedoCommand redoCmd = new RedoCommand();
+	        String output = redoCmd.execute(journalManager);
+	        assertEquals("Success", output);
 	    }
 }

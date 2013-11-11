@@ -4,6 +4,9 @@ package jim.journal;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+
+import jim.journal.JournalManager.CommandTaskPair;
+
 import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
@@ -31,7 +34,9 @@ public class TemporaryJournalManager extends JournalManager {
     
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
     private List<CommandTaskPair> historyOfCommand = new ArrayList<CommandTaskPair>();
-    private int historyIndex = -1; 
+	private static final int NO_COMMAND_EXECUTED_YET = -1;
+    private int historyIndex = NO_COMMAND_EXECUTED_YET; 
+    private boolean newTrueCommand = true;
 
     /**
      * Returns a String representation of the current Journal state.
@@ -119,36 +124,57 @@ public class TemporaryJournalManager extends JournalManager {
         storeAllTasks.remove(old_task);
         storeAllTasks.add(new_task);
     }
-    
-    public void addCommandHistory(String cmd, Task someTask){
-    	CommandTaskPair command = new CommandTaskPair(cmd, someTask);
+    public void addCommandHistory(String cmd, Task someTask, Task editTask){
+    	CommandTaskPair command = new CommandTaskPair(cmd, someTask, editTask);
     	historyIndex++;
     	historyOfCommand.add(historyIndex, command);
     }
-    public boolean undoLastCommand(){
+    
+    public void addCommandHistory(String cmd, Task someTask){
+    	addCommandHistory(cmd, someTask, null);
+    }
+    public boolean undoLastCommand() throws Exception{
     	// get the last command in historyOfCommand
-    	if (historyIndex > -1) {
+    	if (historyIndex > NO_COMMAND_EXECUTED_YET) {
+        	newTrueCommand = false;
     		CommandTaskPair LastCommand = historyOfCommand.get(historyIndex--);
 		    //add, edit, remove, complete
-		    if (LastCommand.getCommand().equals("add")){
+		    if (LastCommand.getCommand().equals(COMMAND_ADD)){
 		    	removeTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("edit")){
-		        editTask(LastCommand.getSomeTask(), LastCommand.getEditTask());
-		    } else if (LastCommand.getCommand().equals("remove")){
+		    } else if (LastCommand.getCommand().equals(COMMAND_EDIT)){
+		    	editTask(LastCommand.getSomeTask(), LastCommand.getEditTask());
+		    } else if (LastCommand.getCommand().equals(COMMAND_REMOVE)){
 		    	addTask(LastCommand.getSomeTask());
-		    } else if (LastCommand.getCommand().equals("complete")){
-		    	try {
-                    uncompleteTask(LastCommand.getSomeTask());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-		    } else {
-		        //error
+		    } else if (LastCommand.getCommand().equals(COMMAND_COMPLETE)){
+		    	uncompleteTask(LastCommand.getSomeTask());
+		    } else if (LastCommand.getCommand().equals(COMMAND_UNCOMPLETE)){
+		    	completeTask(LastCommand.getSomeTask());
 		    }
-    		return true;
+		    return true;
     	} else {
-			return false;
+    		return false;
     	}
     }
-
+    
+    public boolean redoUndoCommand() throws Exception{
+    	if (historyOfCommand.size() >= 0 && historyIndex < historyOfCommand.size() - 1) {
+    		newTrueCommand = false;
+    		CommandTaskPair LastCommand = historyOfCommand.get(++historyIndex);
+		    //add, edit, remove, complete
+		    if (LastCommand.getCommand().equals(COMMAND_ADD)){
+		    	addTask(LastCommand.getSomeTask());
+		    } else if (LastCommand.getCommand().equals(COMMAND_EDIT)){
+		    	editTask(LastCommand.getEditTask(), LastCommand.getSomeTask());
+		    } else if (LastCommand.getCommand().equals(COMMAND_REMOVE)){
+		    	removeTask(LastCommand.getSomeTask());
+		    } else if (LastCommand.getCommand().equals(COMMAND_COMPLETE)){
+		    	completeTask(LastCommand.getSomeTask());
+		    } else if (LastCommand.getCommand().equals(COMMAND_UNCOMPLETE)){
+		    	uncompleteTask(LastCommand.getSomeTask());
+		    }
+		    return true;
+    	} else {
+    		return false;
+    	}
+    }
 }

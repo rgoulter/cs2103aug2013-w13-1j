@@ -22,16 +22,12 @@ import jim.suggestions.SuggestionManager;
 import org.joda.time.MutableDateTime;
 import org.junit.Test;
 
-
 /* GLOSSARY
  * Editing happens in up to three phases: 1) Search Phase, 2) Select Phase, 3) Edit Phase
  * In Phase 1, the user enters the name of a task, and a search is performed
  * In Phase 2, if the input is ambiguous, allow the user to make a selection
  * In Phase 3, the user enters new text to replace that of the selected task
  */
-
-
-
 
 public class EditUnitTests {
 
