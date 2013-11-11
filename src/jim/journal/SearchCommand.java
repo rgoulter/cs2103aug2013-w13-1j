@@ -13,6 +13,7 @@ public class SearchCommand extends Command {
     private static final String EXECUTION_STATUS_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     
     //For display to the user
+    private static final String INFO_SEARCH_BY_DATE_NOT_FOUND = "Search performed on that date returned no results.";
     private static final String INFO_SEARCH_TERM_NOT_FOUND = "Search term '%s' was not found.";
     private static final String INFO_SEARCH_TERM_FOUND = "Matches for '%s':\n";
     private static final String INFO_STRING_INITIAL = "";
@@ -51,7 +52,10 @@ public class SearchCommand extends Command {
         for (Task task : matchingTasks){
             output = output + task.toString() + INFO_END_OF_LINE;
         }
-        if (output.equals(INFO_STRING_INITIAL)) {
+        
+        if (output.equals(INFO_STRING_INITIAL) && date != null) {
+            outputln(INFO_SEARCH_BY_DATE_NOT_FOUND);
+        } else if (output.equals(INFO_STRING_INITIAL)) {
             outputln(String.format(INFO_SEARCH_TERM_NOT_FOUND,description));
         } else {
             outputln(String.format(INFO_SEARCH_TERM_FOUND, description) + output);

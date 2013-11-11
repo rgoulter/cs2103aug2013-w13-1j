@@ -42,9 +42,7 @@ public class IntegrationTests {
                 "To-Do Tasks: \n" +
                 "hello\nworld\n" +
                 "\n--------------- Completed Tasks -----------------\n"+
-                "Timed Tasks: \n\n" +
-                "Deadline Tasks: \n\n" +
-                "To-Do Tasks: \n" , feedback);
+                "There are no tasks to display.\n" , feedback);
     }
     
     
@@ -75,9 +73,7 @@ public class IntegrationTests {
                 "To-Do Tasks: \n" +
                 "hello\n" +
                 "\n--------------- Completed Tasks -----------------\n"+
-                "Timed Tasks: \n\n" +
-                "Deadline Tasks: \n\n" +
-                "To-Do Tasks: \n" , feedback);
+                "There are no tasks to display.\n" , feedback);
     }
     
     
@@ -109,11 +105,7 @@ public class IntegrationTests {
         
         String displayOutput = dispCmd.getOutput();
         assertEquals("-------------------- Tasks ----------------------\n" + 
-                "Timed Tasks: \n" +
-                "\n" +
-                "Deadline Tasks: \n" +
-                "\n" + 
-                "To-Do Tasks: \n" +
+                "There are no tasks to display.\n" +
                 "\n--------------- Completed Tasks -----------------\n"+
                 "Timed Tasks: \n\n" +
                 "Deadline Tasks: \n\n" +

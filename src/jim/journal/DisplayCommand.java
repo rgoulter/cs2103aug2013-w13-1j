@@ -11,6 +11,7 @@ public class DisplayCommand extends Command {
     private static final String EXECUTION_STATUS_FAILURE = "Failure";
     
     //For display to user
+    private static final String INFO_NO_TASKS = "There are no tasks to display.";
     private static final String INFO_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     private static final String INFO_TASK_TITLE = "-------------------- Tasks ----------------------";
     private static final String INFO_COMPLETED_TASK_TITLE = "\n--------------- Completed Tasks -----------------";
@@ -107,17 +108,23 @@ public class DisplayCommand extends Command {
         DeadlineTasksToDisplay = searchTool.sortDeadlineTasks(DeadlineTasksToDisplay);
         FloatingTasksToDisplay = searchTool.sortFloatingTasks(FloatingTasksToDisplay);
         
-        outputln(CATEGORY_TIMED_TASKS);
-        for (TimedTask current : TimedTasksToDisplay){
-            outputln(current.toString());
+        if (TimedTasksToDisplay.isEmpty() && DeadlineTasksToDisplay.isEmpty() &&
+            FloatingTasksToDisplay.isEmpty()) {
+            outputln(INFO_NO_TASKS);
         }
-        outputln(CATEGORY_DEADLINE_TASKS);
-        for (DeadlineTask current : DeadlineTasksToDisplay){
-            outputln(current.toString());
-        }
-        outputln(CATEGORY_FLOATING_TASKS);
-        for (FloatingTask current : FloatingTasksToDisplay){
-            outputln(current.toString());
+        else {
+            outputln(CATEGORY_TIMED_TASKS);
+            for (TimedTask current : TimedTasksToDisplay){
+                outputln(current.toString());
+            }
+            outputln(CATEGORY_DEADLINE_TASKS);
+            for (DeadlineTask current : DeadlineTasksToDisplay){
+                outputln(current.toString());
+            }
+            outputln(CATEGORY_FLOATING_TASKS);
+            for (FloatingTask current : FloatingTasksToDisplay){
+                outputln(current.toString());
+            }
         }
     }
 

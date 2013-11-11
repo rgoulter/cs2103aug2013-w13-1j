@@ -55,9 +55,7 @@ public class DisplayUnitTests {
                 "To-Do Tasks: \n" +
                 "CS2103 Lecture\n" +
                 "\n--------------- Completed Tasks -----------------\n"+
-                "Timed Tasks: \n\n" +
-                "Deadline Tasks: \n\n" +
-                "To-Do Tasks: \n",
+                "There are no tasks to display.\n",
                 output);
     }
 
@@ -91,10 +89,7 @@ public class DisplayUnitTests {
                      "\n" + 
                      "To-Do Tasks: \n" +
                      "\n--------------- Completed Tasks -----------------\n"+
-                     "Timed Tasks: \n\n" +
-                     "Deadline Tasks: \n" +
-                     "\n" + 
-                     "To-Do Tasks: \n",
+                     "There are no tasks to display.\n",
                      output);
     }
 
@@ -129,10 +124,7 @@ public class DisplayUnitTests {
                 "\n" + 
                 "To-Do Tasks: \n" +
                 "\n--------------- Completed Tasks -----------------\n"+
-                "Timed Tasks: \n\n" +
-                "Deadline Tasks: \n" +
-                "\n" + 
-                "To-Do Tasks: \n",
+                "There are no tasks to display.\n",
                 output);
                      
     }
@@ -176,9 +168,7 @@ public class DisplayUnitTests {
                              "\n" + 
                              "To-Do Tasks: \n" +
                              "\n--------------- Completed Tasks -----------------\n"+
-                             "Timed Tasks: \n\n" +
-                             "Deadline Tasks: \n\n" +
-                             "To-Do Tasks: \n",
+                             "There are no tasks to display.\n",
                              output);
                      
     }

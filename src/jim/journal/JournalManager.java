@@ -11,7 +11,8 @@ import org.joda.time.MutableDateTime;
 import org.joda.time.DateTimeComparator;
 
 public class JournalManager {
-	private static final int NO_COMMAND_EXECUTED_YET = -1;
+	private static final String EMPTY_STRING = "";
+    private static final int NO_COMMAND_EXECUTED_YET = -1;
 	private static final int SAME_TIME = 0;
 	private static final int CURRENT_TIME_WITHIN_TIMEFRAME = 0;
 	
@@ -24,6 +25,8 @@ public class JournalManager {
 	private static final String MESSAGE_DONE = "[DONE] ";
 	private static final String MESSAGE_COMPLETED_TASK = "Completed Task: %s";
 	private static final String MESSAGE_UNCOMPLETED_TASK = "Uncompleted Task: %s";
+	private static final String MESSAGE_WELCOME = "Welcome to <i>JIM!</i><br>" +
+	                                              "Add some tasks to get started! Type <b>help</b> anytime for more information.";
 	private static final String DESCRIPTION_TODO = "\n\nTodo:\n";
 	private static final String APPEND_TIMED_DEADLINE_TASK = "%s%s%s";
 	private static final String APPEND_FLOATING_TASK_WITH_DONE = "%s%s%s%s";
@@ -97,7 +100,7 @@ public class JournalManager {
     
     /* Note: Use sortAllTasks() before calling getTimedTaskString()*/
     public String getTimedTaskString() {
-    	String timedTasks = "";
+    	String timedTasks = EMPTY_STRING;
     	for (TimedTask task : upcomingTimedTask){
             timedTasks =  String.format(APPEND_TIMED_DEADLINE_TASK, timedTasks, task.toString(),"\n");
         }
@@ -106,7 +109,7 @@ public class JournalManager {
     
     /* Note: Use sortAllTasks() before calling getDeadlineTaskString()*/
     public String getDeadlineTaskString() {
-    	String deadlineTasks = "";
+    	String deadlineTasks = EMPTY_STRING;
     	for (DeadlineTask task : upcomingDeadlineTask){
     		deadlineTasks =  String.format(APPEND_TIMED_DEADLINE_TASK, deadlineTasks, task.toString(),"\n");
         }
@@ -115,7 +118,7 @@ public class JournalManager {
     
     /* Note: Use sortAllTasks() before calling getFloatingString()*/
     public String getFloatingString() {
-    	String floatingTasks = "";
+    	String floatingTasks = EMPTY_STRING;
     	 for (FloatingTask task : upcomingFloatingTask){
              if (task.isCompleted()){
                  floatingTasks = String.format(APPEND_FLOATING_TASK_WITH_DONE, floatingTasks, MESSAGE_DONE, task.toString(),"\n");
@@ -132,6 +135,13 @@ public class JournalManager {
         } catch (Exception e) {
             return FILE_ERROR;
         }
+    	
+    	if (getTimedTaskString().equals(EMPTY_STRING) &&
+    	    getDeadlineTaskString().equals(EMPTY_STRING) &&
+    	    getFloatingString().equals(EMPTY_STRING)) {
+    	    return MESSAGE_WELCOME;
+    	}
+    	
         String output = DESCRIPTION_UPCOMING_TASKS + getTimedTaskString() + getDeadlineTaskString() + DESCRIPTION_TODO + getFloatingString();
         return output;
     }
