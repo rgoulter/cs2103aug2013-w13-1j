@@ -269,7 +269,6 @@ public class JournalManager {
     	} else {
     		return false;
     	}
-    	
     }
     
     private void clearPastCmds(){

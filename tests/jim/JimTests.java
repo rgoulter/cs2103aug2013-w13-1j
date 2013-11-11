@@ -13,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({AddUnitTests.class,
                CompleteUnitTests.class,
+               UncompleteUnitTests.class,
                DisplayUnitTests.class,
                EditUnitTests.class,
                RemoveUnitTests.class,

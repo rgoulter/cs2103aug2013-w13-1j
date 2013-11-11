@@ -12,6 +12,23 @@ import org.joda.time.DateTimeComparator;
  * Because we don't want to involve the storage file when doing the unit test.
  */
 public class TemporaryJournalManager extends JournalManager {
+	private static final String COMMAND_ADD = "add";
+	private static final String COMMAND_EDIT = "edit";
+	private static final String COMMAND_REMOVE = "remove";
+	private static final String COMMAND_COMPLETE = "complete";
+	private static final String COMMAND_UNCOMPLETE = "uncomplete";
+	private static final String DESCRIPTION_UPCOMING_TASKS = "Upcoming Events: \n";
+	private static final String MESSAGE_DONE = "[DONE] ";
+	private static final String MESSAGE_COMPLETED_TASK = "Completed Task: %s";
+	private static final String MESSAGE_UNCOMPLETED_TASK = "Uncompleted Task: %s";
+	private static final String DESCRIPTION_TODO = "\n\nTodo:\n";
+	private static final String APPEND_TIMED_DEADLINE_TASK = "%s%s%s";
+	private static final String APPEND_FLOATING_TASK_WITH_DONE = "%s%s%s%s";
+	private static final String APPEND_FLOATING_TASK_WITHOUT_DONE = "%s%s%s";
+    private static final String FILE_ERROR = "FILE ERROR";
+    private static final String TASK_ALREADY_COMPLETED = "Task %s has already been completed.";
+    private static final String TASK_ALREADY_UNCOMPLETED = "Task %s has not been completed.";
+    
     private ArrayList<Task> storeAllTasks = new ArrayList<Task>();
     private List<CommandTaskPair> historyOfCommand = new ArrayList<CommandTaskPair>();
     private int historyIndex = -1; 
@@ -86,6 +103,15 @@ public class TemporaryJournalManager extends JournalManager {
         } else {
             task.markAsCompleted();
             return "Completed Task: " + task.toString();
+        }
+    }
+    
+    public String uncompleteTask(Task task) throws IOException {
+        if (!task.isCompleted()) {
+            return String.format(TASK_ALREADY_UNCOMPLETED, task.toString());
+        } else {
+            task.markAsIncompleted();
+            return String.format(MESSAGE_UNCOMPLETED_TASK, task.toString());
         }
     }
 

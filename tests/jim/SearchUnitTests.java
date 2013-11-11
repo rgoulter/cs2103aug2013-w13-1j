@@ -12,11 +12,6 @@ import jim.suggestions.SuggestionManager;
 
 import org.junit.Test;
 
-
-
-
-
-
 public class SearchUnitTests {
 
     @Test
