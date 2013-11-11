@@ -9,6 +9,7 @@ import org.joda.time.chrono.ISOChronology;
 public class TimedTask extends Task implements Comparable<TimedTask>{
 
     private static Configuration configManager = Configuration.getConfiguration();
+    private static final int DEFAULT_TIME_DURATION = 2;
     private static final String DATE_SEPARATOR = configManager.getDateSeparator();
     private static final String TIME_SEPARATOR = configManager.getTimeSeparator();
     private static final String DATE_TIME_OF_TASKS = "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
@@ -16,20 +17,34 @@ public class TimedTask extends Task implements Comparable<TimedTask>{
             										 "[%02d" + DATE_SEPARATOR + "%02d" + DATE_SEPARATOR + "%02d]" +
             										 " [%02d" + TIME_SEPARATOR + "%02d]" + " %s"; 
     private static final String DATE_TIME_OF_TASKS_FOR_EDIT_COMMAND = "%02d/%02d/%02d %02d:%02d %02d/%02d/%02d %02d:%02d %s";
-    
+    private static final int ZERO_FOR_COMPARE = 0;
     private static final int CURRENT_MIILLENIUM = 2000;
     private MutableDateTime startTime;
     private MutableDateTime endTime;
     
+    //@author A0105572L
     public TimedTask(MutableDateTime startTime, MutableDateTime endTime, String desc) {
-        this.startTime = startTime;
-        this.endTime = endTime;
+        //To make sure that the start time is earlier than the end time. 
+        //If they are equal, then there is default duration 2 hours.
+        if (DateTimeComparator.getInstance().compare(startTime, endTime) > ZERO_FOR_COMPARE){
+            this.startTime = endTime;
+            this.endTime = startTime;
+        }else if (DateTimeComparator.getInstance().compare(startTime, endTime) == ZERO_FOR_COMPARE){
+            this.startTime = startTime;
+            endTime.addHours(DEFAULT_TIME_DURATION);
+            this.endTime = endTime;
+        }else{
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
         description = desc;
     }
     
     //For taking task from storage.
     //@author A0105572L
     public TimedTask(String startTime, String endTime, String desc) {
+        //we don't have to compare the startTime and endTime here, 
+        //since it should be in the correct order when we add in the task.
         this.startTime = MutableDateTime.parse(startTime);
         this.endTime = MutableDateTime.parse(endTime);
         description = desc;

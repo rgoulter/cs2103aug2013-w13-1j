@@ -109,7 +109,9 @@ public class DisplayUnitTests {
         // Note that "January" is Month 0. October is month 9..
         Calendar testDateCal = new GregorianCalendar(2013, 9, 10);
         MutableDateTime testDate = new MutableDateTime(testDateCal);
-        AddCommand addCmd = new AddCommand(testDate, testDate, "CS2103 Lecture");
+        Calendar testDateCal2 = new GregorianCalendar(2013, 9, 10);
+        MutableDateTime testDate2 = new MutableDateTime(testDateCal2);
+        AddCommand addCmd = new AddCommand(testDate, testDate2, "CS2103 Lecture");
         addCmd.execute(jManager);
 
         DisplayCommand dispCmd = new DisplayCommand(testDate);
@@ -121,7 +123,7 @@ public class DisplayUnitTests {
                 "[10" + dSeparator + "10" + dSeparator + "13] " + 
                 "[00" + tSeparator + "00] - " +
                 "[10" + dSeparator + "10" + dSeparator + "13] " + 
-                "[00" + tSeparator + "00] CS2103 Lecture\n" +
+                "[02" + tSeparator + "00] CS2103 Lecture\n" +
                 "\n" +
                 "Deadline Tasks: \n" +
                 "\n" + 
@@ -145,12 +147,16 @@ public class DisplayUnitTests {
         
         Calendar testDateCal = new GregorianCalendar(2013, 9, 10);
         MutableDateTime testDate = new MutableDateTime(testDateCal);
-        AddCommand addCmd = new AddCommand(testDate, testDate, "CS2103 Lecture");
+        Calendar testDateCal3 = new GregorianCalendar(2013, 9, 11);
+        MutableDateTime testDate3 = new MutableDateTime(testDateCal3);
+        AddCommand addCmd = new AddCommand(testDate, testDate3, "CS2103 Lecture");
         addCmd.execute(jManager);
         
         testDateCal = new GregorianCalendar(2013, 9, 14);
         testDate = new MutableDateTime(testDateCal);
-        addCmd = new AddCommand(testDate, testDate, "CS2101 Lesson");
+        GregorianCalendar testDateCal2 = new GregorianCalendar(2013, 9, 15);
+        MutableDateTime testDate2 = new MutableDateTime(testDateCal2);
+        addCmd = new AddCommand(testDate, testDate2, "CS2101 Lesson");
         addCmd.execute(jManager);
         
         testDateCal = new GregorianCalendar(2013, 9, 10);
@@ -163,7 +169,7 @@ public class DisplayUnitTests {
                              "-------------------- Tasks ----------------------\n" +
                              "Timed Tasks: \n" +
                              "[10" + dSeparator + "10" + dSeparator + "13] " + 
-                             "[00" + tSeparator + "00] - " + "[10" + dSeparator + "10" + dSeparator + "13] " + 
+                             "[00" + tSeparator + "00] - " + "[11" + dSeparator + "10" + dSeparator + "13] " + 
                              "[00" + tSeparator + "00] CS2103 Lecture\n" +
                              "\n" +
                              "Deadline Tasks: \n" +
