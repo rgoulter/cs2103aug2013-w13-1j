@@ -23,7 +23,7 @@ public class EditCommand extends Command {
     private static final String INFO_NEW_OLD_TASK_CONNECTOR = "To";
     private static final String INFO_SEPERATER = ",";
     private static final String INFO_SPACE = " ";
-    private static final String INFO_FILE_ERROR = "FILE_ERROR";
+    private static final String INFO_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     
     //For taking tasks from the array
     private static final int NUMOFTASK_NOMATCH = 0;

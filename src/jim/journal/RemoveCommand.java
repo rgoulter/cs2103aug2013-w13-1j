@@ -17,7 +17,7 @@ public class RemoveCommand extends Command {
     private static final String INFO_NOMATCH = "Description was not matched.";
     private static final String INFO_SEPERATER = ",";
     private static final String INFO_SPACE = " ";
-    private static final String INFO_FILE_ERROR = "FILE_ERROR";
+    private static final String INFO_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     private static final String INFO_REMOVE_TASK = "Removed task: %s";
     
     //For taking tasks from the array

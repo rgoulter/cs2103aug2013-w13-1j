@@ -11,7 +11,7 @@ public class DisplayCommand extends Command {
     private static final String EXECUTION_STATUS_FAILURE = "Failure";
     
     //For display to user
-    private static final String INFO_FILE_ERROR = "FILE_ERROR";
+    private static final String INFO_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     private static final String INFO_TASK_TITLE = "-------------------- Tasks ----------------------";
     private static final String INFO_COMPLETED_TASK_TITLE = "\n--------------- Completed Tasks -----------------";
     private static final String CATEGORY_TIMED_TASKS = "Timed Tasks: ";

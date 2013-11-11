@@ -2,7 +2,7 @@
 package jim.journal;
 
 public class UndoCommand extends Command{
-    private static final String FILE_ERROR = "FILE_ERROR";
+    private static final String FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     private static final String COMMAND_UNDO = "Undo";
     private static final String MESSAGE_SUCCESSFUL = "Undo Successful";
     private static final String MESSAGE_UNSUCCESSFUL = "Undo Unsuccessful";
