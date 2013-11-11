@@ -339,10 +339,10 @@ class SyntaxClassSyntaxTerm extends SyntaxTerm {
     		return xWordsMap.get(x);
     	}
     	
-    	assert syntaxClassesMap.containsKey(x + "word");
-    	
     	List<SyntaxFormat> formats = getDefinitionsForSyntaxClassName(x + "word");
     	String[] words = new String[formats.size()];
+    	
+    	assert formats.size() > 0 : "<" + x + "word> syntax class must exist in the grammar.";
     	
     	for (int i = 0; i < words.length; i++) {
     		assert formats.get(i).getSyntaxTerms().length == 1;
