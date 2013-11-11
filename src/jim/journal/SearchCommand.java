@@ -10,7 +10,7 @@ public class SearchCommand extends Command {
     private static final String COMMANDTYPE = "Search";
     private static final String EXECUTION_STATUS_SUCCESS = "Success";
     private static final String EXECUTION_STATUS_FAILURE = "Failure";
-    private static final String EXECUTION_STATUS_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
+    private static final String EXECUTION_STATUS_FILE_ERROR = "FILE ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     
     //For display to the user
     private static final String INFO_SEARCH_BY_DATE_NOT_FOUND = "Search performed on that date returned no results.";

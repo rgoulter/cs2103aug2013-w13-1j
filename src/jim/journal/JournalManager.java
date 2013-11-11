@@ -30,7 +30,6 @@ public class JournalManager {
 	private static final String APPEND_TIMED_DEADLINE_TASK = "%s%s%s";
 	private static final String APPEND_FLOATING_TASK_WITH_DONE = "%s%s%s%s";
 	private static final String APPEND_FLOATING_TASK_WITHOUT_DONE = "%s%s%s";
-    private static final String FILE_ERROR = "Welcome to use JIM! \n\n Please add any tasks in the box above to create the storage file \n\n and keep this file with your JIM! together all the time. \n\n Enjoy JIM!";
     private static final String TASK_ALREADY_COMPLETED = "Task %s has already been completed.";
     private static final String TASK_ALREADY_UNCOMPLETED = "Task %s has not been completed.";
 	
@@ -133,7 +132,7 @@ public class JournalManager {
     	try {
             sortAllTasks();
         } catch (Exception e) {
-            return FILE_ERROR;
+            return MESSAGE_WELCOME;
         }
     	
     	if (getTimedTaskString().equals(EMPTY_STRING) &&

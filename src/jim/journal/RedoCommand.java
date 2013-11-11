@@ -2,7 +2,7 @@
 package jim.journal;
 
 public class RedoCommand extends Command{
-    private static final String FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
+    private static final String FILE_ERROR = "FILE ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     private static final String EXECUTION_STATUS_SUCCESS = "Success";
     private static final String EXECUTION_STATUS_FAIL = "Failure";
     private static final String MESSAGE_SUCCESS_REDO = "Redo Successful";

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.joda.time.MutableDateTime;
 
 public class UncompleteCommand extends Command {
-    private static final String FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
+    private static final String FILE_ERROR = "FILE ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     private static final String COMMAND_UNCOMPLETE = "Uncomplete";
     private static final String MESSAGE_DESCRIPTION_MISMATCH = "Description was not matched.";
     private static final String MESSAGE_INDEX_SELECTION = "Type in just the index of tasks you wish to process. Please seperate them by ','";

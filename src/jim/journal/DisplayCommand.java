@@ -12,7 +12,6 @@ public class DisplayCommand extends Command {
     
     //For display to user
     private static final String INFO_NO_TASKS = "There are no tasks to display.";
-    private static final String INFO_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     private static final String INFO_TASK_TITLE = "-------------------- Tasks ----------------------";
     private static final String INFO_COMPLETED_TASK_TITLE = "\n--------------- Completed Tasks -----------------";
     private static final String CATEGORY_TIMED_TASKS = "Timed Tasks: ";
@@ -50,7 +49,7 @@ public class DisplayCommand extends Command {
         try {
             searchTool = new SearchTool(MyJournalManager);
         } catch (Exception e) {
-            outputln(INFO_FILE_ERROR);
+            outputln(INFO_NO_TASKS);
             return EXECUTION_STATUS_FAILURE;
         }
         if (date != null){

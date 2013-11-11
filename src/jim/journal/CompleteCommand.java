@@ -16,7 +16,7 @@ public class CompleteCommand extends Command {
     private static final String INFO_NOMATCH = "Description was not matched.";
     private static final String INFO_SEPERATER = ",";
     private static final String INFO_SPACE = " ";
-    private static final String INFO_FILE_ERROR = "FILE_ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
+    private static final String INFO_FILE_ERROR = "FILE ERROR: Please add any tasks in the box above to create the storage file. Enjoy JIM!";
     
     //For taking tasks from the array
     private static final int NUMOFTASK_NOMATCH = 0;
