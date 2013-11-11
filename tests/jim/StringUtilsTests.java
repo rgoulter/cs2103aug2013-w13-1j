@@ -9,6 +9,7 @@ import jim.util.StringUtils;
 
 import org.junit.Test;
 
+//@author A0088816N
 public class StringUtilsTests {
 
 	@Test

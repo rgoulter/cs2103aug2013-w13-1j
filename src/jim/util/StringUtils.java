@@ -5,6 +5,7 @@ import static jim.util.StringUtils.isLowercase;
 import java.util.HashSet;
 import java.util.Set;
 
+//@author A0088816N
 public class StringUtils {
 
 
