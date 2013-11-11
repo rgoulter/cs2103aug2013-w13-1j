@@ -27,8 +27,6 @@ public class RedoUnitTests {
 	
 	 @Test
 	    public void testAddSingleFloatingTaskUnableToRedo () {
-	        // Strict syntax for "add" command:
-	        // add <words describing event>
 	
 	        String description = "CS2103 Lecture";
 	        AddCommand addCmd = new AddCommand(description);
@@ -41,8 +39,6 @@ public class RedoUnitTests {
 
 	   @Test
 	    public void testAddSingleFloatingTaskRedoCommand () {
-	        // Strict syntax for "add" command:
-	        // add <words describing event>
 	
 	        String description = "CS2103 Lecture";
 	        AddCommand addCmd = new AddCommand(description);
@@ -64,8 +60,6 @@ public class RedoUnitTests {
 	   
 	   @Test
 	    public void testAddMultipleFloatingTaskRedoCommand () {
-	        // Strict syntax for "add" command:
-	        // add <words describing event>
 	
 	        String description = "CS2103 Lecture";
 	        AddCommand addCmd = new AddCommand(description);
@@ -149,9 +143,7 @@ public class RedoUnitTests {
 
 	   @Test
 	   public void testRemoveSingleFloatingTaskUndoAndRedo () {
-		   // Strict syntax for "add" command:
-		   // add <words describing event>
-
+		   
 		   String description = "CS2103 Lecture";
 		   AddCommand addCmd = new AddCommand(description);
 		   JournalManager journalManager = new TemporaryJournalManager();                                   
@@ -174,7 +166,7 @@ public class RedoUnitTests {
 	   }
 	   
 	    @Test
-	    public void testStrictSyntaxUndoCommandAfterCompleteCommand () {
+	    public void testStrictSyntaxRedoCommandAfterCompleteCommand () {
 	        JournalManager journalManager = new TemporaryJournalManager();
 	        AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
 	        addCmd1.execute(journalManager);
@@ -189,7 +181,7 @@ public class RedoUnitTests {
 	    }
 	    
 	    @Test
-	    public void testStrictSyntaxUndoCommandAfterUncompleteCommand () {
+	    public void testStrictSyntaxRedoCommandAfterUncompleteCommand () {
 	        JournalManager journalManager = new TemporaryJournalManager();
 	        AddCommand addCmd1 = new AddCommand("CS2103 Lecture");
 	        addCmd1.execute(journalManager);
