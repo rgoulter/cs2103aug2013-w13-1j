@@ -1,4 +1,4 @@
-// All members have edited this class
+//@author A0097081B
 package jim.journal;
 
 public abstract class Task {

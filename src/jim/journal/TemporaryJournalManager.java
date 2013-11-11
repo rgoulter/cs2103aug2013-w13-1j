@@ -1,4 +1,4 @@
-//@author A0105572L, A0097081B
+//@author A0097081B
 package jim.journal;
 
 import java.io.IOException;
