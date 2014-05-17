@@ -162,8 +162,8 @@ public class RemoveUnitTests {
         String tSeparator = cManager.getTimeSeparator();
         
         JournalManager jManager = new TemporaryJournalManager();
-        String startTime = "2013-10-12T12:00:00.000+08:00";
-        String endTime = "2013-10-12T13:00:00.000+08:00";
+        String startTime = "2013-10-12T12:00:00.000";
+        String endTime = "2013-10-12T13:00:00.000";
         String description = "do a TimedTask";
         TimedTask testTask = new TimedTask(startTime,endTime,description);
         AddCommand addCmd1 = new AddCommand(testTask);

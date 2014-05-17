@@ -61,9 +61,13 @@ public class SuggestionManagerTest {
         assertEquals("Parsed description should be the same.",
                      expectedTask.getDescription(),
                      parsedFloatingTask.getDescription());
-        assertEquals("Parsed time should be the same.",
-                     expectedTask.getEndDate(),
-                     parsedFloatingTask.getEndDate());
+        
+        // parsedDate, expectedDate may be off in the millisecond field,
+        // so instead check whether they are "close" enough. (< 1s difference).
+        long expectedDateMillis = expectedTask.getEndDate().getMillis();
+        long parsedDateMillis = parsedFloatingTask.getEndDate().getMillis();
+        assertTrue("Parsed time should be the same.",
+                   Math.abs(expectedDateMillis - parsedDateMillis) < 1000);
     }
     
     @Test
